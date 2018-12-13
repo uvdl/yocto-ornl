@@ -19,8 +19,8 @@ if [[ -e ${YOCTO_ROOT}b2qt-init-build-env ]] ; then
 	readonly YOCTO_DEFAULT_IMAGE=b2qt-embedded-qt5-image
 else
 	readonly BSP_TYPE="YOCTO"
-	readonly YOCTO_BUILD=${YOCTO_ROOT}/build_x11
-	readonly YOCTO_DEFAULT_IMAGE=fsl-image-gui
+	readonly YOCTO_BUILD=${YOCTO_ROOT}/build_ornl
+	readonly YOCTO_DEFAULT_IMAGE=fsl-image-ornl
 fi
 echo "BSP type: ${BSP_TYPE}"
 
@@ -83,7 +83,7 @@ echo "================================================"
 
 help() {
 	bn=`basename $0`
-	echo " Usage: MACHINE=<var-som-mx6|imx6ul-var-dart|imx7-var-som> $bn <options> device_node"
+	echo " Usage: MACHINE=<var-som-mx6|var-som-mx6-ornl|imx6ul-var-dart|imx7-var-som> $bn <options> device_node"
 	echo
 	echo " options:"
 	echo " -h		display this Help message"
@@ -103,6 +103,9 @@ fi
 if [[ $MACHINE == var-som-mx6 ]] ; then
 	FAT_VOLNAME=BOOT-VARMX6
 	IS_SPL=true
+elif [[ $MACHINE == var-som-mx6-ornl ]] ; then
+        FAT_VOLNAME=BOOT-VARMX6
+        IS_SPL=true
 elif [[ $MACHINE == imx6ul-var-dart ]] ; then
 	FAT_VOLNAME=BOOT-VAR6UL
 	IS_SPL=true
@@ -319,7 +322,7 @@ function copy_scripts
 	echo "Copying scripts and desktop icons"
 
 	cp ${YOCTO_SCRIPTS_PATH}/echos.sh				${P2_MOUNT_DIR}/usr/bin/
-	if [[ $MACHINE == var-som-mx6 ]] ; then
+	if [[ $MACHINE == var-som-mx6 ]] || [[ $MACHINE == var-som-mx6-ornl ]] ; then
 		cp ${YOCTO_SCRIPTS_PATH}/mx6_install_yocto.sh		${P2_MOUNT_DIR}/usr/bin/install_yocto.sh
 		cp ${YOCTO_SCRIPTS_PATH}/mx6_install_yocto_emmc.sh	${P2_MOUNT_DIR}/usr/bin/install_yocto_emmc.sh
 	else
