@@ -42,30 +42,40 @@ $YOCTO_DIR$ repo sync -j4
 
 #### Download ORNL layer
 ```
-$YOCTO_DIR$ git clone https://github.com/RidgeRun/ornl.git
-$YOCTO_DIR$ cd ornl
+$YOCTO_DIR$ git clone https://github.com/uvdl/yocto-ornl.git
+$YOCTO_DIR$ cd yocto-ornl
 $YOCTO_DIR/ornl$ git checkout develop
 $YOCTO_DIR/ornl$ cd ..
-$YOCTO_DIR$ cp -r ornl/sources/meta-ornl sources
+$YOCTO_DIR$ cp -r yocto-ornl/sources/meta-ornl sources
 ```
 
 
 ### Set-up Yocto build environment
 
 ```
-$YOCTO_DIR$ MACHINE=var-som-mx6 DISTRO=fslc-framebuffer . setup-environment build_fb
+$YOCTO_DIR$ MACHINE=var-som-mx6-ornl DISTRO=fslc-framebuffer . setup-environment build_ornl
 ```
 
 ### Build Yocto
 * Before building the project, overwrite the configuration files
 ```
-$YOCTO_DIR/build_fb$ cd ..
-$YOCTO_DIR$ cp ornl/build/conf/local.conf build_fb/conf/
-$YOCTO_DIR$ cp ornl/build/conf/bblayers.conf build_fb/conf/
+$YOCTO_DIR/build_ornl$ cd ..
+$YOCTO_DIR$ cp yocto-ornl/build/conf/local.conf build_ornl/conf/
+$YOCTO_DIR$ cp yocto-ornl/build/conf/bblayers.conf build_ornl/conf/
 ```
 
 * Finally, start the build
 ```
-$YOCTO_DIR/build_fb$ cd build_fb
+$YOCTO_DIR/build_fb$ cd build_ornl
 $YOCTO_DIR/build_fb$ bitbake fsl-image-ornl
+```
+
+### Creating SD card
+
+Once the build process finishes, the sdcard image will be located at
+**build_ornl/tmp/deploy/images/var-som-mx6-ornl/fsl-image-ornl-var-som-mx6-ornl.sdcard**. In order to 
+install your sdcar you can use dd as follows:
+
+```
+sudo dd if=build_ornl/tmp/deploy/images/var-som-mx6-ornl/fsl-image-ornl-var-som-mx6-ornl.sdcard of=<your sdcard device> bs=1M
 ```
