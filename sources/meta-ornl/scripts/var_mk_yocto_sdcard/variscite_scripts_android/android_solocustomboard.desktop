@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Install Android
+Comment=SOLOCustomBoard
+Exec=/usr/bin/xterm -e "/usr/bin/install_android.sh -b scb; read"
+Icon=media-flash
+Terminal=false
+Categories=GTK;Application;
+StartupNotify=true
