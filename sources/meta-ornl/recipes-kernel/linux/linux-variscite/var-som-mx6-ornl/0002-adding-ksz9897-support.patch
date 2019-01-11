@@ -4,6 +4,8 @@ Date: Wed, 12 Dec 2018 10:49:39 -0600
 Subject: [PATCH] adding ksz9897 support
 
 ---
+ arch/arm/boot/dts/imx6q-iris2.dts               |    18 +
+ arch/arm/boot/dts/imx6qdl-iris2.dtsi            |     1 +
  drivers/net/ethernet/micrel/Kconfig             |   117 +
  drivers/net/ethernet/micrel/Makefile            |     1 +
  drivers/net/ethernet/micrel/hsr_main.h          |   223 +
@@ -43,7 +45,7 @@ Subject: [PATCH] adding ksz9897 support
  drivers/net/ethernet/micrel/msrp.c              |  1226 ++
  drivers/net/ethernet/micrel/mvrp.c              |   160 +
  drivers/net/ethernet/micrel/spi-ksz9897.c       |   839 +
- 39 files changed, 63428 insertions(+)
+ 41 files changed, 63447 insertions(+)
  create mode 100644 drivers/net/ethernet/micrel/hsr_main.h
  create mode 100644 drivers/net/ethernet/micrel/ksz9897.h
  create mode 100644 drivers/net/ethernet/micrel/ksz_cfg_9897.h
@@ -82,6 +84,47 @@ Subject: [PATCH] adding ksz9897 support
  create mode 100644 drivers/net/ethernet/micrel/mvrp.c
  create mode 100644 drivers/net/ethernet/micrel/spi-ksz9897.c
 
+diff --git a/arch/arm/boot/dts/imx6q-iris2.dts b/arch/arm/boot/dts/imx6q-iris2.dts
+index 5b99a57..015966f 100644
+--- a/arch/arm/boot/dts/imx6q-iris2.dts
++++ b/arch/arm/boot/dts/imx6q-iris2.dts
+@@ -142,6 +142,24 @@
+ 	};
+ };
+ 
++&ecspi1 {
++	fsl,spi-num-chipselects = <1>;
++	cs-gpios = <&gpio5 17 0>;
++	pinctrl-names = "default";
++	pinctrl-0 = <&pinctrl_ecspi1_1>;
++	status = "okay";
++
++	ksz9893: ksz9893@0 {
++		compatible = "microchip,ksz9893";
++		reg = <0>;
++
++		spi-max-frequency = <40000000>;
++		spi-cpha;
++		spi-cpol;
++		status = "okay";
++	};
++};
++
+ &touch {
+ 	interrupt-parent = <&gpio1>;
+ 	interrupts = <4 0>;
+diff --git a/arch/arm/boot/dts/imx6qdl-iris2.dtsi b/arch/arm/boot/dts/imx6qdl-iris2.dtsi
+index c49e03b..5b0b1af 100644
+--- a/arch/arm/boot/dts/imx6qdl-iris2.dtsi
++++ b/arch/arm/boot/dts/imx6qdl-iris2.dtsi
+@@ -628,6 +628,7 @@
+ 				MX6QDL_PAD_DISP0_DAT22__ECSPI1_MISO	0x100b1
+ 				MX6QDL_PAD_DISP0_DAT21__ECSPI1_MOSI	0x100b1
+ 				MX6QDL_PAD_DISP0_DAT20__ECSPI1_SCLK	0x100b1
++				MX6QDL_PAD_DISP0_DAT23__GPIO5_IO17 0x000f0b0 /* cs0 */
+ 			>;
+ 		};
+ 
 diff --git a/drivers/net/ethernet/micrel/Kconfig b/drivers/net/ethernet/micrel/Kconfig
 index d16b11e..305280d 100644
 --- a/drivers/net/ethernet/micrel/Kconfig
