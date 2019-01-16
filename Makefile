@@ -1,5 +1,5 @@
 # Automation for instructions
-# https://github.com/uvdl/yocto-ornl/blob/develop/README.md
+# https://github.com/uvdl/yocto-ornl/tree/feature/yocto_sumo
 
 SHELL := /bin/bash
 CPUS := $(shell nproc)
