@@ -7,7 +7,7 @@ SUDO := $(shell test $${EUID} -ne 0 && echo "sudo")
 LANG := en_US.UTF-8
 .EXPORT_ALL_VARIABLES:
 
-DOT_GZ=
+DOT_GZ=.gz
 EULA=1	# https://patchwork.openembedded.org/patch/100815/
 LOGDIR=$(HOME)/log
 MACHINE=var-som-mx6-ornl
