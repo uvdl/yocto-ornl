@@ -1,11 +1,11 @@
-From dd53898c85eb5d506f8e663363918eeadaa6d7b1 Mon Sep 17 00:00:00 2001
+From b2d98a2e7d840a08d956a2076af2d9191ef66803 Mon Sep 17 00:00:00 2001
 From: Edison Fernandez <edison.fernandez@ridgerun.com>
-Date: Tue, 15 Jan 2019 16:21:30 -0600
+Date: Tue, 22 Jan 2019 12:43:45 -0600
 Subject: [PATCH] adding ksz9897 driver
 
 ---
- arch/arm/boot/dts/imx6q-iris2.dts               |    17 +
- arch/arm/boot/dts/imx6qdl-iris2.dtsi            |    18 +-
+ arch/arm/boot/dts/imx6q-iris2.dts               |    38 +
+ arch/arm/boot/dts/imx6qdl-iris2.dtsi            |    21 +-
  drivers/net/ethernet/micrel/Kconfig             |   233 +-
  drivers/net/ethernet/micrel/Makefile            |    10 +
  drivers/net/ethernet/micrel/hsr_main.h          |   223 +
@@ -49,7 +49,7 @@ Subject: [PATCH] adding ksz9897 driver
  drivers/net/ethernet/micrel/msrp.c              |  1237 ++
  drivers/net/ethernet/micrel/mvrp.c              |   160 +
  drivers/net/ethernet/micrel/spi-ksz9897.c       |   716 +
- 45 files changed, 72878 insertions(+), 18 deletions(-)
+ 45 files changed, 72901 insertions(+), 19 deletions(-)
  create mode 100644 drivers/net/ethernet/micrel/hsr_main.h
  create mode 100644 drivers/net/ethernet/micrel/i2c-ksz9897.c
  create mode 100644 drivers/net/ethernet/micrel/ksz9897.h
@@ -93,10 +93,10 @@ Subject: [PATCH] adding ksz9897 driver
  create mode 100644 drivers/net/ethernet/micrel/spi-ksz9897.c
 
 diff --git a/arch/arm/boot/dts/imx6q-iris2.dts b/arch/arm/boot/dts/imx6q-iris2.dts
-index 69f89f0..7d69948 100644
+index 69f89f0..62021b8 100644
 --- a/arch/arm/boot/dts/imx6q-iris2.dts
 +++ b/arch/arm/boot/dts/imx6q-iris2.dts
-@@ -37,6 +37,23 @@
+@@ -37,6 +37,44 @@
  	>;
  };
  
@@ -114,6 +114,27 @@ index 69f89f0..7d69948 100644
 +		spi-cpha;
 +		spi-cpol;
 +		status = "okay";
++		ports {
++			#address-cells = <1>;
++			#size-cells = <0>;
++			port@0 {
++				reg = <0>;
++				label = "lan1";
++			};
++			port@1 {
++				reg = <1>;
++				label = "lan2";
++			};
++			port@2 {
++				reg = <2>;
++				label = "cpu";
++				ethernet = <&fec>;
++				fixed-link {
++					speed = <1000>;
++					full-duplex;
++				};
++			};
++		};
 +	};
 +};
 +
@@ -121,7 +142,7 @@ index 69f89f0..7d69948 100644
  	lvds-channel@0 {
  		crtc = "ipu2-di0";
 diff --git a/arch/arm/boot/dts/imx6qdl-iris2.dtsi b/arch/arm/boot/dts/imx6qdl-iris2.dtsi
-index 1edce53..118a744 100644
+index 1edce53..df7c929 100644
 --- a/arch/arm/boot/dts/imx6qdl-iris2.dtsi
 +++ b/arch/arm/boot/dts/imx6qdl-iris2.dtsi
 @@ -216,21 +216,6 @@
@@ -153,6 +174,23 @@ index 1edce53..118a744 100644
 -				MX6QDL_PAD_DISP0_DAT23__ECSPI1_SS0	0x80000000 /* CS0 */
 -				MX6QDL_PAD_KEY_COL2__ECSPI1_SS1 	0x80000000 /* CS1 (N/C on Iris2) */
 +				MX6QDL_PAD_DISP0_DAT23__GPIO5_IO17 0x000f0b0 /* cs0 */
+ 			>;
+ 		};
+ 
+@@ -425,7 +409,7 @@
+ 				MX6QDL_PAD_RGMII_TD2__RGMII_TD2		0x0001b0b0
+ 				MX6QDL_PAD_RGMII_TD3__RGMII_TD3		0x0001b0b0
+ 				MX6QDL_PAD_RGMII_TX_CTL__RGMII_TX_CTL	0x0001b0b0
+-				MX6QDL_PAD_ENET_REF_CLK__ENET_TX_CLK	0x0001b0b0
++				MX6QDL_PAD_ENET_REF_CLK__ENET_TX_CLK	0x0000b0f1
+ 				MX6QDL_PAD_RGMII_RXC__RGMII_RXC		0x0001b0b0
+ 				MX6QDL_PAD_RGMII_RD0__RGMII_RD0		0x0001b0b0
+ 				MX6QDL_PAD_RGMII_RD1__RGMII_RD1		0x0001b0b0
+@@ -433,6 +417,7 @@
+ 				MX6QDL_PAD_RGMII_RD3__RGMII_RD3		0x0001b0b0
+ 				MX6QDL_PAD_RGMII_RX_CTL__RGMII_RX_CTL	0x0001b0b0
+ 				MX6QDL_PAD_ENET_CRS_DV__GPIO1_IO25	0x00000831 /* PHY Reset */
++				MX6QDL_PAD_GPIO_16__ENET_REF_CLK 0x0001B0D9
  			>;
  		};
  
