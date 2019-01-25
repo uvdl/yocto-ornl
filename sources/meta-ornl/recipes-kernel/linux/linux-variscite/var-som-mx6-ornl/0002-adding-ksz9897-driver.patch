@@ -1,11 +1,11 @@
-From e399797ee57918958fa8daeb346b0c1058309cce Mon Sep 17 00:00:00 2001
+From 9c5dce923ef1e673bcf749a4894b65d3de5b4c1d Mon Sep 17 00:00:00 2001
 From: Edison Fernandez <edison.fernandez@ridgerun.com>
-Date: Wed, 23 Jan 2019 11:41:29 -0600
+Date: Fri, 25 Jan 2019 11:39:12 -0600
 Subject: [PATCH] adding ksz9897 driver
 
 ---
  arch/arm/boot/dts/imx6q-iris2.dts               |    38 +
- arch/arm/boot/dts/imx6qdl-iris2.dtsi            |    25 +-
+ arch/arm/boot/dts/imx6qdl-iris2.dtsi            |    26 +-
  drivers/net/ethernet/micrel/Kconfig             |   233 +-
  drivers/net/ethernet/micrel/Makefile            |    10 +
  drivers/net/ethernet/micrel/hsr_main.h          |   223 +
@@ -49,7 +49,7 @@ Subject: [PATCH] adding ksz9897 driver
  drivers/net/ethernet/micrel/msrp.c              |  1237 ++
  drivers/net/ethernet/micrel/mvrp.c              |   160 +
  drivers/net/ethernet/micrel/spi-ksz9897.c       |   716 +
- 45 files changed, 72905 insertions(+), 19 deletions(-)
+ 45 files changed, 72906 insertions(+), 19 deletions(-)
  create mode 100644 drivers/net/ethernet/micrel/hsr_main.h
  create mode 100644 drivers/net/ethernet/micrel/i2c-ksz9897.c
  create mode 100644 drivers/net/ethernet/micrel/ksz9897.h
@@ -142,10 +142,10 @@ index 69f89f0..62021b8 100644
  	lvds-channel@0 {
  		crtc = "ipu2-di0";
 diff --git a/arch/arm/boot/dts/imx6qdl-iris2.dtsi b/arch/arm/boot/dts/imx6qdl-iris2.dtsi
-index 1edce53..435708f 100644
+index 1edce53..26740a0 100644
 --- a/arch/arm/boot/dts/imx6qdl-iris2.dtsi
 +++ b/arch/arm/boot/dts/imx6qdl-iris2.dtsi
-@@ -216,21 +216,6 @@
+@@ -216,28 +216,18 @@
  	status = "okay";
  };
  
@@ -167,7 +167,8 @@ index 1edce53..435708f 100644
  &fec {
  	pinctrl-names = "default";
  	pinctrl-0 = <&pinctrl_enet>;
-@@ -238,6 +223,10 @@
+ 	phy-mode = "rgmii";
++	phy-handle = <&ksz9893>;
  	phy-reset-gpios = <&gpio1 25 0>;
  	fsl,magic-packet;
  	status = "okay";
@@ -178,7 +179,7 @@ index 1edce53..435708f 100644
  };
  
  &gpc {
-@@ -412,8 +401,7 @@
+@@ -412,8 +402,7 @@
  				MX6QDL_PAD_DISP0_DAT22__ECSPI1_MISO	0x000100b1
  				MX6QDL_PAD_DISP0_DAT21__ECSPI1_MOSI	0x000100b1
  				MX6QDL_PAD_DISP0_DAT20__ECSPI1_SCLK	0x000100b1
@@ -188,7 +189,7 @@ index 1edce53..435708f 100644
  			>;
  		};
  
-@@ -425,7 +413,7 @@
+@@ -425,7 +414,7 @@
  				MX6QDL_PAD_RGMII_TD2__RGMII_TD2		0x0001b0b0
  				MX6QDL_PAD_RGMII_TD3__RGMII_TD3		0x0001b0b0
  				MX6QDL_PAD_RGMII_TX_CTL__RGMII_TX_CTL	0x0001b0b0
@@ -197,7 +198,7 @@ index 1edce53..435708f 100644
  				MX6QDL_PAD_RGMII_RXC__RGMII_RXC		0x0001b0b0
  				MX6QDL_PAD_RGMII_RD0__RGMII_RD0		0x0001b0b0
  				MX6QDL_PAD_RGMII_RD1__RGMII_RD1		0x0001b0b0
-@@ -433,6 +421,7 @@
+@@ -433,6 +422,7 @@
  				MX6QDL_PAD_RGMII_RD3__RGMII_RD3		0x0001b0b0
  				MX6QDL_PAD_RGMII_RX_CTL__RGMII_RX_CTL	0x0001b0b0
  				MX6QDL_PAD_ENET_CRS_DV__GPIO1_IO25	0x00000831 /* PHY Reset */
