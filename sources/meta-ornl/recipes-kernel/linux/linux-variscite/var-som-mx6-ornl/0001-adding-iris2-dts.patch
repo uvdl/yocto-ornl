@@ -5,11 +5,11 @@ Subject: [PATCH] adding iris2 dts
 
 ---
  arch/arm/boot/dts/Makefile           |   1 +
- arch/arm/boot/dts/imx6q-iris2.dts    |  73 ++++
- arch/arm/boot/dts/imx6qdl-iris2.dtsi | 823 +++++++++++++++++++++++++++++++++++
+ arch/arm/boot/dts/imx6q-iris2-R0.dts    |  73 ++++
+ arch/arm/boot/dts/imx6qdl-iris2-R0.dtsi | 823 +++++++++++++++++++++++++++++++++++
  3 files changed, 897 insertions(+)
- create mode 100644 arch/arm/boot/dts/imx6q-iris2.dts
- create mode 100644 arch/arm/boot/dts/imx6qdl-iris2.dtsi
+ create mode 100644 arch/arm/boot/dts/imx6q-iris2-R0.dts
+ create mode 100644 arch/arm/boot/dts/imx6qdl-iris2-R0.dtsi
 
 diff --git a/arch/arm/boot/dts/Makefile b/arch/arm/boot/dts/Makefile
 index 077dfc4..3163ef2 100644
@@ -19,15 +19,15 @@ index 077dfc4..3163ef2 100644
  	imx6q-tx6q-11x0-mb7.dtb \
  	imx6q-udoo.dtb \
  	imx6q-utilite-pro.dtb \
-+	imx6q-iris2.dtb \
++	imx6q-iris2-R0.dtb \
  	imx6q-var-dart.dtb \
  	imx6q-var-som-cap.dtb \
  	imx6q-var-som-res.dtb \
-diff --git a/arch/arm/boot/dts/imx6q-iris2.dts b/arch/arm/boot/dts/imx6q-iris2.dts
+diff --git a/arch/arm/boot/dts/imx6q-iris2-R0.dts b/arch/arm/boot/dts/imx6q-iris2-R0.dts
 new file mode 100644
 index 0000000..69f89f0
 --- /dev/null
-+++ b/arch/arm/boot/dts/imx6q-iris2.dts
++++ b/arch/arm/boot/dts/imx6q-iris2-R0.dts
 @@ -0,0 +1,73 @@
 +/*
 + * Copyright (C) 2015-2017 Variscite Ltd.
@@ -40,7 +40,7 @@ index 0000000..69f89f0
 +/dts-v1/;
 +
 +#include "imx6q.dtsi"
-+#include "imx6qdl-iris2.dtsi"
++#include "imx6qdl-iris2-R0.dtsi"
 +#include "imx6qdl-var-solocb-dt6cb-displays.dtsi"
 +#include "imx6qdl-var-dt6cb-buttons.dtsi"
 +
@@ -102,11 +102,11 @@ index 0000000..69f89f0
 +&sata {
 +	status = "disabled";
 +};
-diff --git a/arch/arm/boot/dts/imx6qdl-iris2.dtsi b/arch/arm/boot/dts/imx6qdl-iris2.dtsi
+diff --git a/arch/arm/boot/dts/imx6qdl-iris2-R0.dtsi b/arch/arm/boot/dts/imx6qdl-iris2-R0.dtsi
 new file mode 100644
 index 0000000..9943e2d
 --- /dev/null
-+++ b/arch/arm/boot/dts/imx6qdl-iris2.dtsi
++++ b/arch/arm/boot/dts/imx6qdl-iris2-R0.dtsi
 @@ -0,0 +1,823 @@
 +/*
 + * Copyright (C) 2015-2017 Variscite Ltd.
