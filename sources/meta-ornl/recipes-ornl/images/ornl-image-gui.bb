@@ -54,4 +54,5 @@ CORE_IMAGE_EXTRA_INSTALL += " \
 	screen \
 	minicom \
 	openssl \
+	imx-test \
 "

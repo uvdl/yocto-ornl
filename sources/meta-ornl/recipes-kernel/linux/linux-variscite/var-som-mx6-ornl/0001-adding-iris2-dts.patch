@@ -1,47 +1,40 @@
-From 0c1343bfbb49ac3217f92c1aae48ed11dc0ab12c Mon Sep 17 00:00:00 2001
-From: RidgeRun User <edison.fernandez@ridgerun.com>
-Date: Tue, 18 Dec 2018 22:05:03 +0000
-Subject: [PATCH] creating iris2 dtb
+From 6931bb51f60d96a9de3d5781625b0e153ce369a9 Mon Sep 17 00:00:00 2001
+From: Edison Fernandez <edison.fernandez@ridgerun.com>
+Date: Mon, 14 Jan 2019 17:17:51 -0600
+Subject: [PATCH] adding iris2 dts
 
 ---
  arch/arm/boot/dts/Makefile           |   1 +
- arch/arm/boot/dts/imx6q-iris2.dts    | 169 ++++++++
- arch/arm/boot/dts/imx6qdl-iris2.dtsi | 818 +++++++++++++++++++++++++++++++++++
- 3 files changed, 988 insertions(+)
+ arch/arm/boot/dts/imx6q-iris2.dts    |  73 ++++
+ arch/arm/boot/dts/imx6qdl-iris2.dtsi | 823 +++++++++++++++++++++++++++++++++++
+ 3 files changed, 897 insertions(+)
  create mode 100644 arch/arm/boot/dts/imx6q-iris2.dts
  create mode 100644 arch/arm/boot/dts/imx6qdl-iris2.dtsi
 
 diff --git a/arch/arm/boot/dts/Makefile b/arch/arm/boot/dts/Makefile
-index de7ac56..1a2ac4c 100644
+index 077dfc4..3163ef2 100644
 --- a/arch/arm/boot/dts/Makefile
 +++ b/arch/arm/boot/dts/Makefile
-@@ -335,6 +335,7 @@ dtb-$(CONFIG_SOC_IMX6Q) += \
- 	imx6q-tx6q-1020-comtft.dtb \
- 	imx6q-tx6q-1110.dtb \
+@@ -439,6 +439,7 @@ dtb-$(CONFIG_SOC_IMX6Q) += \
+ 	imx6q-tx6q-11x0-mb7.dtb \
  	imx6q-udoo.dtb \
+ 	imx6q-utilite-pro.dtb \
 +	imx6q-iris2.dtb \
  	imx6q-var-dart.dtb \
  	imx6q-var-som-cap.dtb \
  	imx6q-var-som-res.dtb \
 diff --git a/arch/arm/boot/dts/imx6q-iris2.dts b/arch/arm/boot/dts/imx6q-iris2.dts
 new file mode 100644
-index 0000000..5b99a57
+index 0000000..69f89f0
 --- /dev/null
 +++ b/arch/arm/boot/dts/imx6q-iris2.dts
-@@ -0,0 +1,169 @@
+@@ -0,0 +1,73 @@
 +/*
-+ * Copyright (C) 2014-2016 Variscite, Ltd. All Rights Reserved
-+ * Donio Ron: ron.d@variscite.com
++ * Copyright (C) 2015-2017 Variscite Ltd.
 + *
-+ * Copyright 2012 Freescale Semiconductor, Inc.
-+ * Copyright 2011 Linaro Ltd.
-+ *
-+ * The code contained herein is licensed under the GNU General Public
-+ * License. You may obtain a copy of the GNU General Public License
-+ * Version 2 or later at the following locations:
-+ *
-+ * http://www.opensource.org/licenses/gpl-license.html
-+ * http://www.gnu.org/copyleft/gpl.html
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 as
++ * published by the Free Software Foundation.
 + */
 +
 +/dts-v1/;
@@ -49,6 +42,7 @@ index 0000000..5b99a57
 +#include "imx6q.dtsi"
 +#include "imx6qdl-iris2.dtsi"
 +#include "imx6qdl-var-solocb-dt6cb-displays.dtsi"
++#include "imx6qdl-var-dt6cb-buttons.dtsi"
 +
 +/ {
 +	model = "Variscite i.MX6 QUAD VAR-DART Smart Device Board";
@@ -58,125 +52,35 @@ index 0000000..5b99a57
 +&cpu0 {
 +	operating-points = <
 +		/* kHz    uV */
-+		1200000 1350000
-+		996000  1250000
-+		852000  1250000
-+		792000  1175000
-+		396000  1175000
-+	>;
-+	fsl,soc-operating-points = <
-+		/* ARM kHz  SOC-PU uV */
-+		1200000 1275000
++		1200000	1350000
 +		996000	1250000
 +		852000	1250000
 +		792000	1175000
 +		396000	1175000
 +	>;
++	fsl,soc-operating-points = <
++		/* ARM kHz  SOC-PU uV */
++		1200000	1275000
++		996000	1250000
++		852000	1250000
++		792000	1250000
++		396000	1250000
++	>;
 +};
 +
-+&i2c2 {
-+	pmic: pfuze100@08 {
-+		compatible = "fsl,pfuze100";
-+		reg = <0x08>;
-+		regulators {
-+			sw1a_reg: sw1ab {
-+				regulator-min-microvolt = <300000>;
-+				regulator-max-microvolt = <1875000>;
-+				regulator-boot-on;
-+				regulator-always-on;
-+				regulator-ramp-delay = <6250>;
-+			};
-+			sw1c_reg: sw1c {
-+				regulator-min-microvolt = <300000>;
-+				regulator-max-microvolt = <1875000>;
-+				regulator-boot-on;
-+				regulator-always-on;
-+				regulator-ramp-delay = <6250>;
-+			};
++&ldb {
++	lvds-channel@0 {
++		crtc = "ipu2-di0";
++	};
 +
-+			sw2_reg: sw2 {
-+				regulator-min-microvolt = <800000>;
-+				regulator-max-microvolt = <3300000>;
-+				regulator-boot-on;
-+				regulator-always-on;
-+			};
-+
-+			sw3a_reg: sw3a {
-+				regulator-min-microvolt = <800000>;
-+				regulator-max-microvolt = <3950000>;
-+				regulator-boot-on;
-+				regulator-always-on;
-+			};
-+
-+			sw3b_reg: sw3b {
-+				regulator-min-microvolt = <800000>;
-+				regulator-max-microvolt = <3950000>;
-+				regulator-boot-on;
-+				regulator-always-on;
-+			};
-+
-+			sw4_reg: sw4 {
-+				regulator-min-microvolt = <800000>;
-+				regulator-max-microvolt = <3950000>;
-+			};
-+
-+			snvs_reg: vsnvs {
-+				regulator-min-microvolt = <1200000>;
-+				regulator-max-microvolt = <3000000>;
-+				regulator-boot-on;
-+				regulator-always-on;
-+			};
-+
-+			vref_reg: vrefddr {
-+				regulator-boot-on;
-+				regulator-always-on;
-+			};
-+#if 0
-+			vgen1_reg: vgen1 {
-+				regulator-min-microvolt = <800000>;
-+				regulator-max-microvolt = <1550000>;
-+			};
-+
-+			vgen2_reg: vgen2 {
-+				regulator-min-microvolt = <800000>;
-+				regulator-max-microvolt = <1550000>;
-+			};
-+
-+			vgen3_reg: vgen3 {
-+				regulator-min-microvolt = <1800000>;
-+				regulator-max-microvolt = <3300000>;
-+				regulator-always-on;
-+				regulator-boot-on;
-+			};
-+
-+			vgen4_reg: vgen4 {
-+				regulator-min-microvolt = <1800000>;
-+				regulator-max-microvolt = <3300000>;
-+				regulator-always-on;
-+				regulator-boot-on;
-+			};
-+
-+			vgen5_reg: vgen5 {
-+				regulator-min-microvolt = <1800000>;
-+				regulator-max-microvolt = <3300000>;
-+				regulator-always-on;
-+				regulator-boot-on;
-+			};
-+#endif
-+			vgen6_reg: vgen6 {
-+				regulator-min-microvolt = <2800000>;
-+				regulator-max-microvolt = <2800000>;
-+				regulator-always-on;
-+				regulator-boot-on;
-+			};
-+		};
++	lvds-channel@1 {
++		crtc = "ipu2-di1";
 +	};
 +};
 +
 +&touch {
 +	interrupt-parent = <&gpio1>;
 +	interrupts = <4 0>;
-+	focaltech,irq-gpio = <&gpio1 4 0x00>;
 +};
 +
 +&mxcfb1 {
@@ -200,23 +104,16 @@ index 0000000..5b99a57
 +};
 diff --git a/arch/arm/boot/dts/imx6qdl-iris2.dtsi b/arch/arm/boot/dts/imx6qdl-iris2.dtsi
 new file mode 100644
-index 0000000..c49e03b
+index 0000000..9943e2d
 --- /dev/null
 +++ b/arch/arm/boot/dts/imx6qdl-iris2.dtsi
-@@ -0,0 +1,818 @@
+@@ -0,0 +1,823 @@
 +/*
-+ * Copyright (C) 2014-2016 Variscite, Ltd. All Rights Reserved
-+ * Donio Ron: ron.d@variscite.com
++ * Copyright (C) 2015-2017 Variscite Ltd.
 + *
-+ * Copyright 2012 Freescale Semiconductor, Inc.
-+ * Copyright 2011 Linaro Ltd.
-+ *
-+ * The code contained herein is licensed under the GNU General Public
-+ * License. You may obtain a copy of the GNU General Public License
-+ * Version 2 or later at the following locations:
-+ *
-+ * http://www.opensource.org/licenses/gpl-license.html
-+ * http://www.gnu.org/copyleft/gpl.html
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 as
++ * published by the Free Software Foundation.
 + */
 +
 +#include <dt-bindings/input/input.h>
@@ -252,6 +149,7 @@ index 0000000..c49e03b
 +			regulator-state-mem {
 +				regulator-off-in-suspend;
 +			};
++			
 +		};
 +
 +		reg_usb_h1_vbus: regulator@1 {
@@ -260,13 +158,14 @@ index 0000000..c49e03b
 +			regulator-name = "usb_h1_vbus";
 +			regulator-min-microvolt = <5000000>;
 +			regulator-max-microvolt = <5000000>;
-+			egulator-always-on;
++			regulator-always-on;
 +			gpio = <&gpio4 21 0>;
 +			enable-active-high;
 +
 +			regulator-state-mem {
 +				regulator-off-in-suspend;
 +			};
++			
 +		};
 +
 +		reg_audio: regulator@2 {
@@ -290,7 +189,6 @@ index 0000000..c49e03b
 +			regulator-always-on;
 +			status = "okay";
 +		};
-+
 +	};
 +
 +	wlan_en_reg: fixedregulator@2 {
@@ -307,36 +205,6 @@ index 0000000..c49e03b
 +		enable-active-high;
 +	};
 +
-+#if 0
-+	/* Keys may interfere with touch */
-+	gpio-keys {
-+		compatible = "gpio-keys";
-+
-+		enter {
-+			label = "Enter";
-+			gpios = <&gpio5 11 1>;
-+			linux,code = <28>; /* KEY_HOME */
-+			gpio-key,wakeup;
-+		};
-+
-+		left {
-+			label = "Left";
-+			gpios = <&gpio4 26 1>;
-+			linux,code = <105>; /* KEY_BACK */
-+			gpio-key,wakeup;
-+		};
-+
-+		right {
-+			label = "Right";
-+			gpios = <&gpio4 25 1>;
-+			linux,code = <106 >; /* KEY_BACK */
-+			gpio-key,wakeup;
-+		};
-+
-+
-+	};
-+#endif
-+
 +	sound {
 +		compatible = "fsl,imx6q-var-som-tlv320aic3x", "fsl,imx-audio-tlv320aic3x";
 +		model = "tlv320aic3x-audio";
@@ -347,7 +215,8 @@ index 0000000..c49e03b
 +			"Headphone Jack",	"HPLOUT",
 +			"Headphone Jack",	"HPROUT",
 +			"Line In Jack",		"LINE1L",
-+			"Line In Jack",		"LINE1R";
++			"Line In Jack",		"LINE1R",
++			"Mic Jack",		"DMIC";
 +		mux-int-port = <2>;
 +		mux-ext-port = <3>;
 +	};
@@ -400,7 +269,7 @@ index 0000000..c49e03b
 +		status = "disabled";
 +	};
 +
-+#if 0
++/*
 +	lcd@0 {
 +		compatible = "fsl,lcd";
 +		ipu_id = <0>;
@@ -408,10 +277,9 @@ index 0000000..c49e03b
 +		default_ifmt = "RGB565";
 +		pinctrl-names = "default";
 +		pinctrl-0 = <&pinctrl_ipu1>;
-+		status = "okay";
++		status = "disabled";
 +	};
-+#endif
-+
++*/
 +	backlight {
 +		compatible = "pwm-backlight";
 +		pwms = <&pwm2 0 50000>;
@@ -428,34 +296,10 @@ index 0000000..c49e03b
 +		status = "okay";
 +	};
 +
-+
-+
 +	v4l2_out {
 +		compatible = "fsl,mxc_v4l2_output";
 +		status = "okay";
 +	};
-+
-+	wlan_bt_rfkill {
-+		compatible = "net,rfkill-gpio";
-+		name = "wlan_bt_rfkill";
-+		type = <2>;     /* bluetooth */
-+		gpios = <&gpio6 18 0>;
-+	};
-+
-+	btwilink {
-+		compatible = "btwilink";
-+	};
-+
-+#if 0
-+	kim {
-+		compatible = "kim";
-+		nshutdown_gpio = <&gpio6 18 0>;
-+		dev_name = "/dev/ttymxc1";
-+		flow_cntrl = <1>;
-+		baud_rate = <3000000>;
-+	};
-+#endif
-+
 +};
 +
 +&audmux {
@@ -464,17 +308,72 @@ index 0000000..c49e03b
 +	status = "okay";
 +};
 +
-+&cpu0 {
-+	arm-supply = <&sw1a_reg>;
-+	soc-supply = <&sw1c_reg>;
++&can1 {
++	pinctrl-names = "default";
++	pinctrl-0 = <&pinctrl_flexcan1_3>;
++	status = "okay";
++};
++
++&dcic1 {
++	dcic_id = <0>;
++	dcic_mux = "dcic-hdmi";
++	status = "okay";
++};
++
++&dcic2 {
++	dcic_id = <1>;
++	dcic_mux = "dcic-lvds1";
++	status = "okay";
++};
++
++&ecspi1 {
++	fsl,spi-num-chipselects = <1>;
++	// cs-gpios = <&gpio5 17 0>, <&gpio4 10 0>;
++	cs-gpios = <&gpio5 17 0>;
++	pinctrl-names = "default";
++	pinctrl-0 = <&pinctrl_ecspi1>;
++	status = "okay";
++
++	spi: spi@0 {
++		compatible = "spidev";
++		spi-max-frequency = <57600000>;
++		reg = <0>;
++	};
 +};
 +
 +&fec {
 +	pinctrl-names = "default";
-+	pinctrl-0 = <&pinctrl_enet_4>;
++	pinctrl-0 = <&pinctrl_enet>;
 +	phy-mode = "rgmii";
 +	phy-reset-gpios = <&gpio1 25 0>;
 +	fsl,magic-packet;
++	status = "okay";
++};
++
++&gpc {
++	/* use ldo-bypass, u-boot will check it and configure */
++	fsl,ldo-bypass = <1>;
++};
++
++&hdmi_audio {
++	status = "okay";
++};
++
++&hdmi_cec {
++	pinctrl-names = "default";
++	pinctrl-0 = <&pinctrl_hdmi_cec>;
++	status = "okay";
++};
++
++&hdmi_core {
++	ipu_id = <0>;
++	disp_id = <0>;
++	status = "okay";
++};
++
++&hdmi_video {
++	fsl,phy_reg_vlev = <0x0294>;
++	fsl,phy_reg_cksymtx = <0x800d>;
 +	status = "okay";
 +};
 +
@@ -501,14 +400,77 @@ index 0000000..c49e03b
 +		AVDD-supply = <&reg_audio>;
 +		DRVDD-supply = <&reg_audio>;
 +		gpio-reset = <&gpio4 5 1>;
-+		gpio-cfg = <
-+			0x0000 /* 0:Default */
-+			0x0000 /* 1:Default */
-+			0x0013 /* 2:FN_DMICCLK */
-+			0x0000 /* 3:Default */
-+			0x8014 /* 4:FN_DMICCDAT */
-+			0x0000 /* 5:Default */
++		ai3x-gpio-func = <
++			0 /* AIC3X_GPIO1_FUNC_DISABLED */
++			5 /* AIC3X_GPIO2_FUNC_DIGITAL_MIC_INPUT */
 +		>;
++	};
++
++	pmic: pfuze100@08 {
++		compatible = "fsl,pfuze100";
++		reg = <0x08>;
++		regulators {
++			sw1a_reg: sw1ab {
++				regulator-min-microvolt = <300000>;
++				regulator-max-microvolt = <1875000>;
++				regulator-boot-on;
++				regulator-always-on;
++				regulator-ramp-delay = <6250>;
++			};
++
++			sw1c_reg: sw1c {
++				regulator-min-microvolt = <300000>;
++				regulator-max-microvolt = <1875000>;
++				regulator-boot-on;
++				regulator-always-on;
++				regulator-ramp-delay = <6250>;
++			};
++
++			sw2_reg: sw2 {
++				regulator-min-microvolt = <800000>;
++				regulator-max-microvolt = <3300000>;
++				regulator-boot-on;
++				regulator-always-on;
++			};
++
++			sw3a_reg: sw3a {
++				regulator-min-microvolt = <800000>;
++				regulator-max-microvolt = <3950000>;
++				regulator-boot-on;
++				regulator-always-on;
++			};
++
++			sw3b_reg: sw3b {
++				regulator-min-microvolt = <800000>;
++				regulator-max-microvolt = <3950000>;
++				regulator-boot-on;
++				regulator-always-on;
++			};
++
++			sw4_reg: sw4 {
++				regulator-min-microvolt = <800000>;
++				regulator-max-microvolt = <3950000>;
++			};
++
++			snvs_reg: vsnvs {
++				regulator-min-microvolt = <1200000>;
++				regulator-max-microvolt = <3000000>;
++				regulator-boot-on;
++				regulator-always-on;
++			};
++
++			vref_reg: vrefddr {
++				regulator-boot-on;
++				regulator-always-on;
++			};
++
++			vgen6_reg: vgen6 {
++				regulator-min-microvolt = <2800000>;
++				regulator-max-microvolt = <2800000>;
++				regulator-always-on;
++				regulator-boot-on;
++			};
++		};
 +	};
 +};
 +
@@ -518,9 +480,9 @@ index 0000000..c49e03b
 +	pinctrl-0 = <&pinctrl_i2c3_3>;
 +	status = "okay";
 +
-+	/* DS1307 RTC module */
++	/* DS1337 RTC module */
 +	rtc@0x68 {
-+		compatible = "dallas,ds1307";
++		compatible = "dallas,ds1337";
 +		reg = <0x68>;
 +	};
 +};
@@ -543,9 +505,6 @@ index 0000000..c49e03b
 +				MX6QDL_PAD_GPIO_0__CCM_CLKO1		0x130b0
 +				/* Camera Clock */
 +				MX6QDL_PAD_GPIO_3__CCM_CLKO2		0x130b0
-+				MX6QDL_PAD_KEY_ROW0__GPIO4_IO07		0x0b0b1
-+				MX6QDL_PAD_KEY_COL1__GPIO4_IO08		0x0b0b1
-+
 +			>;
 +		};
 +
@@ -558,23 +517,32 @@ index 0000000..c49e03b
 +			>;
 +		};
 +
-+		pinctrl_enet_4: enetgrp {
++		pinctrl_ecspi1: ecspi1grp {
 +			fsl,pins = <
-+				MX6QDL_PAD_ENET_MDIO__ENET_MDIO		0x1b0b0
-+				MX6QDL_PAD_ENET_MDC__ENET_MDC		0x1b0b0
-+				MX6QDL_PAD_RGMII_TXC__RGMII_TXC		0x1b0b0
-+				MX6QDL_PAD_RGMII_TD0__RGMII_TD0		0x1b0b0
-+				MX6QDL_PAD_RGMII_TD1__RGMII_TD1		0x1b0b0
-+				MX6QDL_PAD_RGMII_TD2__RGMII_TD2		0x1b0b0
-+				MX6QDL_PAD_RGMII_TD3__RGMII_TD3		0x1b0b0
-+				MX6QDL_PAD_RGMII_TX_CTL__RGMII_TX_CTL	0x1b0b0
-+				MX6QDL_PAD_ENET_REF_CLK__ENET_TX_CLK	0x1b0b0
-+				MX6QDL_PAD_RGMII_RXC__RGMII_RXC		0x1b0b0
-+				MX6QDL_PAD_RGMII_RD0__RGMII_RD0		0x1b0b0
-+				MX6QDL_PAD_RGMII_RD1__RGMII_RD1		0x1b0b0
-+				MX6QDL_PAD_RGMII_RD2__RGMII_RD2		0x1b0b0
-+				MX6QDL_PAD_RGMII_RD3__RGMII_RD3		0x1b0b0
-+				MX6QDL_PAD_RGMII_RX_CTL__RGMII_RX_CTL	0x1b0b0
++				MX6QDL_PAD_DISP0_DAT22__ECSPI1_MISO	0x000100b1
++				MX6QDL_PAD_DISP0_DAT21__ECSPI1_MOSI	0x000100b1
++				MX6QDL_PAD_DISP0_DAT20__ECSPI1_SCLK	0x000100b1
++				MX6QDL_PAD_DISP0_DAT23__ECSPI1_SS0	0x80000000 /* CS0 */
++				MX6QDL_PAD_KEY_COL2__ECSPI1_SS1 	0x80000000 /* CS1 (N/C on Iris2) */
++			>;
++		};
++
++		pinctrl_enet: enetgrp {
++			fsl,pins = <
++				MX6QDL_PAD_RGMII_TXC__RGMII_TXC		0x0001b0b0
++				MX6QDL_PAD_RGMII_TD0__RGMII_TD0		0x0001b0b0
++				MX6QDL_PAD_RGMII_TD1__RGMII_TD1		0x0001b0b0
++				MX6QDL_PAD_RGMII_TD2__RGMII_TD2		0x0001b0b0
++				MX6QDL_PAD_RGMII_TD3__RGMII_TD3		0x0001b0b0
++				MX6QDL_PAD_RGMII_TX_CTL__RGMII_TX_CTL	0x0001b0b0
++				MX6QDL_PAD_ENET_REF_CLK__ENET_TX_CLK	0x0001b0b0
++				MX6QDL_PAD_RGMII_RXC__RGMII_RXC		0x0001b0b0
++				MX6QDL_PAD_RGMII_RD0__RGMII_RD0		0x0001b0b0
++				MX6QDL_PAD_RGMII_RD1__RGMII_RD1		0x0001b0b0
++				MX6QDL_PAD_RGMII_RD2__RGMII_RD2		0x0001b0b0
++				MX6QDL_PAD_RGMII_RD3__RGMII_RD3		0x0001b0b0
++				MX6QDL_PAD_RGMII_RX_CTL__RGMII_RX_CTL	0x0001b0b0
++				MX6QDL_PAD_ENET_CRS_DV__GPIO1_IO25	0x00000831 /* PHY Reset */
 +			>;
 +		};
 +
@@ -652,28 +620,12 @@ index 0000000..c49e03b
 +			>;
 +		};
 +
-+		pinctrl_ipu1_2: ipu1grp-2 { /* parallel camera */
++		pinctrl_pwm2: pwm2grp {
 +			fsl,pins = <
-+				MX6QDL_PAD_CSI0_DAT12__IPU1_CSI0_DATA12		0x80000000
-+				MX6QDL_PAD_CSI0_DAT13__IPU1_CSI0_DATA13		0x80000000
-+				MX6QDL_PAD_CSI0_DAT14__IPU1_CSI0_DATA14		0x80000000
-+				MX6QDL_PAD_CSI0_DAT15__IPU1_CSI0_DATA15		0x80000000
-+				MX6QDL_PAD_CSI0_DAT16__IPU1_CSI0_DATA16		0x80000000
-+				MX6QDL_PAD_CSI0_DAT17__IPU1_CSI0_DATA17		0x80000000
-+				MX6QDL_PAD_CSI0_DAT18__IPU1_CSI0_DATA18		0x80000000
-+				MX6QDL_PAD_CSI0_DAT19__IPU1_CSI0_DATA19		0x80000000
-+				MX6QDL_PAD_CSI0_DATA_EN__IPU1_CSI0_DATA_EN	0x80000000
-+				MX6QDL_PAD_CSI0_PIXCLK__IPU1_CSI0_PIXCLK	0x80000000
-+				MX6QDL_PAD_CSI0_MCLK__IPU1_CSI0_HSYNC		0x80000000
-+				MX6QDL_PAD_CSI0_VSYNC__IPU1_CSI0_VSYNC		0x80000000
++				MX6QDL_PAD_DISP0_DAT9__PWM2_OUT		0x0001b0b1
 +			>;
 +		};
 +
-+		pinctrl_pwm1_1: pwm1grp {
-+			fsl,pins = <
-+				MX6QDL_PAD_DISP0_DAT9__PWM2_OUT		0x1b0b1
-+			>;
-+		};
 +		/* UART1 (Console) */
 +		pinctrl_uart1_1: uart1grp-1 { /* RX/TX RTS/CTS */
 +			fsl,pins = <
@@ -710,6 +662,7 @@ index 0000000..c49e03b
 +				MX6QDL_PAD_SD4_DAT5__UART2_RTS_B	0x1b0b1
 +			>;
 +		};
++
 +		/* UART3 (PDDL) */
 +		pinctrl_uart3_1: uart3grp-1 {	/* RX/TX only mode */
 +			fsl,pins = <
@@ -717,6 +670,7 @@ index 0000000..c49e03b
 +				MX6QDL_PAD_EIM_D24__UART3_TX_DATA	0x1b0b1
 +			>;
 +		};
++
 +		/* UART4 (Pixhawk) */
 +		pinctrl_uart4_1: uart4grp-1 {	/* RX/TX only mode */
 +			fsl,pins = <
@@ -730,12 +684,6 @@ index 0000000..c49e03b
 +			fsl,pins = <
 +				MX6QDL_PAD_KEY_ROW1__UART5_RX_DATA	0x1b0b1
 +				MX6QDL_PAD_KEY_COL1__UART5_TX_DATA	0x1b0b1
-+			>;
-+		};
-+
-+		pinctrl_usbotg_2: usbotggrp-2 {
-+			fsl,pins = <
-+				MX6QDL_PAD_ENET_RX_ER__USB_OTG_ID 0x17059
 +			>;
 +		};
 +
@@ -829,14 +777,6 @@ index 0000000..c49e03b
 +			>;
 +		};
 +
-+		pinctrl_ecspi1_1: ecspi1grp {
-+			fsl,pins = <
-+				MX6QDL_PAD_DISP0_DAT22__ECSPI1_MISO	0x100b1
-+				MX6QDL_PAD_DISP0_DAT21__ECSPI1_MOSI	0x100b1
-+				MX6QDL_PAD_DISP0_DAT20__ECSPI1_SCLK	0x100b1
-+			>;
-+		};
-+
 +		pinctrl_flexcan1_3: flexcan1grp {
 +			fsl,pins = <
 +				MX6QDL_PAD_GPIO_7__FLEXCAN1_TX		0x80000000
@@ -846,51 +786,13 @@ index 0000000..c49e03b
 +	};
 +};
 +
-+&dcic1 {
-+	dcic_id = <0>;
-+	dcic_mux = "dcic-hdmi";
-+	status = "okay";
-+};
-+
-+&dcic2 {
-+	dcic_id = <1>;
-+	dcic_mux = "dcic-lvds1";
-+	status = "okay";
-+};
-+
-+&gpc {
-+	/* use ldo-bypass, u-boot will check it and configure */
-+	fsl,ldo-bypass = <1>;
-+};
-+
-+&hdmi_audio {
-+	status = "okay";
-+};
-+
-+&hdmi_cec {
-+	pinctrl-names = "default";
-+	pinctrl-0 = <&pinctrl_hdmi_cec>;
-+	status = "okay";
-+};
-+
-+&hdmi_core {
-+	ipu_id = <0>;
-+	disp_id = <0>;
-+	status = "okay";
-+};
-+
-+&hdmi_video {
-+	fsl,phy_reg_vlev = <0x0294>;
-+	fsl,phy_reg_cksymtx = <0x800d>;
-+	status = "okay";
-+};
-+
 +&mipi_csi {
 +	status = "okay";
 +	ipu_id = <0>;
 +	csi_id = <1>;
 +	v_channel = <0>;
 +	lanes = <2>;
++	status = "okay";
 +};
 +
 +&pcie {
@@ -902,7 +804,27 @@ index 0000000..c49e03b
 +
 +&pwm2 {
 +	pinctrl-names = "default";
-+	pinctrl-0 = <&pinctrl_pwm1_1>;
++	pinctrl-0 = <&pinctrl_pwm2>;
++	status = "okay";
++};
++
++&reg_arm {
++	vin-supply = <&sw1a_reg>;
++};
++
++&reg_pu {
++	vin-supply = <&sw1c_reg>;
++};
++
++&reg_soc {
++	vin-supply = <&sw1c_reg>;
++};
++
++&snvs_pwrkey {
++	status = "okay";
++};
++
++&snvs_poweroff {
 +	status = "okay";
 +};
 +
@@ -949,12 +871,6 @@ index 0000000..c49e03b
 +	status = "okay";
 +};
 +
-+&can1 {
-+	pinctrl-names = "default";
-+	pinctrl-0 = <&pinctrl_flexcan1_3>;
-+	status = "okay";
-+};
-+
 +&usbh1 {
 +	vbus-supply = <&reg_usb_h1_vbus>;
 +	status = "okay";
@@ -965,6 +881,9 @@ index 0000000..c49e03b
 +	disable-over-current;
 +	/* dr_mode: One of "host", "peripheral" or "otg". Defaults to "otg" */
 +	dr_mode = "peripheral";
++	srp-disable;
++	hnp-disable;
++	adp-disable;
 +	status = "okay";
 +};
 +
@@ -985,17 +904,11 @@ index 0000000..c49e03b
 +	wlcore: wlcore@0 {
 +		compatible = "ti,wl1835";
 +		reg = <2>;
-+#if 0
-+		gpio = <177>;   /* The wl8 driver expects gpio to be an integer, so gpio6_17 is (6-1)*32+17=207
-+				   irq property must not be set as driver derives irq number from gpio if no irq set
-+				   use edge irqs for suspend/resume */
-+		platform-quirks = <1>;
-+#endif
 +		interrupt-parent = <&gpio6>;
 +		interrupts = <17 IRQ_TYPE_EDGE_RISING>;
 +
 +		/* if a 12xx card is there, configure the clock to WL12XX_REFCLOCK_38_XTAL */
-+		board-ref-clock = <4>;
++		ref-clock-frequency = <38400000>;
 +	};
 +};
 +
@@ -1018,10 +931,7 @@ index 0000000..c49e03b
 +	enable-sdio-wakeup;
 +	status = "okay";
 +};
-+
-+&snvs_poweroff {
-+	status = "okay";
-+};
+\ No newline at end of file
 -- 
 2.7.4
 
