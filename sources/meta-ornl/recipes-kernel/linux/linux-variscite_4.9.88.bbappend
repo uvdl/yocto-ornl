@@ -7,6 +7,7 @@ SRCREV_var-som-mx6-ornl = "9af28698b83d232c549eee3ef96449cae878cea2"
 KERNEL_SRC_var-som-mx6-ornl ?= "git://github.com/uvdl/linux-imx.git;protocol=git"
 
 SRC_URI_append_var-som-mx6-ornl = " \
+									${KERNEL_SRC};branch=${SRCBRANCH} \
 									file://ornl_defconfig \
 			   	  "
 

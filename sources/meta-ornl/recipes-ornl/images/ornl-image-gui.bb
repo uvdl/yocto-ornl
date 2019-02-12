@@ -21,7 +21,6 @@ IMAGE_FEATURES += " \
     debug-tweaks \
     nfs-server \
     tools-debug \
-    tools-testapps \
     ${@bb.utils.contains('DISTRO_FEATURES', 'wayland', '', \
        bb.utils.contains('DISTRO_FEATURES',     'x11', 'x11-base x11-sato', \
                                                        '', d), d)} \
@@ -55,4 +54,5 @@ CORE_IMAGE_EXTRA_INSTALL += " \
 	minicom \
 	openssl \
 	imx-test \
+	networkmanager \
 "
