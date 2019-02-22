@@ -5,6 +5,8 @@ SHELL := /bin/bash
 CPUS := $(shell nproc)
 SUDO := $(shell test $${EUID} -ne 0 && echo "sudo")
 LANG := en_US.UTF-8
+DATE := $(shell date --iso-8601)
+ARCHIVE := $(HOME)/data
 .EXPORT_ALL_VARIABLES:
 
 DOT_GZ=.gz
@@ -30,7 +32,7 @@ REPO_LOC=https://storage.googleapis.com/git-repo-downloads/repo
 REPO_SUM=d06f33115aea44e583c8669375b35aad397176a411de3461897444d247b6c220
 
 # Known variations
-YOCTO_DIR=$(HOME)/ornl-dart-yocto
+YOCTO_DIR := $(HOME)/ornl-dart-yocto
 YOCTO_DISTRO=fslc-framebuffer
 YOCTO_ENV=build_ornl
 YOCTO_IMG=ornl-image-gui
@@ -42,7 +44,7 @@ define LOG
   ($1) 2>&1 | tee -a $(LOGDIR)/$(YOCTO_ENV)-build.log && echo "$$(date --iso-8601='ns'): $1 completed." >>$(LOGDIR)/$(YOCTO_ENV)-make.log
 endef
 
-.PHONY: all build clean deps docker-deploy docker-image id locale mrproper see
+.PHONY: all archive build clean deps docker-deploy docker-image id locale mrproper see
 
 default: see
 
@@ -73,6 +75,20 @@ all: $(LOGDIR)
 	$(call LOG, $(MAKE) see )
 	$(call LOG, $(MAKE) build )
 	$(call LOG, $(MAKE) sd.img$(DOT_GZ) )
+
+archive:
+	@mkdir -p $(ARCHIVE)/$(PROJECT)-$(DATE)/dts
+	-mv $(LOGDIR) $(ARCHIVE)/$(PROJECT)-$(DATE)
+	( for f in `find $(YOCTO_DIR)/$(YOCTO_ENV)/tmp/deploy/images/$(MACHINE) -type l -name "*.dtb" -print` ; do n=$$(basename $$f) ; nb=$${n%.*} ; dtc -I dtb -O dts -o $(ARCHIVE)/$(PROJECT)-$(DATE)/dts/$${nb}.dts $$f ; done )
+	cp sd.img$(DOT_GZ) $(ARCHIVE)/$(PROJECT)-$(DATE)
+	tar czf $(ARCHIVE)/$(PROJECT)-$(DATE)/kernel-source.tgz -C $(YOCTO_DIR)/$(YOCTO_ENV)/tmp/work-shared/$(MACHINE) kernel-source
+	@echo "# To write image to MMC, do:" > $(ARCHIVE)/$(PROJECT)-$(DATE)/readme.txt
+ifeq ($(DOT_GZ),.gz)
+	@echo "gunzip -c sd.img$(DOT_GZ) > /tmp/sd.img" >> $(ARCHIVE)/$(PROJECT)-$(DATE)/readme.txt
+	@echo "$(SUDO) bmaptool copy /tmp/sd.img /dev/sda --nobmap" >> $(ARCHIVE)/$(PROJECT)-$(DATE)/readme.txt
+else
+	@echo "$(SUDO) bmaptool copy sd.img$(DOT_GZ) /dev/sda --nobmap" >> $(ARCHIVE)/$(PROJECT)-$(DATE)/readme.txt
+endif
 
 build: $(YOCTO_DIR)/setup-environment build/conf/local.conf build/conf/bblayers.conf sources/meta-ornl
 	# https://github.com/gmacario/easy-build/tree/master/build-yocto#bitbake-complains-if-run-as-root
@@ -136,6 +152,8 @@ see:
 	@echo "CPUS=$(CPUS)"
 	@echo "SUDO=$(SUDO)"
 	@echo "YOCTO_DIR=$(YOCTO_DIR)"
+	@echo "ARCHIVE-TO=$(ARCHIVE)/$(PROJECT)-$(DATE)"
+	@echo "KERNEL=$(YOCTO_DIR)/$(YOCTO_ENV)/tmp/work-shared/$(MACHINE)/kernel-source"
 	-@echo "*** local.conf ***" && diff build/conf/local.conf $(YOCTO_DIR)/$(YOCTO_ENV)/conf/local.conf
 	-@echo "*** bblayers.conf ***" && diff build/conf/bblayers.conf $(YOCTO_DIR)/$(YOCTO_ENV)/conf/bblayers.conf
 	@echo "*** Build Commands ***"
