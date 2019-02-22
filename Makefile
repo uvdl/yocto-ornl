@@ -42,7 +42,7 @@ define LOG
   ($1) 2>&1 | tee -a $(LOGDIR)/$(YOCTO_ENV)-build.log && echo "$$(date --iso-8601='ns'): $1 completed." >>$(LOGDIR)/$(YOCTO_ENV)-make.log
 endef
 
-.PHONY: all build clean deps docker-deploy docker-image id locale see
+.PHONY: all build clean deps docker-deploy docker-image id locale mrproper see
 
 default: see
 
@@ -86,7 +86,7 @@ build: $(YOCTO_DIR)/setup-environment build/conf/local.conf build/conf/bblayers.
 
 clean:
 	-rm -f $(LOGDIR)/*-build.log $(LOGDIR)/*-make.log
-	rm sd.img$(DOT_GZ)
+	-rm sd.img$(DOT_GZ)
 
 deps:
 	$(SUDO) apt-get update
@@ -128,6 +128,9 @@ locale:
 	#$(SUDO) dpkg-reconfigure locales
 	$(SUDO) locale-gen $(LANG)
 	$(SUDO) update-locale LC ALL=$(LANG) LANG=$(LANG)
+
+mrproper: clean
+	-rm -rf $(YOCTO_DIR)
 
 see:
 	@echo "CPUS=$(CPUS)"
