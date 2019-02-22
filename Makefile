@@ -26,8 +26,8 @@ PROJECT_REMOTE := $(USER)
 PROJECT_TAG := core
 REPO=/usr/local/bin/repo
 REPO_LOC=https://storage.googleapis.com/git-repo-downloads/repo
-# repo version 1.23
-REPO_SUM=e147f0392686c40cfd7d5e6f332c6ee74c4eab4d24e2694b3b0a0c037bf51dc5
+# repo version 1.25
+REPO_SUM=d06f33115aea44e583c8669375b35aad397176a411de3461897444d247b6c220
 
 # Known variations
 YOCTO_DIR=$(HOME)/ornl-dart-yocto
