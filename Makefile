@@ -140,9 +140,13 @@ id:
 	git config --global credential.helper "cache --timeout=5400"
 
 # https://community.nxp.com/docs/DOC-95003
+# https://github.com/uvdl/yocto-ornl/issues/11#issuecomment-462969336
 kernel: $(LOGDIR)
-	$(call LOG, $(MAKE) YOCTO_CMD="linux-imx -c compile -f" build )
-	$(call LOG, $(MAKE) YOCTO_CMD="linux-imx -c deploy" build )
+	-rm sd.img$(DOT_GZ)
+	$(call LOG, $(MAKE) YOCTO_CMD="-c cleansstate u-boot-variscite" build )
+	$(call LOG, $(MAKE) YOCTO_CMD="-c cleansstate linux-variscite" build )
+	$(call LOG, $(MAKE) YOCTO_CMD="-c cleansstate init-ifupdown" build )
+	$(SUDO) rm -r $(YOCTO_DIR)/$(YOCTO_ENV)/tmp/work
 	$(call LOG, $(MAKE) build )
 	$(call LOG, $(MAKE) sd.img$(DOT_GZ) )
 
