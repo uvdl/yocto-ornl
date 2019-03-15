@@ -35,7 +35,8 @@ REPO_SUM=d06f33115aea44e583c8669375b35aad397176a411de3461897444d247b6c220
 YOCTO_DIR := $(HOME)/ornl-dart-yocto
 YOCTO_DISTRO=fslc-framebuffer
 YOCTO_ENV=build_ornl
-YOCTO_IMG := ornl-image-gui
+YOCTO_IMG=ornl-image-gui
+YOCTO_CMD := $(YOCTO_IMG)
 
 # https://stackoverflow.com/questions/16488581/looking-for-well-logged-make-output
 # Invoke this with $(call LOG,<cmdline>)
@@ -44,7 +45,7 @@ define LOG
   ($1) 2>&1 | tee -a $(LOGDIR)/$(YOCTO_ENV)-build.log && echo "$$(date --iso-8601='ns'): $1 completed." >>$(LOGDIR)/$(YOCTO_ENV)-make.log
 endef
 
-.PHONY: all archive build clean deps docker-deploy docker-image id locale mrproper see
+.PHONY: all archive build clean deps docker-deploy docker-image id kernel locale mrproper see
 
 default: see
 
@@ -98,7 +99,7 @@ build: $(YOCTO_DIR)/setup-environment build/conf/local.conf build/conf/bblayers.
 		cp $(CURDIR)/build/conf/local.conf $(YOCTO_DIR)/$(YOCTO_ENV)/conf/ && \
 		cp $(CURDIR)/build/conf/bblayers.conf $(YOCTO_DIR)/$(YOCTO_ENV)/conf/ && \
 		touch $(YOCTO_DIR)/$(YOCTO_ENV)/conf/sanity.conf && \
-		cd $(YOCTO_DIR)/$(YOCTO_ENV) && LANG=$(LANG) bitbake $(YOCTO_IMG)
+		cd $(YOCTO_DIR)/$(YOCTO_ENV) && LANG=$(LANG) bitbake $(YOCTO_CMD)
 
 clean:
 	-rm -f $(LOGDIR)/*-build.log $(LOGDIR)/*-make.log
@@ -138,6 +139,13 @@ id:
 	git config --global push.default matching
 	git config --global credential.helper "cache --timeout=5400"
 
+# https://community.nxp.com/docs/DOC-95003
+kernel: $(LOGDIR)
+	$(call LOG, $(MAKE) YOCTO_CMD="linux-imx -c compile -f" build )
+	$(call LOG, $(MAKE) YOCTO_CMD="linux-imx -c deploy" build )
+	$(call LOG, $(MAKE) build )
+	$(call LOG, $(MAKE) sd.img$(DOT_GZ) )
+
 locale:
 	# https://wiki.yoctoproject.org/wiki/TipsAndTricks/ResolvingLocaleIssues
 	$(SUDO) apt-get install locales
@@ -159,6 +167,6 @@ see:
 	@echo "*** Build Commands ***"
 	@echo "cd $(YOCTO_DIR)"
 	@echo "MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV)"
-	@echo "cd $(YOCTO_DIR)/$(YOCTO_ENV) && LANG=$(LANG) bitbake $(YOCTO_IMG)"
+	@echo "cd $(YOCTO_DIR)/$(YOCTO_ENV) && LANG=$(LANG) bitbake $(YOCTO_CMD)"
 	@echo "**********************"
 	@echo "Use: \"make all\" to perform this build"
