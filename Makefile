@@ -5,7 +5,7 @@ SHELL := /bin/bash
 CPUS := $(shell nproc)
 SUDO := $(shell test $${EUID} -ne 0 && echo "sudo")
 LANG := en_US.UTF-8
-DATE := $(shell date --iso-8601)
+DATE := $(shell date +%Y-%m-%d_%H%M)
 ARCHIVE := $(HOME)/data
 .EXPORT_ALL_VARIABLES:
 
@@ -35,7 +35,7 @@ REPO_SUM=d06f33115aea44e583c8669375b35aad397176a411de3461897444d247b6c220
 YOCTO_DIR := $(HOME)/ornl-dart-yocto
 YOCTO_DISTRO=fslc-framebuffer
 YOCTO_ENV=build_ornl
-YOCTO_IMG=ornl-image-gui
+YOCTO_IMG := ornl-image-gui
 
 # https://stackoverflow.com/questions/16488581/looking-for-well-logged-make-output
 # Invoke this with $(call LOG,<cmdline>)
