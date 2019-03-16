@@ -3,7 +3,7 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}/${MACHINE}:"
 LOCALVERSION_var-som-mx6-ornl = "-mx6"
 
 SRCBRANCH_var-som-mx6-ornl = "project/debug_ksz9893"
-SRCREV_var-som-mx6-ornl = "b05b56a4c6b17d7849ee02a0f4f58565bfd49046"
+SRCREV_var-som-mx6-ornl = "d937c60ac634c78085dfc522ab5b7e09d48a316e"
 KERNEL_SRC_var-som-mx6-ornl ?= "git://github.com/uvdl/linux-imx.git;protocol=git"
 
 SRC_URI_append_var-som-mx6-ornl = " \
