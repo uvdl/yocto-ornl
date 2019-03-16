@@ -162,7 +162,7 @@ kernel: $(LOGDIR)
 		cd $(YOCTO_DIR)/$(YOCTO_ENV)/$(KERNEL_TEMP) && \
 		./run.do_compile && \
 		./run.do_compile_kernelmodules && \
-		echo "kernel built in $(YOCTO_DIR)/$(YOCTO_ENV)/$(KERNEL_IMAGE)
+		echo "kernel built in $(YOCTO_DIR)/$(YOCTO_ENV)/$(KERNEL_IMAGE)"
 
 kernel-pull:
 	cd $(YOCTO_DIR)/$(YOCTO_ENV)/$(KERNEL_GIT) && git pull
