@@ -38,6 +38,12 @@ YOCTO_ENV=build_ornl
 YOCTO_IMG=ornl-image-gui
 YOCTO_CMD := $(YOCTO_IMG)
 
+# Kernel rebuilding; paths relative to $(YOCTO_DIR)/$(YOCTO_ENV)
+_KERNEL_RELATIVE_PATH := tmp/work/var_som_mx6_ornl-fslc-linux-gnueabi/linux-variscite/4.9.88-r0
+KERNEL_BUILD=$(_KERNEL_RELATIVE_PATH)/build
+KERNEL_TEMP=$(_KERNEL_RELATIVE_PATH)/temp
+KERNEL_IMAGE=$(KERNEL_BUILD)/arch/arm/boot/uImage
+
 # https://stackoverflow.com/questions/16488581/looking-for-well-logged-make-output
 # Invoke this with $(call LOG,<cmdline>)
 define LOG
@@ -82,6 +88,7 @@ archive:
 	-mv $(LOGDIR) $(ARCHIVE)/$(PROJECT)-$(DATE)
 	( for f in `find $(YOCTO_DIR)/$(YOCTO_ENV)/tmp/deploy/images/$(MACHINE) -type l -name "*.dtb" -print` ; do n=$$(basename $$f) ; nb=$${n%.*} ; dtc -I dtb -O dts -o $(ARCHIVE)/$(PROJECT)-$(DATE)/dts/$${nb}.dts $$f ; done )
 	cp sd.img$(DOT_GZ) $(ARCHIVE)/$(PROJECT)-$(DATE)
+	cp $(YOCTO_DIR)/$(YOCTO_ENV)/$(KERNEL_IMAGE) $(ARCHIVE)/$(PROJECT)-$(DATE)
 	tar czf $(ARCHIVE)/$(PROJECT)-$(DATE)/kernel-source.tgz -C $(YOCTO_DIR)/$(YOCTO_ENV)/tmp/work-shared/$(MACHINE) kernel-source
 	@echo "# To write image to MMC, do:" > $(ARCHIVE)/$(PROJECT)-$(DATE)/readme.txt
 ifeq ($(DOT_GZ),.gz)
@@ -141,14 +148,15 @@ id:
 
 # https://community.nxp.com/docs/DOC-95003
 # https://github.com/uvdl/yocto-ornl/issues/11#issuecomment-462969336
+# Edison's email from 2019-03-15 Re: FEC driver debugging
 kernel: $(LOGDIR)
 	-rm sd.img$(DOT_GZ)
-	$(call LOG, $(MAKE) YOCTO_CMD="-c cleansstate u-boot-variscite" build )
-	$(call LOG, $(MAKE) YOCTO_CMD="-c cleansstate linux-variscite" build )
-	$(call LOG, $(MAKE) YOCTO_CMD="-c cleansstate init-ifupdown" build )
-	$(SUDO) rm -r $(YOCTO_DIR)/$(YOCTO_ENV)/tmp/work
-	$(call LOG, $(MAKE) build )
-	$(call LOG, $(MAKE) sd.img$(DOT_GZ) )
+	cd $(YOCTO_DIR) && \
+		MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV) && \
+		cd $(YOCTO_DIR)/$(YOCTO_ENV)/$(KERNEL_TEMP) && \
+		./run.do_compile && \
+		./run.do_compile_kernelmodules && \
+		echo "kernel built in $(YOCTO_DIR)/$(YOCTO_ENV)/$(KERNEL_IMAGE)
 
 locale:
 	# https://wiki.yoctoproject.org/wiki/TipsAndTricks/ResolvingLocaleIssues
