@@ -101,7 +101,7 @@ else
 endif
 	@echo "# To write kernel to MMC, do:" >> $(ARCHIVE)/$(PROJECT)-$(DATE)/readme.txt
 	@echo "$(SUDO) mount -t vfat /dev/sda1 /mnt" >> $(ARCHIVE)/$(PROJECT)-$(DATE)/readme.txt
-	@echo "cp uImage /mnt" >> $(ARCHIVE)/$(PROJECT)-$(DATE)/readme.txt
+	@echo "$(SUDO) cp dts/* uImage /mnt" >> $(ARCHIVE)/$(PROJECT)-$(DATE)/readme.txt
 	@echo "$(SUDO) umount /mnt" >> $(ARCHIVE)/$(PROJECT)-$(DATE)/readme.txt
 
 build: $(YOCTO_DIR)/setup-environment build/conf/local.conf build/conf/bblayers.conf sources/meta-ornl
