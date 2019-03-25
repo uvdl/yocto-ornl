@@ -53,7 +53,7 @@ define LOG
 endef
 
 .PHONY: all archive build clean deps docker-deploy docker-image
-.PHONY: id kernel kernel-pull locale mrproper see
+.PHONY: id kernel kernel-config kernel-pull locale mrproper see
 
 default: see
 
@@ -163,6 +163,12 @@ kernel: $(LOGDIR)
 		./run.do_compile && \
 		./run.do_compile_kernelmodules && \
 		echo "kernel built in $(YOCTO_DIR)/$(YOCTO_ENV)/$(KERNEL_IMAGE)"
+
+kernel-config: $(LOGDIR)
+	cd $(YOCTO_DIR) && \
+		MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV) && \
+		cd $(YOCTO_DIR)/$(YOCTO_ENV)/$(KERNEL_TEMP) && \
+		LANG=$(LANG) bitbake linux-variscite -c menuconfig
 
 kernel-pull:
 	cd $(YOCTO_DIR)/$(YOCTO_ENV)/$(KERNEL_GIT) && git pull
