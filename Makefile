@@ -43,6 +43,7 @@ _KERNEL_RELATIVE_PATH := tmp/work/var_som_mx6_ornl-fslc-linux-gnueabi/linux-vari
 KERNEL_BUILD=$(_KERNEL_RELATIVE_PATH)/build
 KERNEL_GIT=$(_KERNEL_RELATIVE_PATH)/git
 KERNEL_IMAGE=$(KERNEL_BUILD)/arch/arm/boot/uImage
+KERNEL_DTS=$(KERNEL_BUILD)/arch/arm/boot/dts
 KERNEL_TEMP=$(_KERNEL_RELATIVE_PATH)/temp
 
 # https://stackoverflow.com/questions/16488581/looking-for-well-logged-make-output
@@ -88,7 +89,7 @@ all: $(LOGDIR)
 archive:
 	@mkdir -p $(ARCHIVE)/$(PROJECT)-$(DATE)/dts
 	-mv $(LOGDIR) $(ARCHIVE)/$(PROJECT)-$(DATE)
-	( for f in `find $(YOCTO_DIR)/$(YOCTO_ENV)/tmp/deploy/images/$(MACHINE) -type l -name "*.dtb" -print` ; do n=$$(basename $$f) ; nb=$${n%.*} ; dtc -I dtb -O dts -o $(ARCHIVE)/$(PROJECT)-$(DATE)/dts/$${nb}.dts $$f ; cp $$f $(ARCHIVE)/$(PROJECT)-$(DATE)/dts/$${nb}.dtb ; done )
+	( for f in `find $(YOCTO_DIR)/$(YOCTO_ENV)/$(KERNEL_DTS) -name "*.dtb" -print` ; do n=$$(basename $$f) ; nb=$${n%.*} ; dtc -I dtb -O dts -o $(ARCHIVE)/$(PROJECT)-$(DATE)/dts/$${nb}.dts $$f ; cp $$f $(ARCHIVE)/$(PROJECT)-$(DATE)/dts/$${nb}.dtb ; done )
 	-cp sd.img$(DOT_GZ) $(ARCHIVE)/$(PROJECT)-$(DATE)
 	cp $(YOCTO_DIR)/$(YOCTO_ENV)/$(KERNEL_IMAGE) $(ARCHIVE)/$(PROJECT)-$(DATE)
 	tar czf $(ARCHIVE)/$(PROJECT)-$(DATE)/kernel-source.tgz -C $(YOCTO_DIR)/$(YOCTO_ENV)/tmp/work-shared/$(MACHINE) kernel-source
