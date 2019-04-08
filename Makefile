@@ -5,7 +5,7 @@ SHELL := /bin/bash
 CPUS := $(shell nproc)
 SUDO := $(shell test $${EUID} -ne 0 && echo "sudo")
 LANG := en_US.UTF-8
-DATE := $(shell date --iso-8601)
+DATE := $(shell date +%Y-%m-%d_%H%M)
 ARCHIVE := $(HOME)/data
 .EXPORT_ALL_VARIABLES:
 
@@ -36,6 +36,7 @@ YOCTO_DIR := $(HOME)/ornl-dart-yocto
 YOCTO_DISTRO=fslc-framebuffer
 YOCTO_ENV=build_ornl
 YOCTO_IMG=ornl-image-gui
+YOCTO_CMD := $(YOCTO_IMG)
 
 # https://stackoverflow.com/questions/16488581/looking-for-well-logged-make-output
 # Invoke this with $(call LOG,<cmdline>)
@@ -44,7 +45,7 @@ define LOG
   ($1) 2>&1 | tee -a $(LOGDIR)/$(YOCTO_ENV)-build.log && echo "$$(date --iso-8601='ns'): $1 completed." >>$(LOGDIR)/$(YOCTO_ENV)-make.log
 endef
 
-.PHONY: all archive build clean deps docker-deploy docker-image id locale mrproper see
+.PHONY: all archive build clean deps docker-deploy docker-image id kernel locale mrproper see
 
 default: see
 
@@ -98,7 +99,7 @@ build: $(YOCTO_DIR)/setup-environment build/conf/local.conf build/conf/bblayers.
 		cp $(CURDIR)/build/conf/local.conf $(YOCTO_DIR)/$(YOCTO_ENV)/conf/ && \
 		cp $(CURDIR)/build/conf/bblayers.conf $(YOCTO_DIR)/$(YOCTO_ENV)/conf/ && \
 		touch $(YOCTO_DIR)/$(YOCTO_ENV)/conf/sanity.conf && \
-		cd $(YOCTO_DIR)/$(YOCTO_ENV) && LANG=$(LANG) bitbake $(YOCTO_IMG)
+		cd $(YOCTO_DIR)/$(YOCTO_ENV) && LANG=$(LANG) bitbake $(YOCTO_CMD)
 
 clean:
 	-rm -f $(LOGDIR)/*-build.log $(LOGDIR)/*-make.log
@@ -138,6 +139,17 @@ id:
 	git config --global push.default matching
 	git config --global credential.helper "cache --timeout=5400"
 
+# https://community.nxp.com/docs/DOC-95003
+# https://github.com/uvdl/yocto-ornl/issues/11#issuecomment-462969336
+kernel: $(LOGDIR)
+	-rm sd.img$(DOT_GZ)
+	$(call LOG, $(MAKE) YOCTO_CMD="-c cleansstate u-boot-variscite" build )
+	$(call LOG, $(MAKE) YOCTO_CMD="-c cleansstate linux-variscite" build )
+	$(call LOG, $(MAKE) YOCTO_CMD="-c cleansstate init-ifupdown" build )
+	$(SUDO) rm -r $(YOCTO_DIR)/$(YOCTO_ENV)/tmp/work
+	$(call LOG, $(MAKE) build )
+	$(call LOG, $(MAKE) sd.img$(DOT_GZ) )
+
 locale:
 	# https://wiki.yoctoproject.org/wiki/TipsAndTricks/ResolvingLocaleIssues
 	$(SUDO) apt-get install locales
@@ -159,6 +171,6 @@ see:
 	@echo "*** Build Commands ***"
 	@echo "cd $(YOCTO_DIR)"
 	@echo "MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV)"
-	@echo "cd $(YOCTO_DIR)/$(YOCTO_ENV) && LANG=$(LANG) bitbake $(YOCTO_IMG)"
+	@echo "cd $(YOCTO_DIR)/$(YOCTO_ENV) && LANG=$(LANG) bitbake $(YOCTO_CMD)"
 	@echo "**********************"
 	@echo "Use: \"make all\" to perform this build"
