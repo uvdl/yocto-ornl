@@ -55,4 +55,5 @@ CORE_IMAGE_EXTRA_INSTALL += " \
 	openssl \
 	imx-test \
 	networkmanager \
+	v4l-utils \
 "
