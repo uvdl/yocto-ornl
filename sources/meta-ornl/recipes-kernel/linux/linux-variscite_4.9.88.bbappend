@@ -2,7 +2,7 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}/${MACHINE}:"
 
 LOCALVERSION_var-som-mx6-ornl = "-mx6"
 
-SRCBRANCH_var-som-mx6-ornl = "project/ksz9897-microchip"
+SRCBRANCH_var-som-mx6-ornl = "feature/iris2"
 SRCREV_var-som-mx6-ornl = "${AUTOREV}"
 KERNEL_SRC_var-som-mx6-ornl ?= "git://github.com/uvdl/linux-imx.git;protocol=git"
 
