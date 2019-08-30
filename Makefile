@@ -38,6 +38,14 @@ YOCTO_ENV=build_ornl
 YOCTO_IMG=ornl-image-gui
 YOCTO_CMD := $(YOCTO_IMG)
 
+# Kernel rebuilding; paths relative to $(YOCTO_DIR)/$(YOCTO_ENV)
+_KERNEL_RELATIVE_PATH := tmp/work/var_som_mx6_ornl-fslc-linux-gnueabi/linux-variscite/4.9.88-r0
+KERNEL_BUILD=$(_KERNEL_RELATIVE_PATH)/build
+KERNEL_GIT=$(_KERNEL_RELATIVE_PATH)/git
+KERNEL_IMAGE=$(KERNEL_BUILD)/arch/arm/boot/uImage
+KERNEL_DTS=$(KERNEL_BUILD)/arch/arm/boot/dts
+KERNEL_TEMP=$(_KERNEL_RELATIVE_PATH)/temp
+
 # https://stackoverflow.com/questions/16488581/looking-for-well-logged-make-output
 # Invoke this with $(call LOG,<cmdline>)
 define LOG
@@ -45,7 +53,8 @@ define LOG
   ($1) 2>&1 | tee -a $(LOGDIR)/$(YOCTO_ENV)-build.log && echo "$$(date --iso-8601='ns'): $1 completed." >>$(LOGDIR)/$(YOCTO_ENV)-make.log
 endef
 
-.PHONY: all archive build clean deps docker-deploy docker-image id kernel locale mrproper see
+.PHONY: all archive build clean deps docker-deploy docker-image
+.PHONY: id kernel kernel-config kernel-pull locale mrproper see
 
 default: see
 
@@ -80,9 +89,11 @@ all: $(LOGDIR)
 archive:
 	@mkdir -p $(ARCHIVE)/$(PROJECT)-$(DATE)/dts
 	-mv $(LOGDIR) $(ARCHIVE)/$(PROJECT)-$(DATE)
-	( for f in `find $(YOCTO_DIR)/$(YOCTO_ENV)/tmp/deploy/images/$(MACHINE) -type l -name "*.dtb" -print` ; do n=$$(basename $$f) ; nb=$${n%.*} ; dtc -I dtb -O dts -o $(ARCHIVE)/$(PROJECT)-$(DATE)/dts/$${nb}.dts $$f ; done )
-	cp sd.img$(DOT_GZ) $(ARCHIVE)/$(PROJECT)-$(DATE)
+	( for f in `find $(YOCTO_DIR)/$(YOCTO_ENV)/$(KERNEL_DTS) -name "*.dtb" -print` ; do n=$$(basename $$f) ; nb=$${n%.*} ; dtc -I dtb -O dts -o $(ARCHIVE)/$(PROJECT)-$(DATE)/dts/$${nb}.dts $$f ; cp $$f $(ARCHIVE)/$(PROJECT)-$(DATE)/dts/$${nb}.dtb ; done )
+	-cp sd.img$(DOT_GZ) $(ARCHIVE)/$(PROJECT)-$(DATE)
+	cp $(YOCTO_DIR)/$(YOCTO_ENV)/$(KERNEL_IMAGE) $(ARCHIVE)/$(PROJECT)-$(DATE)
 	tar czf $(ARCHIVE)/$(PROJECT)-$(DATE)/kernel-source.tgz -C $(YOCTO_DIR)/$(YOCTO_ENV)/tmp/work-shared/$(MACHINE) kernel-source
+	@( cd $(YOCTO_DIR)/$(YOCTO_ENV)/$(KERNEL_GIT) && commit=$$(git log | head -1 | tr -s ' ' | cut -f2 | tr -s ' ' | cut -f2 -d' ') ; touch $(ARCHIVE)/$(PROJECT)-$(DATE)/$$commit ) 
 	@echo "# To write image to MMC, do:" > $(ARCHIVE)/$(PROJECT)-$(DATE)/readme.txt
 ifeq ($(DOT_GZ),.gz)
 	@echo "gunzip -c sd.img$(DOT_GZ) > /tmp/sd.img" >> $(ARCHIVE)/$(PROJECT)-$(DATE)/readme.txt
@@ -90,6 +101,10 @@ ifeq ($(DOT_GZ),.gz)
 else
 	@echo "$(SUDO) bmaptool copy sd.img$(DOT_GZ) /dev/sda --nobmap" >> $(ARCHIVE)/$(PROJECT)-$(DATE)/readme.txt
 endif
+	@echo "# To write kernel to MMC, do:" >> $(ARCHIVE)/$(PROJECT)-$(DATE)/readme.txt
+	@echo "$(SUDO) mount -t vfat /dev/sda1 /mnt" >> $(ARCHIVE)/$(PROJECT)-$(DATE)/readme.txt
+	@echo "$(SUDO) cp dts/*.dtb uImage /mnt" >> $(ARCHIVE)/$(PROJECT)-$(DATE)/readme.txt
+	@echo "$(SUDO) umount /mnt" >> $(ARCHIVE)/$(PROJECT)-$(DATE)/readme.txt
 
 build: $(YOCTO_DIR)/setup-environment build/conf/local.conf build/conf/bblayers.conf sources/meta-ornl
 	# https://github.com/gmacario/easy-build/tree/master/build-yocto#bitbake-complains-if-run-as-root
@@ -141,14 +156,24 @@ id:
 
 # https://community.nxp.com/docs/DOC-95003
 # https://github.com/uvdl/yocto-ornl/issues/11#issuecomment-462969336
+# Edison's email from 2019-03-15 Re: FEC driver debugging
 kernel: $(LOGDIR)
 	-rm sd.img$(DOT_GZ)
-	$(call LOG, $(MAKE) YOCTO_CMD="-c cleansstate u-boot-variscite" build )
-	$(call LOG, $(MAKE) YOCTO_CMD="-c cleansstate linux-variscite" build )
-	$(call LOG, $(MAKE) YOCTO_CMD="-c cleansstate init-ifupdown" build )
-	$(SUDO) rm -r $(YOCTO_DIR)/$(YOCTO_ENV)/tmp/work
-	$(call LOG, $(MAKE) build )
-	$(call LOG, $(MAKE) sd.img$(DOT_GZ) )
+	cd $(YOCTO_DIR) && \
+		MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV) && \
+		cd $(YOCTO_DIR)/$(YOCTO_ENV)/$(KERNEL_TEMP) && \
+		./run.do_compile && \
+		./run.do_compile_kernelmodules && \
+		echo "kernel built in $(YOCTO_DIR)/$(YOCTO_ENV)/$(KERNEL_IMAGE)"
+
+kernel-config: $(LOGDIR)
+	cd $(YOCTO_DIR) && \
+		MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV) && \
+		cd $(YOCTO_DIR)/$(YOCTO_ENV)/$(KERNEL_TEMP) && \
+		LANG=$(LANG) bitbake linux-variscite -c menuconfig
+
+kernel-pull:
+	cd $(YOCTO_DIR)/$(YOCTO_ENV)/$(KERNEL_GIT) && git pull
 
 locale:
 	# https://wiki.yoctoproject.org/wiki/TipsAndTricks/ResolvingLocaleIssues
@@ -165,7 +190,8 @@ see:
 	@echo "SUDO=$(SUDO)"
 	@echo "YOCTO_DIR=$(YOCTO_DIR)"
 	@echo "ARCHIVE-TO=$(ARCHIVE)/$(PROJECT)-$(DATE)"
-	@echo "KERNEL=$(YOCTO_DIR)/$(YOCTO_ENV)/tmp/work-shared/$(MACHINE)/kernel-source"
+	@echo -n "KERNEL=$(YOCTO_DIR)/$(YOCTO_ENV)/tmp/work-shared/$(MACHINE)/kernel-source: "
+	@( cd $(YOCTO_DIR)/$(YOCTO_ENV)/$(KERNEL_GIT) && commit=$$(git log | head -1 | tr -s ' ' | cut -f2 | tr -s ' ' | cut -f2 -d' ') ; echo $$commit ) 
 	-@echo "*** local.conf ***" && diff build/conf/local.conf $(YOCTO_DIR)/$(YOCTO_ENV)/conf/local.conf
 	-@echo "*** bblayers.conf ***" && diff build/conf/bblayers.conf $(YOCTO_DIR)/$(YOCTO_ENV)/conf/bblayers.conf
 	@echo "*** Build Commands ***"
