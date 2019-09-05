@@ -4,6 +4,7 @@ LOCALVERSION_var-som-mx6-ornl = "-mx6"
 
 SRCBRANCH_var-som-mx6-ornl = "feature/develop"
 SRCREV_var-som-mx6-ornl = "930c98c12bb9ae1e13765b1f581fe69ac5931457"
+
 KERNEL_SRC_var-som-mx6-ornl ?= "git://github.com/uvdl/linux-imx.git;protocol=git"
 
 SRC_URI_append_var-som-mx6-ornl = " \
