@@ -49,6 +49,7 @@ CORE_IMAGE_EXTRA_INSTALL += " \
 	iperf3 \
 	libtool \
 	python-compiler \
+	python3 python3-pip \
 	strace \
 	screen \
 	minicom \
