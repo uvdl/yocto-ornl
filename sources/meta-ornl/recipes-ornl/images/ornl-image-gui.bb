@@ -48,6 +48,8 @@ CORE_IMAGE_EXTRA_INSTALL += " \
 	make \
 	iperf3 \
 	libtool \
+	libsodium \
+	libsodium-dev \
 	python-compiler \
 	python3 python3-pip \
 	strace \
