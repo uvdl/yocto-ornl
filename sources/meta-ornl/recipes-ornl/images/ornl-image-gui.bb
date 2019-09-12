@@ -51,7 +51,15 @@ CORE_IMAGE_EXTRA_INSTALL += " \
 	libsodium \
 	libsodium-dev \
 	python-compiler \
-	python3 python3-pip \
+	python3 \
+	python3-lxml \
+	python3-pip \
+	python3-protobuf \
+	python3-requests \
+	python3-pexpect \
+	python3-pyserial \
+	python3-pytz \
+	python3-urllib3 \
 	strace \
 	screen \
 	minicom \
