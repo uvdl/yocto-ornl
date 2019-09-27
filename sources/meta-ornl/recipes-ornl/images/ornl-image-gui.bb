@@ -68,4 +68,9 @@ CORE_IMAGE_EXTRA_INSTALL += " \
 	networkmanager \
 	v4l-utils \
 	dtc \
+	gpsd \
+	gps-utils \
+	libgps \
+	ntp \
+	ntp-bin \
 "
