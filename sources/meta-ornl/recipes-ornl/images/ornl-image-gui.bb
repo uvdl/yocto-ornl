@@ -67,4 +67,5 @@ CORE_IMAGE_EXTRA_INSTALL += " \
 	imx-test \
 	networkmanager \
 	v4l-utils \
+	dtc \
 "
