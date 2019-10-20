@@ -4,7 +4,7 @@
 DESCRIPTION = "Minimist Console Image for python3 programs."
 LICENSE = "MIT"
 
-inherit core-image-minimal distro_features_check
+inherit core-image distro_features_check
 
 IMAGE_FEATURES += " \
     package-management \

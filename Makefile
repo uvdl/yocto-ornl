@@ -1,5 +1,4 @@
-# Automation for instructions
-# https://github.com/uvdl/yocto-ornl/tree/feature/yocto_sumo
+# Build Automation
 
 SHELL := /bin/bash
 CPUS := $(shell nproc)
@@ -35,11 +34,11 @@ REPO_SUM=d06f33115aea44e583c8669375b35aad397176a411de3461897444d247b6c220
 YOCTO_DIR := $(HOME)/ornl-dart-yocto
 YOCTO_DISTRO=fslc-framebuffer
 YOCTO_ENV=build_ornl
-YOCTO_IMG=ornl-image-gui
+YOCTO_IMG=ornl-image-cli
 YOCTO_CMD := $(YOCTO_IMG)
 
 # Kernel rebuilding; paths relative to $(YOCTO_DIR)/$(YOCTO_ENV)
-_KERNEL_RELATIVE_PATH := tmp/work/var_som_mx6_ornl-fslc-linux-gnueabi/linux-variscite/4.14.98-r0
+_KERNEL_RELATIVE_PATH := tmp/work/var_som_mx6_ornl-fslc-linux-gnueabi/linux-variscite/4.9.88-r0
 KERNEL_BUILD=$(_KERNEL_RELATIVE_PATH)/build
 KERNEL_GIT=$(_KERNEL_RELATIVE_PATH)/git
 KERNEL_IMAGE=$(KERNEL_BUILD)/arch/arm/boot/uImage
