@@ -2,8 +2,8 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}/${MACHINE}:"
 
 LOCALVERSION_var-som-mx6-ornl = "-mx6"
 
-SRCBRANCH_var-som-mx6-ornl = "imx_4.14.98_2.0.0_ga_uvdl"
-SRCREV_var-som-mx6-ornl = "a76a62c4e59336514a355b8e2e134f4d6709e24f"
+SRCBRANCH_var-som-mx6-ornl = "feature/low-power"
+SRCREV_var-som-mx6-ornl = "e45746bda1f2d42a2e30f24e8c3e1a0ff0824691"
 
 KERNEL_SRC_var-som-mx6-ornl ?= "git://github.com/uvdl/linux-imx.git;protocol=git"
 
