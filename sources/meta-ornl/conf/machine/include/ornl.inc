@@ -1,4 +1,4 @@
-MACHINE_FEATURES += " pci bluetooth touchscreen wifi"
+MACHINE_FEATURES += " pci wifi"
 
 # UBIFS for Variscite 0.5GB NAND flash
 # erase block size of 128KiB
@@ -24,7 +24,7 @@ UBI_VOLNAME  = "rootfs"
 
 # Variscite BSP default providers
 PREFERRED_PROVIDER_virtual/kernel ?= "linux-variscite"
-PREFERRED_VERSION_linux-variscite = "4.9.88"
+PREFERRED_VERSION_linux-variscite = "4.14.98"
 
 PREFERRED_PROVIDER_u-boot = "u-boot-variscite"
 PREFERRED_PROVIDER_virtual/bootloader = "u-boot-variscite"
@@ -44,7 +44,6 @@ MACHINE_EXTRA_RDEPENDS += " \
 			   imx-kobs \
 			   iw \
 			   kernel-modules \
-			   packagegroup-tools-bluetooth \
 			   pm-utils \
 			   rng-tools \
 			   hdparm \
@@ -54,7 +53,6 @@ MACHINE_EXTRA_RDEPENDS += " \
 			   u-boot-fw-utils \
 			   u-boot-splash \
 			   wpa-supplicant \
-			   ${@bb.utils.contains('DISTRO_FEATURES', 'x11', "x11vnc", "", d)} \
 			   "
 
 # Packages added to all images (including core-image-minimal)
@@ -63,7 +61,6 @@ IMAGE_INSTALL_append = " \
 "
 
 BBMASK_prepend = "fsl-image-mfgtool-initramfs "
-BBMASK += "meta-freescale/dynamic-layers/browser-layer/recipes-browser/chromium"
 
 WKS_FILE = "imx-uboot-spl-bootpart.wks"
 IMAGE_FSTYPES += "tar.gz multiubi"

@@ -39,7 +39,7 @@ YOCTO_IMG=ornl-image-gui
 YOCTO_CMD := $(YOCTO_IMG)
 
 # Kernel rebuilding; paths relative to $(YOCTO_DIR)/$(YOCTO_ENV)
-_KERNEL_RELATIVE_PATH := tmp/work/var_som_mx6_ornl-fslc-linux-gnueabi/linux-variscite/4.9.88-r0
+_KERNEL_RELATIVE_PATH := tmp/work/var_som_mx6_ornl-fslc-linux-gnueabi/linux-variscite/4.14.98-r0
 KERNEL_BUILD=$(_KERNEL_RELATIVE_PATH)/build
 KERNEL_GIT=$(_KERNEL_RELATIVE_PATH)/git
 KERNEL_IMAGE=$(KERNEL_BUILD)/arch/arm/boot/uImage

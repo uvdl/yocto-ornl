@@ -6,11 +6,11 @@ OfflineMode=false
 Description = Variscite network configuration
 
 [Wired]
-Enable=true
+Enable=false
 
 [WiFi]
 Enable=true
 
 [Bluetooth]
-Enable=true
+Enable=false
 
