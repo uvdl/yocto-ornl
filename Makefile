@@ -30,6 +30,7 @@ REPO=/usr/local/bin/repo
 REPO_LOC=https://storage.googleapis.com/git-repo-downloads/repo
 # repo version 1.25
 REPO_SUM=d06f33115aea44e583c8669375b35aad397176a411de3461897444d247b6c220
+TOASTER_PORT := 8000
 
 # Known variations
 YOCTO_DIR := $(HOME)/ornl-dart-yocto
@@ -54,7 +55,7 @@ define LOG
 endef
 
 .PHONY: all archive build clean deps docker-deploy docker-image
-.PHONY: id kernel kernel-config kernel-pull locale mrproper see
+.PHONY: id kernel kernel-config kernel-pull locale mrproper see toaster
 
 default: see
 
@@ -124,6 +125,7 @@ deps:
 	$(SUDO) apt-get update
 	$(SUDO) apt-get install -y $(PKGDEPS1)
 	$(SUDO) apt-get install -y $(PKGDEPS2)
+	$(MAKE) --no-print-directory toaster
 
 Dockerfile: Makefile
 	@echo "FROM ubuntu:16.04" > $@
@@ -183,6 +185,8 @@ locale:
 	$(SUDO) update-locale LC ALL=$(LANG) LANG=$(LANG)
 
 mrproper: clean
+	-cd $(YOCTO_DIR)/$(YOCTO_ENV) && \
+		source toaster stop
 	-rm -rf $(YOCTO_DIR)
 
 see:
@@ -200,3 +204,13 @@ see:
 	@echo "cd $(YOCTO_DIR)/$(YOCTO_ENV) && LANG=$(LANG) bitbake $(YOCTO_CMD)"
 	@echo "**********************"
 	@echo "Use: \"make all\" to perform this build"
+
+toaster: $(YOCTO_DIR)/setup-environment
+	# https://www.yoctoproject.org/docs/latest/toaster-manual/toaster-manual.html#toaster-manual-start
+	cd $(YOCTO_DIR) && \
+		cp -r $(CURDIR)/sources/meta-ornl $(YOCTO_DIR)/sources && \
+		MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV) && \
+		cd $(YOCTO_DIR)/$(YOCTO_ENV) && \
+			pip3 install --user -r bitbake/toaster-requirements.txt
+	-cd $(YOCTO_DIR)/$(YOCTO_ENV) && \
+		source toaster start webport=$(TOASTER_PORT)
