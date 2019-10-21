@@ -115,7 +115,9 @@ build: $(YOCTO_DIR)/setup-environment build/conf/local.conf build/conf/bblayers.
 		cp $(CURDIR)/build/conf/local.conf $(YOCTO_DIR)/$(YOCTO_ENV)/conf/ && \
 		cp $(CURDIR)/build/conf/bblayers.conf $(YOCTO_DIR)/$(YOCTO_ENV)/conf/ && \
 		touch $(YOCTO_DIR)/$(YOCTO_ENV)/conf/sanity.conf && \
-		cd $(YOCTO_DIR)/$(YOCTO_ENV) && LANG=$(LANG) bitbake $(YOCTO_CMD)
+		cd $(YOCTO_DIR)/$(YOCTO_ENV) && \
+			source toaster start && \
+			LANG=$(LANG) bitbake $(YOCTO_CMD)
 
 clean:
 	-rm -f $(LOGDIR)/*-build.log $(LOGDIR)/*-make.log
@@ -211,5 +213,4 @@ toaster: $(YOCTO_DIR)/setup-environment
 		cp -r $(CURDIR)/sources/meta-ornl $(YOCTO_DIR)/sources && \
 		MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV) && \
 		cd $(YOCTO_DIR)/$(YOCTO_ENV) && \
-			pip3 install --user -r bitbake/toaster-requirements.txt && \
-			source toaster start webport=$(TOASTER_PORT)
+			pip3 install --user -r bitbake/toaster-requirements.txt
