@@ -211,6 +211,5 @@ toaster: $(YOCTO_DIR)/setup-environment
 		cp -r $(CURDIR)/sources/meta-ornl $(YOCTO_DIR)/sources && \
 		MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV) && \
 		cd $(YOCTO_DIR)/$(YOCTO_ENV) && \
-			pip3 install --user -r bitbake/toaster-requirements.txt
-	-cd $(YOCTO_DIR)/$(YOCTO_ENV) && \
-		source toaster start webport=$(TOASTER_PORT)
+			pip3 install --user -r bitbake/toaster-requirements.txt && \
+			source toaster start webport=$(TOASTER_PORT)
