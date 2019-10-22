@@ -127,7 +127,9 @@ build: $(YOCTO_DIR)/setup-environment build/conf/local.conf build/conf/bblayers.
 		cp $(CURDIR)/build/conf/local.conf $(YOCTO_DIR)/$(YOCTO_ENV)/conf/ && \
 		cp $(CURDIR)/build/conf/bblayers.conf $(YOCTO_DIR)/$(YOCTO_ENV)/conf/ && \
 		touch $(YOCTO_DIR)/$(YOCTO_ENV)/conf/sanity.conf && \
-		cd $(YOCTO_DIR)/$(YOCTO_ENV) && LANG=$(LANG) bitbake $(YOCTO_CMD)
+		cd $(YOCTO_DIR)/$(YOCTO_ENV) && \
+			( source toaster start webport=$(TOASTER_PORT) ; /bin/true ) && \
+			LANG=$(LANG) bitbake $(YOCTO_CMD)
 
 clean:
 	-rm -f $(LOGDIR)/*-build.log $(LOGDIR)/*-make.log
@@ -137,6 +139,7 @@ deps:
 	$(SUDO) apt-get update
 	$(SUDO) apt-get install -y $(PKGDEPS1)
 	$(SUDO) apt-get install -y $(PKGDEPS2)
+	$(MAKE) toaster-install
 
 Dockerfile: Makefile
 	@echo "FROM ubuntu:16.04" > $@
