@@ -7,8 +7,6 @@ SUDO := $(shell test $${EUID} -ne 0 && echo "sudo")
 LANG := en_US.UTF-8
 DATE := $(shell date +%Y-%m-%d_%H%M)
 ARCHIVE := /opt
-SSTATE_DIR := $(ARCHIVE)/sstate-cache
-DL_DIR := $(ARCHIVE)/downloads
 .EXPORT_ALL_VARIABLES:
 
 DOT_GZ=.gz
@@ -65,9 +63,6 @@ default: see
 $(ARCHIVE):
 	mkdir -p $(ARCHIVE)
 
-$(DL_DIR):
-	mkdir -p $(DL_DIR)
-
 $(LOGDIR):
 	mkdir -p $(LOGDIR)
 
@@ -75,9 +70,6 @@ $(REPO): $(shell dirname $(REPO))
 	# https://github.com/curl/curl/issues/1399
 	echo "$(REPO_SUM)  -" > /tmp/sum.txt && curl -fLs $(REPO_LOC) | $(SUDO) tee $@ | sha256sum -c /tmp/sum.txt
 	$(SUDO) chmod a+x $@
-
-$(SSTATE_DIR):
-	mkdir -p $(SSTATE_DIR)
 
 $(YOCTO_DIR):
 	mkdir -p $(YOCTO_DIR)
@@ -119,16 +111,16 @@ endif
 	@echo "$(SUDO) cp dts/*.dtb uImage /mnt" >> $(ARCHIVE)/$(PROJECT)-$(DATE)/readme.txt
 	@echo "$(SUDO) umount /mnt" >> $(ARCHIVE)/$(PROJECT)-$(DATE)/readme.txt
 
-build: $(YOCTO_DIR)/setup-environment build/conf/local.conf build/conf/bblayers.conf sources/meta-ornl $(DL_DIR) $(SSTATE_DIR)
+build: $(YOCTO_DIR)/setup-environment build/conf/local.conf build/conf/bblayers.conf sources/meta-ornl
 	# https://github.com/gmacario/easy-build/tree/master/build-yocto#bitbake-complains-if-run-as-root
 	cd $(YOCTO_DIR) && \
 		cp -r $(CURDIR)/sources/meta-ornl $(YOCTO_DIR)/sources && \
-		MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) DL_DIR=$(DL_DIR) SSTATE_DIR=$(SSTATE_DIR) . setup-environment $(YOCTO_ENV) && \
+		MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV) && \
 		cp $(CURDIR)/build/conf/local.conf $(YOCTO_DIR)/$(YOCTO_ENV)/conf/ && \
 		cp $(CURDIR)/build/conf/bblayers.conf $(YOCTO_DIR)/$(YOCTO_ENV)/conf/ && \
 		touch $(YOCTO_DIR)/$(YOCTO_ENV)/conf/sanity.conf && \
 		cd $(YOCTO_DIR)/$(YOCTO_ENV) && \
-			( source toaster start webport=$(TOASTER_PORT) ; /bin/true ) && \
+			source toaster start && \
 			LANG=$(LANG) bitbake $(YOCTO_CMD)
 
 clean:
@@ -139,7 +131,7 @@ deps:
 	$(SUDO) apt-get update
 	$(SUDO) apt-get install -y $(PKGDEPS1)
 	$(SUDO) apt-get install -y $(PKGDEPS2)
-	$(MAKE) toaster-install
+	$(MAKE) --no-print-directory toaster-install
 
 Dockerfile: Makefile
 	@echo "FROM ubuntu:16.04" > $@
@@ -176,7 +168,7 @@ id:
 kernel: $(LOGDIR)
 	-rm sd.img$(DOT_GZ)
 	cd $(YOCTO_DIR) && \
-		MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) DL_DIR=$(DL_DIR) SSTATE_DIR=$(SSTATE_DIR) . setup-environment $(YOCTO_ENV) && \
+		MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV) && \
 		cd $(YOCTO_DIR)/$(YOCTO_ENV)/$(KERNEL_TEMP) && \
 		./run.do_compile && \
 		./run.do_compile_kernelmodules && \
@@ -184,7 +176,7 @@ kernel: $(LOGDIR)
 
 kernel-config: $(LOGDIR)
 	cd $(YOCTO_DIR) && \
-		MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) DL_DIR=$(DL_DIR) SSTATE_DIR=$(SSTATE_DIR) . setup-environment $(YOCTO_ENV) && \
+		MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV) && \
 		cd $(YOCTO_DIR)/$(YOCTO_ENV)/$(KERNEL_TEMP) && \
 		LANG=$(LANG) bitbake linux-variscite -c menuconfig
 
@@ -212,7 +204,7 @@ see:
 	-@echo "*** bblayers.conf ***" && diff build/conf/bblayers.conf $(YOCTO_DIR)/$(YOCTO_ENV)/conf/bblayers.conf
 	@echo "*** Build Commands ***"
 	@echo "cd $(YOCTO_DIR)"
-	@echo "MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) DL_DIR=$(DL_DIR) SSTATE_DIR=$(SSTATE_DIR) . setup-environment $(YOCTO_ENV)"
+	@echo "MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV)"
 	@echo "cd $(YOCTO_DIR)/$(YOCTO_ENV) && LANG=$(LANG) bitbake $(YOCTO_CMD)"
 	@echo "**********************"
 	@echo "Use: \"make toaster [TOASTER_PORT=NNNN]\" to install and start toaster (default port $(TOASTER_PORT))"
@@ -222,12 +214,12 @@ toaster-install: $(YOCTO_DIR)/setup-environment
 	# https://www.yoctoproject.org/docs/latest/toaster-manual/toaster-manual.html#toaster-manual-start
 	cd $(YOCTO_DIR) && \
 		cp -r $(CURDIR)/sources/meta-ornl $(YOCTO_DIR)/sources && \
-		MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) DL_DIR=$(DL_DIR) SSTATE_DIR=$(SSTATE_DIR) . setup-environment $(YOCTO_ENV) && \
+		MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV) && \
 		cd $(YOCTO_DIR)/sources/poky && \
 			pip3 install --user -r bitbake/toaster-requirements.txt
 
 toaster: toaster-install
-	cd $(YOCTO_DIR)/$(YOCTO_ENV) && source toaster start webport=$(TOASTER_PORT)
+	cd $(YOCTO_DIR)/$(YOCTO_ENV) && source toaster start
 
 toaster-stop:
 	-cd $(YOCTO_DIR)/$(YOCTO_ENV) && source toaster stop
