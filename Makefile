@@ -56,7 +56,7 @@ endef
 
 .PHONY: all archive build clean deps docker-deploy docker-image
 .PHONY: id kernel kernel-config kernel-pull locale mrproper see
-.PHONY: toaster-install toaster toaster-stop
+.PHONY: toaster toaster-stop
 
 default: see
 
@@ -120,7 +120,7 @@ build: $(YOCTO_DIR)/setup-environment build/conf/local.conf build/conf/bblayers.
 		cp $(CURDIR)/build/conf/bblayers.conf $(YOCTO_DIR)/$(YOCTO_ENV)/conf/ && \
 		touch $(YOCTO_DIR)/$(YOCTO_ENV)/conf/sanity.conf && \
 		cd $(YOCTO_DIR)/$(YOCTO_ENV) && \
-			source toaster start && \
+			( source toaster start ; /bin/true ) && \
 			LANG=$(LANG) bitbake $(YOCTO_CMD)
 
 clean:
@@ -131,7 +131,7 @@ deps:
 	$(SUDO) apt-get update
 	$(SUDO) apt-get install -y $(PKGDEPS1)
 	$(SUDO) apt-get install -y $(PKGDEPS2)
-	$(MAKE) --no-print-directory toaster-install
+	$(MAKE) --no-print-directory toaster
 
 Dockerfile: Makefile
 	@echo "FROM ubuntu:16.04" > $@
@@ -207,19 +207,16 @@ see:
 	@echo "MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV)"
 	@echo "cd $(YOCTO_DIR)/$(YOCTO_ENV) && LANG=$(LANG) bitbake $(YOCTO_CMD)"
 	@echo "**********************"
-	@echo "Use: \"make toaster [TOASTER_PORT=NNNN]\" to install and start toaster (default port $(TOASTER_PORT))"
+	@echo "Use: \"make toaster\" to install it so it can track the build (port $(TOASTER_PORT))"
 	@echo "Use: \"make all\" to perform this build"
 
-toaster-install: $(YOCTO_DIR)/setup-environment
+toaster: $(YOCTO_DIR)/setup-environment
 	# https://www.yoctoproject.org/docs/latest/toaster-manual/toaster-manual.html#toaster-manual-start
 	cd $(YOCTO_DIR) && \
 		cp -r $(CURDIR)/sources/meta-ornl $(YOCTO_DIR)/sources && \
 		MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV) && \
 		cd $(YOCTO_DIR)/sources/poky && \
 			pip3 install --user -r bitbake/toaster-requirements.txt
-
-toaster: toaster-install
-	cd $(YOCTO_DIR)/$(YOCTO_ENV) && source toaster start
 
 toaster-stop:
 	-cd $(YOCTO_DIR)/$(YOCTO_ENV) && source toaster stop
