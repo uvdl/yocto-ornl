@@ -125,7 +125,7 @@ build: $(YOCTO_DIR)/setup-environment build/conf/local.conf build/conf/bblayers.
 clean:
 	-rm -f $(LOGDIR)/*-build.log $(LOGDIR)/*-make.log
 	-rm sd.img$(DOT_GZ)
-	-rm -f $(YOCTO_DIR)/sources
+	-rm -rf $(YOCTO_DIR)/sources
 	-rm $(YOCTO_DIR)/$(YOCTO_ENV)/conf/local.conf
 	-rm $(YOCTO_DIR)/$(YOCTO_ENV)/conf/bblayers.conf
 	-rm $(YOCTO_DIR)/$(YOCTO_ENV)/conf/sanity.conf
