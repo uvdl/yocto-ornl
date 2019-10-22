@@ -173,7 +173,7 @@ id:
 kernel: $(LOGDIR)
 	-rm sd.img$(DOT_GZ)
 	cd $(YOCTO_DIR) && \
-		MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV) && \
+		MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) DL_DIR=$(DL_DIR) SSTATE_DIR=$(SSTATE_DIR) . setup-environment $(YOCTO_ENV) && \
 		cd $(YOCTO_DIR)/$(YOCTO_ENV)/$(KERNEL_TEMP) && \
 		./run.do_compile && \
 		./run.do_compile_kernelmodules && \
@@ -181,7 +181,7 @@ kernel: $(LOGDIR)
 
 kernel-config: $(LOGDIR)
 	cd $(YOCTO_DIR) && \
-		MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV) && \
+		MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) DL_DIR=$(DL_DIR) SSTATE_DIR=$(SSTATE_DIR) . setup-environment $(YOCTO_ENV) && \
 		cd $(YOCTO_DIR)/$(YOCTO_ENV)/$(KERNEL_TEMP) && \
 		LANG=$(LANG) bitbake linux-variscite -c menuconfig
 
@@ -209,7 +209,7 @@ see:
 	-@echo "*** bblayers.conf ***" && diff build/conf/bblayers.conf $(YOCTO_DIR)/$(YOCTO_ENV)/conf/bblayers.conf
 	@echo "*** Build Commands ***"
 	@echo "cd $(YOCTO_DIR)"
-	@echo "MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV)"
+	@echo "MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) DL_DIR=$(DL_DIR) SSTATE_DIR=$(SSTATE_DIR) . setup-environment $(YOCTO_ENV)"
 	@echo "cd $(YOCTO_DIR)/$(YOCTO_ENV) && LANG=$(LANG) bitbake $(YOCTO_CMD)"
 	@echo "**********************"
 	@echo "Use: \"make toaster [TOASTER_PORT=NNNN]\" to install and start toaster (default port $(TOASTER_PORT))"
@@ -219,7 +219,7 @@ toaster-install: deps $(YOCTO_DIR)/setup-environment
 	# https://www.yoctoproject.org/docs/latest/toaster-manual/toaster-manual.html#toaster-manual-start
 	cd $(YOCTO_DIR) && \
 		cp -r $(CURDIR)/sources/meta-ornl $(YOCTO_DIR)/sources && \
-		MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV) && \
+		MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) DL_DIR=$(DL_DIR) SSTATE_DIR=$(SSTATE_DIR) . setup-environment $(YOCTO_ENV) && \
 		cd $(YOCTO_DIR)/$(YOCTO_ENV) && \
 			pip3 install --user -r bitbake/toaster-requirements.txt
 
