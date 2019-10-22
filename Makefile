@@ -113,24 +113,27 @@ endif
 build: $(YOCTO_DIR)/setup-environment build/conf/local.conf build/conf/bblayers.conf sources/meta-ornl
 	# https://github.com/gmacario/easy-build/tree/master/build-yocto#bitbake-complains-if-run-as-root
 	cd $(YOCTO_DIR) && \
+		rm -rf $(YOCTO_DIR)/sources/meta-ornl && \
 		cp -r $(CURDIR)/sources/meta-ornl $(YOCTO_DIR)/sources && \
 		MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV) && \
 		cp $(CURDIR)/build/conf/local.conf $(YOCTO_DIR)/$(YOCTO_ENV)/conf/ && \
 		cp $(CURDIR)/build/conf/bblayers.conf $(YOCTO_DIR)/$(YOCTO_ENV)/conf/ && \
 		touch $(YOCTO_DIR)/$(YOCTO_ENV)/conf/sanity.conf && \
 		cd $(YOCTO_DIR)/$(YOCTO_ENV) && \
-			( source toaster start ; /bin/true ) && \
 			LANG=$(LANG) bitbake $(YOCTO_CMD)
 
 clean:
 	-rm -f $(LOGDIR)/*-build.log $(LOGDIR)/*-make.log
 	-rm sd.img$(DOT_GZ)
+	-rm -rf $(YOCTO_DIR)/sources
+	-rm $(YOCTO_DIR)/$(YOCTO_ENV)/conf/local.conf
+	-rm $(YOCTO_DIR)/$(YOCTO_ENV)/conf/bblayers.conf
+	-rm $(YOCTO_DIR)/$(YOCTO_ENV)/conf/sanity.conf
 
 deps:
 	$(SUDO) apt-get update
 	$(SUDO) apt-get install -y $(PKGDEPS1)
 	$(SUDO) apt-get install -y $(PKGDEPS2)
-	$(MAKE) --no-print-directory toaster
 
 Dockerfile: Makefile
 	@echo "FROM ubuntu:16.04" > $@
@@ -212,10 +215,12 @@ see:
 toaster: $(YOCTO_DIR)/setup-environment
 	# https://www.yoctoproject.org/docs/latest/toaster-manual/toaster-manual.html#toaster-manual-start
 	cd $(YOCTO_DIR) && \
+		rm -rf $(YOCTO_DIR)/sources/meta-ornl && \
 		cp -r $(CURDIR)/sources/meta-ornl $(YOCTO_DIR)/sources && \
 		MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV) && \
 		cd $(YOCTO_DIR)/sources/poky && \
-			pip3 install --user -r bitbake/toaster-requirements.txt
+			pip3 install --user -r bitbake/toaster-requirements.txt && \
+			cd $(YOCTO_DIR)/$(YOCTO_ENV) && source toaster start
 
 toaster-stop:
 	-cd $(YOCTO_DIR)/$(YOCTO_ENV) && source toaster stop

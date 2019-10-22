@@ -37,9 +37,9 @@ CORE_IMAGE_EXTRA_INSTALL += " \
 	python3-pyserial \
 	python3-pytz \
 	python3-urllib3 \
-	systemd-analyze \
 	strace \
 	screen \
+	systemd-analyze \
 	minicom \
 	openssl \
 	networkmanager \
@@ -49,4 +49,5 @@ CORE_IMAGE_EXTRA_INSTALL += " \
 	libgps \
 	ntp \
 	ntp-bin \
+	postinstall \
 "
