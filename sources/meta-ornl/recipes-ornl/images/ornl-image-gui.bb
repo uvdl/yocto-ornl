@@ -56,6 +56,7 @@ CORE_IMAGE_EXTRA_INSTALL += " \
 	python3-urllib3 \
 	strace \
 	screen \
+	systemd-analyze \
 	minicom \
 	openssl \
 	imx-test \
@@ -67,4 +68,5 @@ CORE_IMAGE_EXTRA_INSTALL += " \
 	libgps \
 	ntp \
 	ntp-bin \
+	postinstall \
 "
