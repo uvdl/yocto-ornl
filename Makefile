@@ -1,12 +1,14 @@
 # Automation for instructions
-# https://github.com/uvdl/yocto-ornl/tree/feature/yocto_sumo
+# https://github.com/uvdl/yocto-ornl/tree/develop
 
 SHELL := /bin/bash
 CPUS := $(shell nproc)
 SUDO := $(shell test $${EUID} -ne 0 && echo "sudo")
 LANG := en_US.UTF-8
 DATE := $(shell date +%Y-%m-%d_%H%M)
-ARCHIVE := $(HOME)/data
+ARCHIVE := /opt
+SSTATE_DIR := $(ARCHIVE)/sstate-cache
+DL_DIR := $(ARCHIVE)/downloads
 .EXPORT_ALL_VARIABLES:
 
 DOT_GZ=.gz
@@ -60,6 +62,12 @@ endef
 
 default: see
 
+$(ARCHIVE):
+	mkdir -p $(ARCHIVE)
+
+$(DL_DIR):
+	mkdir -p $(DL_DIR)
+
 $(LOGDIR):
 	mkdir -p $(LOGDIR)
 
@@ -67,6 +75,9 @@ $(REPO): $(shell dirname $(REPO))
 	# https://github.com/curl/curl/issues/1399
 	echo "$(REPO_SUM)  -" > /tmp/sum.txt && curl -fLs $(REPO_LOC) | $(SUDO) tee $@ | sha256sum -c /tmp/sum.txt
 	$(SUDO) chmod a+x $@
+
+$(SSTATE_DIR):
+	mkdir -p $(SSTATE_DIR)
 
 $(YOCTO_DIR):
 	mkdir -p $(YOCTO_DIR)
@@ -108,11 +119,11 @@ endif
 	@echo "$(SUDO) cp dts/*.dtb uImage /mnt" >> $(ARCHIVE)/$(PROJECT)-$(DATE)/readme.txt
 	@echo "$(SUDO) umount /mnt" >> $(ARCHIVE)/$(PROJECT)-$(DATE)/readme.txt
 
-build: $(YOCTO_DIR)/setup-environment build/conf/local.conf build/conf/bblayers.conf sources/meta-ornl
+build: $(YOCTO_DIR)/setup-environment build/conf/local.conf build/conf/bblayers.conf sources/meta-ornl $(DL_DIR) $(SSTATE_DIR)
 	# https://github.com/gmacario/easy-build/tree/master/build-yocto#bitbake-complains-if-run-as-root
 	cd $(YOCTO_DIR) && \
 		cp -r $(CURDIR)/sources/meta-ornl $(YOCTO_DIR)/sources && \
-		MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV) && \
+		MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) DL_DIR=$(DL_DIR) SSTATE_DIR=$(SSTATE_DIR) . setup-environment $(YOCTO_ENV) && \
 		cp $(CURDIR)/build/conf/local.conf $(YOCTO_DIR)/$(YOCTO_ENV)/conf/ && \
 		cp $(CURDIR)/build/conf/bblayers.conf $(YOCTO_DIR)/$(YOCTO_ENV)/conf/ && \
 		touch $(YOCTO_DIR)/$(YOCTO_ENV)/conf/sanity.conf && \
