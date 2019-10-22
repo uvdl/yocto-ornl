@@ -220,7 +220,7 @@ toaster-install: deps $(YOCTO_DIR)/setup-environment
 	cd $(YOCTO_DIR) && \
 		cp -r $(CURDIR)/sources/meta-ornl $(YOCTO_DIR)/sources && \
 		MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) DL_DIR=$(DL_DIR) SSTATE_DIR=$(SSTATE_DIR) . setup-environment $(YOCTO_ENV) && \
-		cd $(YOCTO_DIR)/$(YOCTO_ENV) && \
+		cd $(YOCTO_DIR)/sources/poky && \
 			pip3 install --user -r bitbake/toaster-requirements.txt
 
 toaster: toaster-install
