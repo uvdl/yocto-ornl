@@ -15,7 +15,6 @@ IMAGE_FEATURES += " \
     ssh-server-dropbear \
     hwcodecs \
     tools-debug \
-    systemd-analyze \
     ${@bb.utils.contains('DISTRO_FEATURES', 'wayland', '', \
        bb.utils.contains('DISTRO_FEATURES',     'x11', 'x11-base x11-sato', \
                                                        '', d), d)} \
