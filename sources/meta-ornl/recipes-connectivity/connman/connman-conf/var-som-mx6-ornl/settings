@@ -1,9 +1,9 @@
-#default network setup for Variscite SOM MX6
+# default network setup
 #
 #
 [global]
 OfflineMode=false
-Description = Variscite network configuration
+Description = Network configuration
 
 [Wired]
 Enable=true
@@ -12,5 +12,5 @@ Enable=true
 Enable=true
 
 [Bluetooth]
-Enable=true
+Enable=false
 
