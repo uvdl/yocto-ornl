@@ -218,7 +218,7 @@ see:
 	@echo "Use: \"make toaster [TOASTER_PORT=NNNN]\" to install and start toaster (default port $(TOASTER_PORT))"
 	@echo "Use: \"make all\" to perform this build"
 
-toaster-install: deps $(YOCTO_DIR)/setup-environment
+toaster-install: $(YOCTO_DIR)/setup-environment
 	# https://www.yoctoproject.org/docs/latest/toaster-manual/toaster-manual.html#toaster-manual-start
 	cd $(YOCTO_DIR) && \
 		cp -r $(CURDIR)/sources/meta-ornl $(YOCTO_DIR)/sources && \
