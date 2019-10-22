@@ -43,8 +43,8 @@ YOCTO_CMD := $(YOCTO_IMG)
 _KERNEL_RELATIVE_PATH := tmp/work/var_som_mx6_ornl-fslc-linux-gnueabi/linux-variscite/4.9.88-r0
 KERNEL_BUILD=$(_KERNEL_RELATIVE_PATH)/build
 KERNEL_GIT=$(_KERNEL_RELATIVE_PATH)/git
-KERNEL_IMAGE=$(KERNEL_BUILD)/arch/arm/boot/uImage
-KERNEL_DTS=$(KERNEL_BUILD)/arch/arm/boot/dts
+KERNEL_IMAGE=tmp/deploy/images/$(MACHINE)/uImage
+KERNEL_DTS=tmp/work-shared/$(MACHINE)/kernel-source/arch/arm/boot/dts
 KERNEL_TEMP=$(_KERNEL_RELATIVE_PATH)/temp
 
 # https://stackoverflow.com/questions/16488581/looking-for-well-logged-make-output
