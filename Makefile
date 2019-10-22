@@ -5,7 +5,7 @@ CPUS := $(shell nproc)
 SUDO := $(shell test $${EUID} -ne 0 && echo "sudo")
 LANG := en_US.UTF-8
 DATE := $(shell date +%Y-%m-%d_%H%M)
-ARCHIVE := $(HOME)/data
+ARCHIVE := /opt
 .EXPORT_ALL_VARIABLES:
 
 DOT_GZ=.gz
@@ -29,6 +29,7 @@ REPO=/usr/local/bin/repo
 REPO_LOC=https://storage.googleapis.com/git-repo-downloads/repo
 # repo version 1.25
 REPO_SUM=d06f33115aea44e583c8669375b35aad397176a411de3461897444d247b6c220
+TOASTER_PORT := 8000
 
 # Known variations
 YOCTO_DIR := $(HOME)/ornl-dart-yocto
@@ -41,8 +42,8 @@ YOCTO_CMD := $(YOCTO_IMG)
 _KERNEL_RELATIVE_PATH := tmp/work/var_som_mx6_ornl-fslc-linux-gnueabi/linux-variscite/4.9.88-r0
 KERNEL_BUILD=$(_KERNEL_RELATIVE_PATH)/build
 KERNEL_GIT=$(_KERNEL_RELATIVE_PATH)/git
-KERNEL_IMAGE=$(KERNEL_BUILD)/arch/arm/boot/uImage
-KERNEL_DTS=$(KERNEL_BUILD)/arch/arm/boot/dts
+KERNEL_IMAGE=tmp/deploy/images/$(MACHINE)/uImage
+KERNEL_DTS=tmp/deploy/images/$(MACHINE)
 KERNEL_TEMP=$(_KERNEL_RELATIVE_PATH)/temp
 
 # https://stackoverflow.com/questions/16488581/looking-for-well-logged-make-output
@@ -54,8 +55,12 @@ endef
 
 .PHONY: all archive build clean deps docker-deploy docker-image
 .PHONY: id kernel kernel-config kernel-pull locale mrproper see
+.PHONY: toaster toaster-stop
 
 default: see
+
+$(ARCHIVE):
+	mkdir -p $(ARCHIVE)
 
 $(LOGDIR):
 	mkdir -p $(LOGDIR)
@@ -113,7 +118,9 @@ build: $(YOCTO_DIR)/setup-environment build/conf/local.conf build/conf/bblayers.
 		cp $(CURDIR)/build/conf/local.conf $(YOCTO_DIR)/$(YOCTO_ENV)/conf/ && \
 		cp $(CURDIR)/build/conf/bblayers.conf $(YOCTO_DIR)/$(YOCTO_ENV)/conf/ && \
 		touch $(YOCTO_DIR)/$(YOCTO_ENV)/conf/sanity.conf && \
-		cd $(YOCTO_DIR)/$(YOCTO_ENV) && LANG=$(LANG) bitbake $(YOCTO_CMD)
+		cd $(YOCTO_DIR)/$(YOCTO_ENV) && \
+			( source toaster start ; /bin/true ) && \
+			LANG=$(LANG) bitbake $(YOCTO_CMD)
 
 clean:
 	-rm -f $(LOGDIR)/*-build.log $(LOGDIR)/*-make.log
@@ -123,6 +130,7 @@ deps:
 	$(SUDO) apt-get update
 	$(SUDO) apt-get install -y $(PKGDEPS1)
 	$(SUDO) apt-get install -y $(PKGDEPS2)
+	$(MAKE) --no-print-directory toaster
 
 Dockerfile: Makefile
 	@echo "FROM ubuntu:16.04" > $@
@@ -181,7 +189,7 @@ locale:
 	$(SUDO) locale-gen $(LANG)
 	$(SUDO) update-locale LC ALL=$(LANG) LANG=$(LANG)
 
-mrproper: clean
+mrproper: clean toaster-stop
 	-rm -rf $(YOCTO_DIR)
 
 see:
@@ -198,4 +206,16 @@ see:
 	@echo "MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV)"
 	@echo "cd $(YOCTO_DIR)/$(YOCTO_ENV) && LANG=$(LANG) bitbake $(YOCTO_CMD)"
 	@echo "**********************"
+	@echo "Use: \"make toaster\" to install it so it can track the build (port $(TOASTER_PORT))"
 	@echo "Use: \"make all\" to perform this build"
+
+toaster: $(YOCTO_DIR)/setup-environment
+	# https://www.yoctoproject.org/docs/latest/toaster-manual/toaster-manual.html#toaster-manual-start
+	cd $(YOCTO_DIR) && \
+		cp -r $(CURDIR)/sources/meta-ornl $(YOCTO_DIR)/sources && \
+		MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV) && \
+		cd $(YOCTO_DIR)/sources/poky && \
+			pip3 install --user -r bitbake/toaster-requirements.txt
+
+toaster-stop:
+	-cd $(YOCTO_DIR)/$(YOCTO_ENV) && source toaster stop
