@@ -4,7 +4,10 @@
 DESCRIPTION = "Minimist Console Image for python3 programs."
 LICENSE = "MIT"
 
-inherit core-image distro_features_check
+inherit core-image distro_features_check extrausers
+
+# https://wiki.yoctoproject.org/wiki/FAQ:How_do_I_set_or_change_the_root_password
+EXTRA_USERS_PARAMS = "usermod -P root root;"
 
 IMAGE_FEATURES += " \
     package-management \
@@ -39,7 +42,6 @@ CORE_IMAGE_EXTRA_INSTALL += " \
 	screen \
 	minicom \
 	openssl \
-	imx-test \
 	networkmanager \
 	dtc \
 	gpsd \
