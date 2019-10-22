@@ -44,7 +44,7 @@ _KERNEL_RELATIVE_PATH := tmp/work/var_som_mx6_ornl-fslc-linux-gnueabi/linux-vari
 KERNEL_BUILD=$(_KERNEL_RELATIVE_PATH)/build
 KERNEL_GIT=$(_KERNEL_RELATIVE_PATH)/git
 KERNEL_IMAGE=tmp/deploy/images/$(MACHINE)/uImage
-KERNEL_DTS=tmp/work-shared/$(MACHINE)/kernel-source/arch/arm/boot/dts
+KERNEL_DTS=tmp/deploy/images/$(MACHINE)
 KERNEL_TEMP=$(_KERNEL_RELATIVE_PATH)/temp
 
 # https://stackoverflow.com/questions/16488581/looking-for-well-logged-make-output
