@@ -117,10 +117,11 @@ build: $(YOCTO_DIR)/setup-environment build/conf/local.conf build/conf/bblayers.
 		rm -rf $(YOCTO_DIR)/sources/meta-ornl && \
 		cp -r $(CURDIR)/sources/meta-ornl $(YOCTO_DIR)/sources && \
 		MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV) && \
-		cp $(CURDIR)/build/conf/local.conf $(YOCTO_DIR)/$(YOCTO_ENV)/conf/ && \
-		cp $(CURDIR)/build/conf/bblayers.conf $(YOCTO_DIR)/$(YOCTO_ENV)/conf/ && \
+		diff -sq $(CURDIR)/build/conf/local.conf $(YOCTO_DIR)/$(YOCTO_ENV)/conf/ && \
+		diff -sq $(CURDIR)/build/conf/bblayers.conf $(YOCTO_DIR)/$(YOCTO_ENV)/conf/ && \
 		touch $(YOCTO_DIR)/$(YOCTO_ENV)/conf/sanity.conf && \
 		cd $(YOCTO_DIR)/$(YOCTO_ENV) && \
+			if [ -e .toaster ] ; then source toaster stop ; source toaster start ; /bin/true ; fi && \
 			LANG=$(LANG) bitbake $(YOCTO_CMD)
 
 clean:
@@ -219,9 +220,13 @@ toaster: $(YOCTO_DIR)/setup-environment
 		rm -rf $(YOCTO_DIR)/sources/meta-ornl && \
 		cp -r $(CURDIR)/sources/meta-ornl $(YOCTO_DIR)/sources && \
 		MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV) && \
+		cp $(CURDIR)/build/conf/local.conf $(YOCTO_DIR)/$(YOCTO_ENV)/conf/ && \
+		cp $(CURDIR)/build/conf/bblayers.conf $(YOCTO_DIR)/$(YOCTO_ENV)/conf/ && \
 		cd $(YOCTO_DIR)/sources/poky && \
 			pip3 install --user -r bitbake/toaster-requirements.txt && \
-			cd $(YOCTO_DIR)/$(YOCTO_ENV) && source toaster start
+			touch $(YOCTO_DIR)/$(YOCTO_ENV)/.toaster
 
 toaster-stop:
-	-cd $(YOCTO_DIR)/$(YOCTO_ENV) && source toaster stop
+	-cd $(YOCTO_DIR) && \
+		MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV) && \
+		cd $(YOCTO_DIR)/$(YOCTO_ENV) && source toaster stop && rm .toaster
