@@ -227,4 +227,5 @@ toaster: $(YOCTO_DIR)/setup-environment
 toaster-stop:
 	-cd $(YOCTO_DIR) && \
 		MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV) && \
-		cd $(YOCTO_DIR)/$(YOCTO_ENV) && source toaster stop && rm .toaster
+		cd $(YOCTO_DIR)/$(YOCTO_ENV) && \
+			source toaster stop && ( rm .toaster ; /bin/true )
