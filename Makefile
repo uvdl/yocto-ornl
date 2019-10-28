@@ -46,6 +46,9 @@ KERNEL_IMAGE=tmp/deploy/images/$(MACHINE)/uImage
 KERNEL_DTS=tmp/deploy/images/$(MACHINE)
 KERNEL_TEMP=$(_KERNEL_RELATIVE_PATH)/temp
 
+# https://stackoverflow.com/questions/50015694/do-rootfs-function-failed-in-yocto-project
+_OE_ROOTFS_REPO_RELATIVE_PATH := tmp/work/var_som_mx6_ornl-fslc-linux-gnueabi/ornl-image-cli/1.0-r0/oe-rootfs-repo/.repodata
+
 # https://stackoverflow.com/questions/16488581/looking-for-well-logged-make-output
 # Invoke this with $(call LOG,<cmdline>)
 define LOG
@@ -130,6 +133,7 @@ clean:
 	-rm $(YOCTO_DIR)/$(YOCTO_ENV)/conf/local.conf
 	-rm $(YOCTO_DIR)/$(YOCTO_ENV)/conf/bblayers.conf
 	-rm $(YOCTO_DIR)/$(YOCTO_ENV)/conf/sanity.conf
+	-rm -rf $(YOCTO_DIR)/$(YOCTO_ENV)/$(_OE_ROOTFS_REPO_RELATIVE_PATH)
 
 deps:
 	$(SUDO) apt-get update
