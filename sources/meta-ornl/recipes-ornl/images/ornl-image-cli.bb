@@ -15,6 +15,8 @@ IMAGE_FEATURES += " \
     tools-debug \
 "
 
+IMAGE_ROOTFS_EXTRA_SPACE = "5242880"
+
 CORE_IMAGE_EXTRA_INSTALL += " \
 	packagegroup-core-full-cmdline \
 	nodejs \
