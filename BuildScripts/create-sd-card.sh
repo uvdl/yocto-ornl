@@ -29,8 +29,6 @@ readonly YOCTO_IMAGE=$3
 # copy the script over
 cp -f var-create-yocto-sdcard.sh $YOCTO_BUILD_DIRECTORY/sources/meta-variscite-fslc/scripts/var_mk_yocto_sdcard/var-create-yocto-sdcard.sh
 
-readonly CURRENT_DIR=$pwd
-
 eval cd $YOCTO_BUILD_DIRECTORY
 
 # run the script
