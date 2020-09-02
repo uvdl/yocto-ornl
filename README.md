@@ -1,6 +1,8 @@
 # UVDL Yocto Install Guide
 
-## Installing required packages
+## Option1
+
+### Installing required packages
 
 Please make sure your host PC is running Ubuntu 16.04 64-bit and install the following packages:
 
@@ -16,7 +18,7 @@ mercurial automake groff curl lzop asciidoc u-boot-tools dos2unix mtd-utils pv \
 libncurses5 libncurses5-dev libncursesw5-dev libelf-dev zlib1g-dev
 </pre>
 
-## Downloading Yocto Sumo
+### Downloading Yocto Sumo
 
 - Configure your git global configuration settings (important in order to push changes to repo)
 
@@ -47,7 +49,7 @@ $YOCTO_DIR$ repo init -u https://github.com/varigit/variscite-bsp-platform.git -
 $YOCTO_DIR$ repo sync -j4
 </pre>
 
-## Download ORNL layer
+### Download ORNL layer
 
 <pre>
 $YOCTO_DIR$ git clone https://github.com/uvdl/yocto-ornl.git
@@ -57,13 +59,13 @@ $YOCTO_DIR/ornl$ cd ..
 $YOCTO_DIR$ cp -r yocto-ornl/sources/meta-ornl sources
 </pre>
 
-## Set-up Yocto build environment
+### Set-up Yocto build environment
 
 <pre>
 $YOCTO_DIR$ MACHINE=var-som-mx6-ornl DISTRO=fslc-framebuffer . setup-environment build_ornl
 </pre>
 
-## Build Yocto
+### Build Yocto
 
 - Before building the project, overwrite the configuration files
 
@@ -73,14 +75,64 @@ $YOCTO_DIR$ cp yocto-ornl/build/conf/local.conf build_ornl/conf/
 $YOCTO_DIR$ cp yocto-ornl/build/conf/bblayers.conf build_ornl/conf/
 </pre>
 
-## Finally, start the build
+### Finally, start the build
 
 <pre>
 $YOCTO_DIR/build_fb$ cd build_ornl
 $YOCTO_DIR/build_fb$ bitbake ornl-image-gui
 </pre>
 
-## Create an SDcard
+## Option 2
+
+This option takes advantage of the ornl setup script. There are three different ways to use it.
+
+### Full Setup with default yocto-ornl branch
+
+This option will install all the dependencies needed, clone and pull all needed repos, and make the build directory for you.  All you need to do is
+run the following command : 
+
+<pre>
+. ornl-setup-yocto.sh [path_to_new_build_directory] [version_of_yocto]
+</pre>
+
+*path_to_new_build_directory* - this is simply the path that you wish to have the new build directory located, i.e. /home/user/Workspace
+*version_of_yocto* - the only versions of Yocto that are supported currently are sumo and thud.
+
+Default branch is develop
+
+### Full Setup with User defined yocto-ornl branch
+
+This option will do the same as the previous but will the option to define what branch of the ORNL Yocto layer you want. All you need to do is
+run the following command : 
+
+<pre>
+. ornl-setup-yocto.sh -c [user_def_branch] [path_to_new_build_directory] [version_of_yocto]
+</pre>
+
+*user_def_branch* - This is the branch that you wish the script to checkout when a new version of uvdl/yocto-ornl is cloned
+The last two arguments are the exact same as before.
+
+### Run just the setup-environment script
+
+This will **NOT** go through the entire setup prcoess.  This can be thought of as just a wrapper for the setup-environment script that you have to
+run in order to run bitbake.  This will **ALSO** copy the local.conf and bblayers.conf files into the build directory.  
+
+<pre>
+. ornl-setup-yocto.sh -b [path_to_build_directory]
+</pre>
+
+This assumes the build directory has already been created.  Just pass the path to the build directory and it *should* be happy.
+
+### Finally, start the build
+
+This step remains the same for both options.
+
+<pre>
+$YOCTO_DIR/build_fb$ cd build_ornl
+$YOCTO_DIR/build_fb$ bitbake ornl-image-gui
+</pre>
+
+# Create an SDcard
 
 **Option 1**
 
