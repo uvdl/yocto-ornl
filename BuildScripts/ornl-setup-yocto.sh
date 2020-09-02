@@ -376,6 +376,7 @@ function help_menu()
 # Script Start
 # =================================================================================
 
+# This looks awful, TODO :: change this to not be so clunky
 # Basically we have to have > 1 arguments and less than 5. and no odd numbers 
 if [ $# -lt 2 ] || [ $# -eq 3 ] || [ $# -gt 4 ]
     then
@@ -389,7 +390,7 @@ if [ "$EUID" -eq 0 ]
         echo "You are logged in as root, some directories will be created with root only access if you continue."
         read -p "Do you wish to proceed? [Y/n] " lets_ride
         lets_ride=${lets_ride:-Y}
-        if [ $lets_ride != "Y" ]
+        if [ $lets_ride != "Y" ] || [ $lets_ride != "y" ]
             then
                 return 0
         fi
@@ -405,7 +406,7 @@ if [ "$ubuntu_release" != "16.04" ]
         echo "This build is only guaranteed to work with Ubuntu 16.04"
         read -p "Do you wish to proceed [y/N]: " answer
         answer=${answer:-N}
-        if [ $answer = "N" ]
+        if [ $answer = "N" ] || [ $answer = "n" ]
             then
                 return 0
         fi
@@ -500,7 +501,7 @@ read -p "Are these correct [Y/n]: " acceptance
 acceptance=${acceptance:-Y}
 
 # Check to see if we should go on
-if [[ $acceptance != "Y" ]]
+if [ $acceptance != "Y" ] || [ $acceptance != "y" ]
     then
         help_menu
 fi
