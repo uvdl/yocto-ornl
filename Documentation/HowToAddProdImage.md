@@ -25,3 +25,12 @@ So far we have been appending to the global variable IMAGE_FEATURES and CORE_IMA
 [IMAGE_FEATURES](https://www.yoctoproject.org/docs/current/mega-manual/mega-manual.html#ref-features-image)
 
 [CORE_IMAGE_EXTRA_INSTALL](https://www.yoctoproject.org/docs/current/mega-manual/mega-manual.html#var-EXTRA_IMAGE_FEATURES)
+
+**How to Build**
+
+After setting up the build environment (see README.md), all you will need to run is the following command.
+<pre>
+bitbake < name-of-your-image >
+</pre>
+
+After how ever long it takes, you will then have a new *production* ready image.
