@@ -1,7 +1,7 @@
 # Copyright (C) 2015 Freescale Semiconductor
 # Released under the MIT license (see COPYING.MIT for the terms)
 
-DESCRIPTION = "Display-enabled Image for python3 programs."
+DESCRIPTION = "Basically everything but the kitchen sink build."
 LICENSE = "MIT"
 
 inherit core-image distro_features_check extrausers
@@ -10,14 +10,13 @@ inherit core-image distro_features_check extrausers
 EXTRA_USERS_PARAMS = "usermod -P root root;"
 
 IMAGE_FEATURES += " \
+    debug-tweaks \
+    tools-sdk \
     splash \
     package-management \
-    ssh-server-dropbear \
+    ssh-server-openssh \
     hwcodecs \
     tools-debug \
-    ${@bb.utils.contains('DISTRO_FEATURES', 'wayland', '', \
-       bb.utils.contains('DISTRO_FEATURES',     'x11', 'x11-base x11-sato', \
-                                                       '', d), d)} \
 "
 
 CORE_IMAGE_EXTRA_INSTALL += " \
@@ -30,10 +29,6 @@ CORE_IMAGE_EXTRA_INSTALL += " \
 	packagegroup-fsl-tools-benchmark \
 	packagegroup-fsl-gstreamer1.0 \
 	packagegroup-fsl-gstreamer1.0-full \
-	${@bb.utils.contains('DISTRO_FEATURES', 'wayland', 'weston-init', '', d)} \
-        ${@bb.utils.contains('DISTRO_FEATURES', 'x11 wayland', 'weston-xwayland xterm', '', d)} \
-        ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'xterm', '', d)} \
-        ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'packagegroup-core-x11-sato-games', '', d)} \
 	nodejs \
 	flex \
 	gcc \
