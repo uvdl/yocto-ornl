@@ -19,7 +19,7 @@ IMAGE_FEATURES += " \
     tools-debug \
 "
 
-CORE_IMAGE_EXTRA_INSTALL += " \
+IMAGE_INSTALL_append += " \
 	packagegroup-core-full-cmdline \
 	packagegroup-tools-bluetooth \
 	packagegroup-imx-tools-audio \
