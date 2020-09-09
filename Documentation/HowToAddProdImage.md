@@ -25,3 +25,7 @@ So far we have been appending to the global variable IMAGE_FEATURES and CORE_IMA
 [IMAGE_FEATURES](https://www.yoctoproject.org/docs/current/mega-manual/mega-manual.html#ref-features-image)
 
 [CORE_IMAGE_EXTRA_INSTALL](https://www.yoctoproject.org/docs/current/mega-manual/mega-manual.html#var-EXTRA_IMAGE_FEATURES)
+
+**SWUpdate Files**
+
+If SWUpdate files exist for the new image then they will need to be tracked as well.  Those typically reside in the recipes-support/ directory under swupdate.  See the Update Guide file for more information. The most important SWUpdate files to add are the artifact recipes, i.e. var-dev-image-swu.bb.  If this is a new project, you might consider adding a recipe to build a new update artifact or maybe just adding on to one that already exists.
