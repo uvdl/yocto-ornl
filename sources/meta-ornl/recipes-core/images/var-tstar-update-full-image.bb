@@ -1,4 +1,4 @@
-SUMMARY = "Stargazer production image"
+SUMMARY = "Generic Production DART Update Image"
 
 IMAGE_FEATURES += "ssh-server-dropbear splash "
 
