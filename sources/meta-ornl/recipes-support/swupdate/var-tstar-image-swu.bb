@@ -24,4 +24,4 @@ SWUPDATE_IMAGES = " \
 
 # Images can have multiple formats - define which image must be
 # taken to be put in the compound image
-SWUPDATE_IMAGES_FSTYPES[var-tstart-update-full-image] = ".tar.gz"
+SWUPDATE_IMAGES_FSTYPES[var-tstar-update-full-image] = ".tar.gz"
