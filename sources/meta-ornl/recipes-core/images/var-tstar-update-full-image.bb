@@ -1,6 +1,9 @@
-SUMMARY = "T-Star Production DART Update Image"
+SUMMARY = "T-Star Variscite Update Image"
 
 IMAGE_FEATURES += "ssh-server-dropbear splash "
+
+# https://wiki.yoctoproject.org/wiki/FAQ:How_do_I_set_or_change_the_root_password
+EXTRA_USERS_PARAMS = "usermod -P root root;"
 
 LICENSE = "MIT"
 
