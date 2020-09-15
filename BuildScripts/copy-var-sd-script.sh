@@ -9,7 +9,7 @@ help(){
     exit 1
 }
 
-if [ "$#" -ne 3 ] 
+if [ "$#" -ne 1 ] 
     then
         help
 fi

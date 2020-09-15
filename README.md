@@ -169,7 +169,14 @@ Use the var-create-yocto-sdcard.sh script that is supplied by Variscite under th
 ***NOTES***
 - The Yocto Path needs to be the full path.
 
-When using the Variscite script use the -a **AND** -r options.
+When using the Variscite script use the -a **AND** -r options. The following command should be used : 
+
+<pre>
+sudo MACHINE=var-som-mx6-ornl sources/meta-variscite-fslc/scripts/var_mk_yocto_sdcard/var-create-yocto-sdcard.sh -a -r build_ornl/tmp/deploy/images/var-som-mx6-ornl/PackageName /dev/xxx
+</pre>
+
+xxx - is the device name. Example /dev/sdb
+PackageName - This is this name of the tar that is created from bitbake. Look in the tmp/images/MACHINE/ file if you are unsure.
 
 ## Flash SD To eMMC
 
