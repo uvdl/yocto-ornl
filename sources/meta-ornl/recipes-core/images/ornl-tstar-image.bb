@@ -1,4 +1,4 @@
-SUMMARY = "Stargazer production image"
+SUMMARY = "Scaled down Tstar build"
 
 IMAGE_FEATURES += "ssh-server-dropbear splash read-only-rootfs"
 
