@@ -378,7 +378,7 @@ function help_menu()
 
 # This looks awful, TODO :: change this to not be so clunky
 # Basically we have to have > 1 arguments and less than 5. and no odd numbers 
-if [ $# -lt 2 ] || [ $# -eq 3 ] || [ $# -gt 4 ]
+if [ $# -lt 2 ] || [ $# -eq 3 ] || [ $# -gt 4 ] || [$# -eq 0]
     then
         help_menu
 fi
