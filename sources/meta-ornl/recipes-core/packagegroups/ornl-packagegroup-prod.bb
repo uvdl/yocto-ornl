@@ -36,4 +36,5 @@ RDEPENDS_${PN} = " \
 	libgps \
     ntp \
 	ntp-bin \
+	postinstall \
 "
