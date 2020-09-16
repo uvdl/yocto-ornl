@@ -25,6 +25,7 @@ RDEPENDS_${PN} = " \
 	python3-pyserial \
 	python3-pytz \
 	python3-urllib3 \
+	python3-pynmea2 \
     minicom \
 	openssl \
     imx-test \
@@ -36,5 +37,4 @@ RDEPENDS_${PN} = " \
 	libgps \
     ntp \
 	ntp-bin \
-	postinstall \
 "

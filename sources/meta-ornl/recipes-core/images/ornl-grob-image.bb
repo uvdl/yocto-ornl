@@ -1,6 +1,6 @@
 # Copyright (C) 2015 Freescale Semiconductor
 # Released under the MIT license (see COPYING.MIT for the terms)
-DESCRIPTION = "This is the base image for the Ground Robotics image"
+DESCRIPTION = "Just the needed packages for the Ground Robotics build"
 
 IMAGE_FEATURES += "package-management ssh-server-openssh "
 
@@ -21,4 +21,9 @@ IMAGE_INSTALL_append += " \
     libxml2-dev \
     libxslt-dev \
     webcam-tools \
+    bind-utils \
+    libtool \
+    pkgconfig \
+    gstd \
+    gst-interpipes \
 "
