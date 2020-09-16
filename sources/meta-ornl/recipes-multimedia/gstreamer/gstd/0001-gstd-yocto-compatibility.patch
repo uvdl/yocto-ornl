@@ -1,0 +1,80 @@
+From 12c7ce854a7c96ee468da80b5a06db490c30b0c2 Mon Sep 17 00:00:00 2001
+From: Marco Madrigal <marco.madrigal@ridgerun.com>
+Date: Fri, 22 Sep 2017 09:33:18 -0600
+Subject: [PATCH] gstd yocto compatibility
+
+---
+ autogen.sh                      | 8 +++++++-
+ docs/reference/gstd/Makefile.am | 2 +-
+ gst_client/Makefile.am          | 4 ++--
+ gstd/Makefile.am                | 2 +-
+ 4 files changed, 12 insertions(+), 6 deletions(-)
+
+diff --git a/autogen.sh b/autogen.sh
+index 66dbd42..793ee2f 100755
+--- a/autogen.sh
++++ b/autogen.sh
+@@ -21,7 +21,11 @@
+ # ACLOCAL, AUTOPOINT and/or LIBTOOLIZE to the right versions, or leave them
+ # unset and get the defaults
+ 
+-gtkdocize || exit 1
++test -n "$srcdir" || srcdir=`dirname "$0"`
++test -n "$srcdir" || srcdir=.
++
++olddir=`pwd`
++cd "$srcdir"
+ 
+ autoreconf --verbose --force --install || {
+  echo 'autogen.sh failed';
+@@ -31,3 +35,5 @@ autoreconf --verbose --force --install || {
+ echo
+ echo "Now run './configure' with your system settings followed by 'make' to compile this module."
+ echo
++
++cd "$olddir"
+diff --git a/docs/reference/gstd/Makefile.am b/docs/reference/gstd/Makefile.am
+index f860fa1..153a13b 100644
+--- a/docs/reference/gstd/Makefile.am
++++ b/docs/reference/gstd/Makefile.am
+@@ -66,7 +66,7 @@ GTKDOC_LIBS=$(top_builddir)/gstd/libgstd-core.la
+ 
+ 
+ # This includes the standard gtk-doc make rules, copied by gtkdocize.
+-include $(top_builddir)/docs/gtk-doc.make
++# include $(top_srcdir)/docs/gtk-doc.make
+ 
+ # Comment this out if you want 'make check' to test you doc status
+ # and run some sanity checks
+diff --git a/gst_client/Makefile.am b/gst_client/Makefile.am
+index 13bacc8..50e7b5c 100644
+--- a/gst_client/Makefile.am
++++ b/gst_client/Makefile.am
+@@ -6,9 +6,9 @@ gst_client_@GSTD_API_VERSION@_LDFLAGS = $(GST_LIBS) $(GIO_LIBS) $(GJSON_LIBS) $(
+ 
+ install-exec-hook:
+ 	$(RM) $(DESTDIR)$(bindir)/gstd-client $(DESTDIR)$(bindir)/gst-client
+-	$(LN_S) $(DESTDIR)$(bindir)/gst-client-@GSTD_API_VERSION@ \
++	$(LN_S) $(bindir)/gst-client-@GSTD_API_VERSION@ \
+            $(DESTDIR)$(bindir)/gstd-client
+-	$(LN_S) $(DESTDIR)$(bindir)/gst-client-@GSTD_API_VERSION@ \
++	$(LN_S) $(bindir)/gst-client-@GSTD_API_VERSION@ \
+            $(DESTDIR)$(bindir)/gst-client
+ 
+ uninstall-hook:
+diff --git a/gstd/Makefile.am b/gstd/Makefile.am
+index 87e24dd..000e14f 100644
+--- a/gstd/Makefile.am
++++ b/gstd/Makefile.am
+@@ -74,7 +74,7 @@ gstd_CFLAGS = $(GST_CFLAGS)					\
+ 	      -DGSTD_LOG_STATE_DIR=\"$(gstdlogstatedir)\"	\
+ 	      -DGSTD_RUN_STATE_DIR=\"$(gstdrunstatedir)\"
+ 
+-gstd_LDFLAGS = $(GST_LIBS) $(GIO_LIBS) $(GIO_UNIX_LIBS) $(GJSON_LIBS) $(LIBD_LIBS) -Wl,-rpath -Wl,$(libdir)
++gstd_LDFLAGS = $(GST_LIBS) $(GIO_LIBS) $(GIO_UNIX_LIBS) $(GJSON_LIBS) $(LIBD_LIBS)
+ gstd_LDADD = libgstd-core.la
+ 
+ gstdincludedir = $(includedir)/gstd
+-- 
+2.7.4
+
