@@ -92,7 +92,7 @@ This option will install all the dependencies needed, clone and pull all needed 
 run the following command : 
 
 <pre>
-. ornl-setup-yocto.sh [path_to_new_build_directory] [version_of_yocto]
+./ornl-setup-yocto.sh [path_to_new_build_directory] [version_of_yocto]
 </pre>
 
 *path_to_new_build_directory* - this is simply the path that you wish to have the new build directory located, i.e. /home/user/Workspace
@@ -118,17 +118,21 @@ This will **NOT** go through the entire setup prcoess.  This can be thought of a
 run in order to run bitbake.  This will **ALSO** copy the local.conf and bblayers.conf files into the build directory.  
 
 <pre>
-. ornl-setup-yocto.sh -b [path_to_build_directory]
+./ornl-setup-yocto.sh -b [path_to_build_directory]
 </pre>
 
 This assumes the build directory has already been created.  Just pass the path to the build directory and it *should* be happy.
 
 ### Finally, start the build
-
+Once the setup script has been run, you will need to move to your build location.  Once there run the setup environment script again.
 This step remains the same for both options.
 
 <pre>
-$YOCTO_DIR/build_fb$ cd build_ornl
+$YOCTO_DIR$ MACHINE=var-som-mx6-ornl DISTRO=fslc-framebuffer . setup-environment build_ornl
+</pre>
+
+Afterwards, start your building. 
+<pre>
 $YOCTO_DIR/build_fb$ bitbake ornl-image-gui
 </pre>
 
@@ -160,7 +164,7 @@ sudo bmaptool copy ornl-image-gui-var-som-mx6-ornl.wic /dev/sdX --nobmap
 
 **Option 2**
 
-Use the var-create-yocto-sdcard.sh script that is supplied by Variscite under the meta-variscite-fslc layer.  We have a companion script that can be run from this directory, use the following command. This will **ONLY** copy the Variscite script to the new directory.  From there just follow the directions from the (Variscite Build Guide)[https://variwiki.com/index.php?title=Yocto_Build_Release&release=RELEASE_SUMO_V1.2_VAR-SOM-MX6#Create_an_extended_SD_card]
+Use the var-create-yocto-sdcard.sh script that is supplied by Variscite under the meta-variscite-fslc layer.  We have a companion script that can be run from this directory, use the following command. This will **ONLY** copy the Variscite script to the new directory.  From there just follow the directions from the [Variscite Build Guide](https://variwiki.com/index.php?title=Yocto_Build_Release&release=RELEASE_SUMO_V1.2_VAR-SOM-MX6#Create_an_extended_SD_card)
 
 <pre>
 ./create-sd-card.sh < Yocto_Build_Directory_Path >

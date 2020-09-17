@@ -58,7 +58,7 @@ function run_all()
             echo "================================================="
             echo "${BOLD}Dependencies failed to install ${NORMAL}"
             echo "================================================="
-            return 1
+            exit 1
     fi
     # More host dependencies
     sudo apt-get install -y autoconf \
@@ -101,7 +101,7 @@ function run_all()
             echo "================================================="
             echo "${BOLD}Dependencies failed to install ${NORMAL}"
             echo "================================================="
-            return 1
+            exit 1
     fi
 
     # Need to have git configuration set for repo
@@ -145,8 +145,9 @@ function sync_variscite_platform()
             echo "========================================================="
             echo "${BOLD}Creating Yocto build directory failed...${NORMAL}"
             echo "========================================================="
-            return 1
+            exit 1
     fi
+    OLD_LOCATION=$PWD
     eval cd $YOCTO_DIR_LOCATION/$YOCTO_DIR_NAME
     repo init -u https://github.com/varigit/variscite-bsp-platform.git -b $YOCTO_VERSION
     if [ $? -ne 0 ]
@@ -155,7 +156,7 @@ function sync_variscite_platform()
             echo "================================================"
             echo "${BOLD}Failed to fetch Varisicte repo${NORMAL}"
             echo "================================================"
-            return 1
+            exit 1
     fi
     repo sync -j4
     if [ $? -ne 0 ]
@@ -164,9 +165,9 @@ function sync_variscite_platform()
             echo "==============================================="
             echo "${BOLD}Failed to sync Varisicte repo${NORMAL}"
             echo "==============================================="
-            return 1
+            exit 1
     fi
-
+    eval cd $OLD_LOCATION
 }
 
 # =================================================================================
@@ -185,7 +186,7 @@ function check_for_bin_repo()
                     echo "====================================================="
                     echo "${BOLD}Failed making the bin directory...${NORMAL}"
                     echo "====================================================="
-                    return 1
+                    exit 1
             fi
     fi
     # bin exists at this point, need to check for repo
@@ -198,7 +199,7 @@ function check_for_bin_repo()
                     echo "============================================"
                     echo "${BOLD}Failed the curl repo command..."
                     echo "============================================"
-                    return 1
+                    exit 1
             fi
             chmod a+x ~/bin/repo
             export PATH=~/bin:$PATH
@@ -237,7 +238,7 @@ function checking_ornl_layer()
             echo "============================================"
             echo "${BOLD}Copy of ORNL layer failed...${NORMAL}"
             echo "============================================"
-            return 1
+            exit 1
     fi
 
 }
@@ -257,7 +258,7 @@ function download_ornl_layer()
                     echo "============================================"
                     echo "${BOLD}Git clone failed...${NORMAL}"
                     echo "============================================"
-                    return 1
+                    exit 1
             fi
     fi
     
@@ -269,7 +270,7 @@ function download_ornl_layer()
             echo "============================================"
             echo "${BOLD}Git failed to get branch...${NORMAL}"
             echo "============================================"
-            return 1
+            exit 1
     fi
 }
 
@@ -301,21 +302,21 @@ function run_setup_script()
             echo "====================================================================="
             echo "${BOLD}$YOCTO_DIR_LOCATION/$YOCTO_DIR_NAME does not exist...${NORMAL}"
             echo "====================================================================="
-            return 1
+            exit 1
     fi
 
     # From scope of script change into the directory.
     eval cd $YOCTO_DIR_LOCATION/$YOCTO_DIR_NAME
 
     # Run Variscite environment script
-    MACHINE=$TARGET_MACHINE DISTRO=fslc-framebuffer . setup-environment build_ornl
+    MACHINE=$TARGET_MACHINE DISTRO=fslc-framebuffer . $YOCTO_DIR_LOCATION/$YOCTO_DIR_NAME/setup-environment build_ornl
     if [ $? -ne 0 ]
         then
             echo
             echo "======================================================"
             echo "${BOLD}Variscite environment script failed...${Normal}"
             echo "======================================================"
-            return 1
+            exit 1
     fi
 
     # lets do our copying of modified config files IF a new setup was completed
@@ -330,7 +331,7 @@ function run_setup_script()
             echo "============================================"
             echo "${BOLD}Copy of local.conf failed...${NORMAL}"
             echo "============================================"
-            return 1
+            exit 1
     fi
 
     echo
@@ -343,8 +344,9 @@ function run_setup_script()
             echo "================================================="
             echo "${BOLD}Copy of bblayers.conf failed...${NORMAL}"
             echo "================================================="
-            return 1
+            exit 1
     fi
+
 }
 
 # =================================================================================
@@ -369,27 +371,16 @@ function help_menu()
     echo "arg2 - The version of Yocto to be used: i.e. sumo, thud..."
     echo
     echo
-    return 0
+    exit 0
 }
 
 # =================================================================================
 # Script Start
 # =================================================================================
 
-# This script has to be sourced. This checks to make sure it is.
-# This is also specific to bash... so comment this out if trying from 
-# other means.
-if [[ "${BASH_SOURCE[0]}" == "${0}" ]] 
-    then 
-        echo
-        echo "${BOLD}This script needs to be sourced in order to run correctly...${NORMAL}"
-        echo 
-        exit 0
-fi
-
 # This looks awful, TODO :: change this to not be so clunky
 # Basically we have to have > 1 arguments and less than 5. and no odd numbers 
-if [ $# -lt 2 ] || [ $# -eq 3 ] || [ $# -gt 4 ] || [$# -eq 0]
+if [ $# -lt 2 ] || [ $# -eq 3 ] || [ $# -gt 4 ] || [ $# -eq 0 ]
     then
         help_menu
 fi
@@ -401,15 +392,18 @@ if [ "$EUID" -eq 0 ]
         echo "You are logged in as root, some directories will be created with root only access if you continue."
         read -p "Do you wish to proceed? [Y/n] " lets_ride
         lets_ride=${lets_ride:-Y}
-        if [ $lets_ride != "Y" ] || [ $lets_ride != "y" ]
-            then
-                return 0
-        fi
+        case "$lets_ride" in
+            Y|y)
+                ;;
+            *)
+                exit 0
+                ;;
+        esac
 fi
 
 # Check what version of Ubuntu we are running.  We are compatible with 16.04
 ubuntu_release=$(cut -f2 <<< "$(lsb_release -r)")
-echo "Usring Ubuntu Version ${BOLD}$ubuntu_release${NORMAL}"
+echo "Using Ubuntu Version ${BOLD}$ubuntu_release${NORMAL}"
 
 if [ "$ubuntu_release" != "16.04" ]
     then
@@ -417,10 +411,13 @@ if [ "$ubuntu_release" != "16.04" ]
         echo "This build is only guaranteed to work with Ubuntu 16.04"
         read -p "Do you wish to proceed [y/N]: " answer
         answer=${answer:-N}
-        if [ $answer = "N" ] || [ $answer = "n" ]
-            then
-                return 0
-        fi
+        case "$answer" in
+            N|n)
+                exit0
+                ;;
+            *)
+                ;;
+        esac
 fi
 
 
@@ -457,7 +454,7 @@ while getopts "h?b:c:" opt; do
         echo "Current build location base is $YOCTO_DIR_LOCATION"
         echo
         run_setup_script
-        return 0
+        exit 0
         ;;
     c)  ORNL_YOCTO_BRANCH=$2
         echo
@@ -485,16 +482,19 @@ if [[ "$YOCTO_VERSION" != "sumo" ]] || [[ "$YOCTO_VERSION" != "sumo" ]]
         echo "============================================================================"
         echo "Please choose a version of Yocto compatible with this system: sumo or thud"
         echo "============================================================================"
-        return 1
+        exit 1
 fi
 
 if [ ! -d $temp_location ]
     then
         echo
         echo "============================================================="
-        echo "${BOLD}${CYAN}Location does not exist!${END_COLOR}${NORMAL}"
+        echo "${BOLD}${CYAN}Location does not exist!!!!${END_COLOR}${NORMAL}"
+        echo "For more info just use the -h to access the help menu"
         echo "============================================================="
-        help_menu
+        echo
+        echo
+        exit 0
 fi
 # Check to see if it is relative or absolute. We need an absolute
 if [[ "$temp_location" = /* ]]
@@ -511,11 +511,16 @@ echo "Build Location is ${BOLD}$YOCTO_DIR_LOCATION${NORMAL}"
 read -p "Are these correct [Y/n]: " acceptance
 acceptance=${acceptance:-Y}
 
-# Check to see if we should go on
-if [ $acceptance != "Y" ] || [ $acceptance != "y" ]
-    then
-        help_menu
-fi
+case "$acceptance" in
+    Y|y) 
+        ;;
+    *)
+        echo
+        echo "${BOLD}Next time, Please use one of the letters given to answer :-)${NORMAL}"
+        echo
+        exit
+        ;;
+esac
 
 # Run the full environment build at this point
 run_all
