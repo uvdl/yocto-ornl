@@ -381,9 +381,10 @@ function help_menu()
 # other means.
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]] 
     then 
-        echo "This script needs to be sourced in order to run correctly..."
+        echo
+        echo "${BOLD}This script needs to be sourced in order to run correctly...${NORMAL}"
         echo 
-        help_menu
+        exit 0
 fi
 
 # This looks awful, TODO :: change this to not be so clunky
