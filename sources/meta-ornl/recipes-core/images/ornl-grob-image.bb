@@ -24,6 +24,7 @@ IMAGE_INSTALL_append += " \
     bind-utils \
     libtool \
     pkgconfig \
+    gst-pylibgstc \
     gstd \
     gst-interpipes \
 "
