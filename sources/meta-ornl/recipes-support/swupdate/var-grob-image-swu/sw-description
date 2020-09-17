@@ -1,0 +1,27 @@
+software =
+{
+	version = "0.1.0";
+
+	var-som-mx6-ornl = {
+		hardware-compatibility: [ "1.0" ];
+
+		files: (
+			{
+				filename = "var-grob-update-full-image-var-som-mx6-ornl.tar.gz";
+				type = "archive";
+				compressed = true;
+				device = "/dev/update";
+				filesystem = "ext4";
+				path = "/";
+				preserve-attributes = true;
+			}
+		);
+
+		scripts: (
+			{
+				filename = "var-update.sh";
+				type = "shellscript";
+			}
+		);
+	};
+}
