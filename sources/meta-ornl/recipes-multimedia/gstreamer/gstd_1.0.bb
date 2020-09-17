@@ -8,9 +8,9 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 
 DEPENDS = "gstreamer1.0 gstreamer1.0-plugins-base gstreamer1.0-plugins-bad gstreamer1.0-rtsp-server json-glib libdaemon jansson"
 
-PV = "v0.10.0"
+PV = "v0.11.0"
 SRCBRANCH ?= "master"
-SRCREV = "09863c510b3d947ae360f445f7b170fe25c09bf9"
+SRCREV = "81b48da1c4dc3c1de3167af1c32838a96006edf3"
 SRC_URI = "git://github.com/RidgeRun/gstd-1.x.git;protocol=https;branch=${SRCBRANCH} \
 	   file://0001-gstd-yocto-compatibility.patch"
 
