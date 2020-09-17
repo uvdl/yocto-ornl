@@ -355,7 +355,7 @@ function help_menu()
     echo 
     echo "${BOLD}Looks like you need some assistence! No worries, lets get you fixed up.${NORMAL}"
     echo 
-    echo "Usage : ./ornl-setup-yocto.sh [option [optarg1]] [arg1, arg2,]"
+    echo "Usage : . ornl-setup-yocto.sh [option [optarg1]] [arg1, arg2,]"
     echo "--------------------------------------------------------------------------------"
     echo "options : "
     echo "-b : Runs only the setup build environment [arg1 - location of yocto build directory]"
@@ -375,6 +375,16 @@ function help_menu()
 # =================================================================================
 # Script Start
 # =================================================================================
+
+# This script has to be sourced. This checks to make sure it is.
+# This is also specific to bash... so comment this out if trying from 
+# other means.
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]] 
+    then 
+        echo "This script needs to be sourced in order to run correctly..."
+        echo 
+        help_menu
+fi
 
 # This looks awful, TODO :: change this to not be so clunky
 # Basically we have to have > 1 arguments and less than 5. and no odd numbers 
