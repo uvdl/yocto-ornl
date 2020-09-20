@@ -28,8 +28,8 @@ PROJECT_REMOTE := $(USER)
 PROJECT_TAG := core
 REPO=/usr/local/bin/repo
 REPO_LOC=https://storage.googleapis.com/git-repo-downloads/repo
-# repo version 1.25
-REPO_SUM=d06f33115aea44e583c8669375b35aad397176a411de3461897444d247b6c220
+# repo version 2.8
+REPO_SUM=d73f3885d717c1dc89eba0563433cec787486a0089b9b04b4e8c56e7c07c7610
 TOASTER_PORT := 8000
 
 # Known variations
@@ -54,7 +54,7 @@ define LOG
   ($1) 2>&1 | tee -a $(LOGDIR)/$(YOCTO_ENV)-build.log && echo "$$(date --iso-8601='ns'): $1 completed." >>$(LOGDIR)/$(YOCTO_ENV)-make.log
 endef
 
-.PHONY: all archive build clean deps docker-deploy docker-image
+.PHONY: all archive build clean dependencies docker-deploy docker-image
 .PHONY: id kernel kernel-config kernel-pull locale mrproper see
 .PHONY: toaster toaster-stop
 
@@ -86,7 +86,7 @@ sd.img$(DOT_GZ): $(YOCTO_DIR)/$(YOCTO_ENV)/tmp/deploy/images/$(MACHINE)/$(YOCTO_
 	ln -sf $(YOCTO_DIR)/$(YOCTO_ENV)/tmp/deploy/images/$(MACHINE)/$(YOCTO_IMG)-$(MACHINE).wic$(DOT_GZ) $@
 
 all: $(LOGDIR)
-	$(call LOG, $(MAKE) deps )
+	$(call LOG, $(MAKE) dependencies )
 	$(call LOG, $(MAKE) see )
 	$(call LOG, $(MAKE) build )
 	$(call LOG, $(MAKE) sd.img$(DOT_GZ) )
@@ -132,7 +132,7 @@ clean:
 	-rm $(YOCTO_DIR)/$(YOCTO_ENV)/conf/bblayers.conf
 	-rm $(YOCTO_DIR)/$(YOCTO_ENV)/conf/sanity.conf
 
-deps:
+dependencies:
 	$(SUDO) apt-get update
 	$(SUDO) apt-get install -y $(PKGDEPS1)
 	$(SUDO) apt-get install -y $(PKGDEPS2)
