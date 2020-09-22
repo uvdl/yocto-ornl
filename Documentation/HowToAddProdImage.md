@@ -4,12 +4,12 @@ The basic point of Yocto is the being able to build a very flexible Linux image.
 
 The file structure is as follows:
 <pre>
-Sources/
+sources/
     meta-ornl/
         recipes-core/
             images/
                 ornl-dev-image.bb
-                ornal-tstar-image.bb
+                ornl-tstar-image.bb
             packagegroups/
                 ornlpackagegroup-prod.bb
 </pre>

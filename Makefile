@@ -28,15 +28,15 @@ PROJECT_REMOTE := $(USER)
 PROJECT_TAG := core
 REPO=/usr/local/bin/repo
 REPO_LOC=https://storage.googleapis.com/git-repo-downloads/repo
-# repo version 1.25
-REPO_SUM=d06f33115aea44e583c8669375b35aad397176a411de3461897444d247b6c220
+# repo version 2.8
+REPO_SUM=d73f3885d717c1dc89eba0563433cec787486a0089b9b04b4e8c56e7c07c7610
 TOASTER_PORT := 8000
 
 # Known variations
 YOCTO_DIR := $(HOME)/ornl-dart-yocto
 YOCTO_DISTRO=fslc-framebuffer
 YOCTO_ENV=build_ornl
-YOCTO_IMG=ornl-image-gui
+YOCTO_IMG=var-dev-update-full-image
 YOCTO_CMD := $(YOCTO_IMG)
 
 # Kernel rebuilding; paths relative to $(YOCTO_DIR)/$(YOCTO_ENV)
@@ -54,7 +54,7 @@ define LOG
   ($1) 2>&1 | tee -a $(LOGDIR)/$(YOCTO_ENV)-build.log && echo "$$(date --iso-8601='ns'): $1 completed." >>$(LOGDIR)/$(YOCTO_ENV)-make.log
 endef
 
-.PHONY: all archive build clean deps docker-deploy docker-image
+.PHONY: all archive build clean dependencies docker-deploy docker-image environment
 .PHONY: id kernel kernel-config kernel-pull locale mrproper see
 .PHONY: toaster toaster-stop
 
@@ -82,14 +82,28 @@ $(YOCTO_DIR)/setup-environment: $(REPO) $(YOCTO_DIR)
 $(YOCTO_DIR)/$(YOCTO_ENV)/conf:
 	mkdir -p $(YOCTO_DIR)/$(YOCTO_ENV)/conf
 
+environment: $(YOCTO_DIR)/setup-environment $(YOCTO_DIR)/$(YOCTO_ENV)/conf
+	# https://github.com/gmacario/easy-build/tree/master/build-yocto#bitbake-complains-if-run-as-root
+	cd $(YOCTO_DIR) && \
+		rm -rf $(YOCTO_DIR)/sources/meta-ornl && \
+		cp -r $(CURDIR)/sources/meta-ornl $(YOCTO_DIR)/sources && \
+		MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV) && \
+		cp $(CURDIR)/build/conf/local.conf $(YOCTO_DIR)/$(YOCTO_ENV)/conf/ && \
+		cp $(CURDIR)/build/conf/bblayers.conf $(YOCTO_DIR)/$(YOCTO_ENV)/conf/ && \
+		touch $(YOCTO_DIR)/$(YOCTO_ENV)/conf/sanity.conf && \
+		echo "*** ENVIRONMENT SETUP ***" && \
+		echo "Please execute the following in your shell before giving bitbake commands:" && \
+		echo "cd $(YOCTO_DIR) && MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV)"
+
 sd.img$(DOT_GZ): $(YOCTO_DIR)/$(YOCTO_ENV)/tmp/deploy/images/$(MACHINE)/$(YOCTO_IMG)-$(MACHINE).wic$(DOT_GZ)
 	ln -sf $(YOCTO_DIR)/$(YOCTO_ENV)/tmp/deploy/images/$(MACHINE)/$(YOCTO_IMG)-$(MACHINE).wic$(DOT_GZ) $@
 
 all: $(LOGDIR)
-	$(call LOG, $(MAKE) deps )
+	$(call LOG, $(MAKE) dependencies )
 	$(call LOG, $(MAKE) see )
-	$(call LOG, $(MAKE) build )
-	$(call LOG, $(MAKE) sd.img$(DOT_GZ) )
+	$(call LOG, $(MAKE) environment )
+	#$(call LOG, $(MAKE) build )
+	#$(call LOG, $(MAKE) sd.img$(DOT_GZ) )
 
 archive:
 	@mkdir -p $(ARCHIVE)/$(PROJECT)-$(DATE)/dts
@@ -112,14 +126,9 @@ endif
 	@echo "$(SUDO) umount /mnt" >> $(ARCHIVE)/$(PROJECT)-$(DATE)/readme.txt
 
 build: $(YOCTO_DIR)/setup-environment build/conf/local.conf build/conf/bblayers.conf sources/meta-ornl
-	# https://github.com/gmacario/easy-build/tree/master/build-yocto#bitbake-complains-if-run-as-root
+	@$(MAKE) --no-print-directory -B environment
 	cd $(YOCTO_DIR) && \
-		rm -rf $(YOCTO_DIR)/sources/meta-ornl && \
-		cp -r $(CURDIR)/sources/meta-ornl $(YOCTO_DIR)/sources && \
 		MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV) && \
-		cp $(CURDIR)/build/conf/local.conf $(YOCTO_DIR)/$(YOCTO_ENV)/conf/ && \
-		cp $(CURDIR)/build/conf/bblayers.conf $(YOCTO_DIR)/$(YOCTO_ENV)/conf/ && \
-		touch $(YOCTO_DIR)/$(YOCTO_ENV)/conf/sanity.conf && \
 		cd $(YOCTO_DIR)/$(YOCTO_ENV) && \
 			if [ -e .toaster ] ; then source toaster stop ; source toaster start ; /bin/true ; fi && \
 			LANG=$(LANG) bitbake $(YOCTO_CMD)
@@ -132,7 +141,7 @@ clean:
 	-rm $(YOCTO_DIR)/$(YOCTO_ENV)/conf/bblayers.conf
 	-rm $(YOCTO_DIR)/$(YOCTO_ENV)/conf/sanity.conf
 
-deps:
+dependencies:
 	$(SUDO) apt-get update
 	$(SUDO) apt-get install -y $(PKGDEPS1)
 	$(SUDO) apt-get install -y $(PKGDEPS2)
