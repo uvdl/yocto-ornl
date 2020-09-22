@@ -159,7 +159,7 @@ fi
 
 # allow only removable/loopback devices, to protect host PC
 echo "MACHINE=${MACHINE}"
-echo "SD card rootfs:  ${YOCTO_DEFAULT_IMAGE}-${MACHINE}"
+echo "SD card rootfs:  ${YOCTO_RECOVERY_ROOTFS_BASE_IN_NAME}"
 echo "Recovery rootfs: ${YOCTO_RECOVERY_ROOTFS_BASE_IN_NAME}"
 echo "================================================"
 check_device $node
@@ -282,7 +282,7 @@ function install_yocto
 
 	echo
 	echo "Installing Yocto Root File System"
-	pv ${YOCTO_IMGS_PATH}/${YOCTO_DEFAULT_IMAGE}-${MACHINE}.tar.gz | tar -xz -C ${P2_MOUNT_DIR}/
+	pv ${YOCTO_RECOVERY_ROOTFS_PATH}/${YOCTO_RECOVERY_ROOTFS_BASE_IN_NAME}.tar.gz | tar -xz -C ${P2_MOUNT_DIR}/
 }
 
 function copy_images
