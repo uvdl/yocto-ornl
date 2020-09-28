@@ -1,4 +1,4 @@
-SUMMARY = "This is the Variscite specific update image for Ground Robotics"
+SUMMARY = "T-Star Variscite Update Image"
 
 IMAGE_FEATURES += "ssh-server-dropbear splash "
 
@@ -7,7 +7,7 @@ EXTRA_USERS_PARAMS = "usermod -P root root;"
 
 LICENSE = "MIT"
 
-require ornl-grob-image.bb
+require ornl-prod-min-image.bb
 
 # Do to how the DART boot is organized for SWUpdate to work we have to have
 # the kernel, dtb, uboot in a /boot/ folder on both rootfs

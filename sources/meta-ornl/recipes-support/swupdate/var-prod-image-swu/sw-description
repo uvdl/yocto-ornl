@@ -7,7 +7,7 @@ software =
 
 		files: (
 			{
-				filename = "var-grob-update-full-image-var-som-mx6-ornl.tar.gz";
+				filename = "var-prod-update-full-image-var-som-mx6-ornl.tar.gz";
 				type = "archive";
 				compressed = true;
 				device = "/dev/update";
