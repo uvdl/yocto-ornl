@@ -1,4 +1,4 @@
-DESCRIPTION = "Example compound image for Variscite boards"
+DESCRIPTION = "Artifact recipe for a Ground Robotics image"
 SECTION = ""
 
 inherit swupdate
@@ -14,14 +14,14 @@ SRC_URI = " \
 
 # IMAGE_DEPENDS: list of Yocto images that contains a root filesystem
 # it will be ensured they are built before creating swupdate image
-IMAGE_DEPENDS = "var-tstar-update-full-image"
+IMAGE_DEPENDS = "var-prod-update-full-image"
 
 # SWUPDATE_IMAGES: list of images that will be part of the compound image
 # the list can have any binaries - images must be in the DEPLOY directory
 SWUPDATE_IMAGES = " \
-	var-tstar-update-full-image \
+	var-prod-update-full-image \
 "
 
 # Images can have multiple formats - define which image must be
 # taken to be put in the compound image
-SWUPDATE_IMAGES_FSTYPES[var-tstar-update-full-image] = ".tar.gz"
+SWUPDATE_IMAGES_FSTYPES[var-prod-update-full-image] = ".tar.gz"
