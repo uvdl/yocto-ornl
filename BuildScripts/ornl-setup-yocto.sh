@@ -125,6 +125,10 @@ function run_all()
     # Run the setup script
     run_setup_script
 
+    # Copy the Variscite script over
+    cp -f $PWD/var-create-yocto-sdcard.sh $YOCTO_DIR_LOCATION/$YOCTO_DIR_NAME/sources/meta-variscite-fslc/scripts/var_mk_yocto_sdcard/var-create-yocto-sdcard.sh
+
+
     echo
     echo
     echo "${BOLD}${GREEN}SUCCESS!!!!${END_COLOR}${NORMAL}"
