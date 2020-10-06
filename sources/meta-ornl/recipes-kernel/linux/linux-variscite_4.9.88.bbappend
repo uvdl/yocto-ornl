@@ -17,6 +17,8 @@ KERNEL_DEFCONFIG_var-som-mx6-ornl ?= "${S}/arch/arm/configs/${ORNL_CONFIG}"
 KBUILD_DEFCONFIG_var-som-mx6-ornl ?= "${S}/arch/arm/configs/${ORNL_CONFIG}"
 KCONFIG_MODE="--alldefconfig"
 
+S = "${WORKDIR}/git"
+
 # I'm not 100% sure this is necessary, I'm going to leave it because it could be useful
 # in the future if we need to overwrite the defconfig and use the one in ${WORKDIR}
 do_overwrite_defconfig() {
