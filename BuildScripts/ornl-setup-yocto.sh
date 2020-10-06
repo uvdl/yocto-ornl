@@ -105,7 +105,7 @@ function run_all()
     fi
 
     # Need to have git configuration set for repo
-    if (($(git config --get user.name) == "" || $(git config --get user.email) == ""))
+    if (($(git config --get user.name) == "" ))
         then
             prompt_user_git_info
     fi
@@ -122,12 +122,11 @@ function run_all()
 
     # Check the current ornl yocto repo
     checking_ornl_layer
+    # make the build directory
+    make_build_dir
     # Run the setup script
-    run_setup_script
-
-    # Copy the Variscite script over
-    cp -f $PWD/var-create-yocto-sdcard.sh $YOCTO_DIR_LOCATION/$YOCTO_DIR_NAME/sources/meta-variscite-fslc/scripts/var_mk_yocto_sdcard/var-create-yocto-sdcard.sh
-
+    YOCTO_DIR_LOCATION="$YOCTO_DIR_LOCATION/$YOCTO_DIR_NAME"
+    copy_config_files
 
     echo
     echo
@@ -295,20 +294,11 @@ function prompt_user_git_info()
 }
 
 # =================================================================================
-#
+# 
 # =================================================================================
-function run_setup_script()
+function make_build_dir()
 {
-    # Make sure the build directory actually exists
-    if [ ! -d $YOCTO_DIR_LOCATION/$YOCTO_DIR_NAME ]
-        then 
-            echo
-            echo "====================================================================="
-            echo "${BOLD}$YOCTO_DIR_LOCATION/$YOCTO_DIR_NAME does not exist...${NORMAL}"
-            echo "====================================================================="
-            exit 1
-    fi
-
+    OLD_DIR=${PWD}
     # From scope of script change into the directory.
     eval cd $YOCTO_DIR_LOCATION/$YOCTO_DIR_NAME
 
@@ -323,12 +313,38 @@ function run_setup_script()
             exit 1
     fi
 
+    eval cd ${OLD_DIR}
+}
+
+# =================================================================================
+#
+# =================================================================================
+function copy_config_files()
+{
+    # Make sure the build directory actually exists
+    if [ ! -d $YOCTO_DIR_LOCATION ]
+        then 
+            echo
+            echo "====================================================================="
+            echo "${BOLD}$YOCTO_DIR_LOCATION/ does not exist...${NORMAL}"
+            echo "====================================================================="
+            exit 1
+    fi
+
+        # Check to see if user sent the ornl_layer in directory
+    this_directory="${PWD}"
+    base=$(basename ${PWD})
+    if [ $base  == "BuildScripts" ]
+        then
+            this_directory=$(dirname ${PWD})
+    fi
+
     # lets do our copying of modified config files IF a new setup was completed
     # TODO :: This copies no matter what, we should do a file compare here.
     echo
     echo "Copying the ORNL local.conf file over... "
     echo
-    cp -f $YOCTO_DIR_LOCATION/ornl_layer/build/conf/local.conf $YOCTO_DIR_LOCATION/$YOCTO_DIR_NAME/build_ornl/conf/
+    cp -f $this_directory/build/conf/local.conf $YOCTO_DIR_LOCATION/build_ornl/conf/
     if [ $? -ne 0 ]
         then
             echo
@@ -341,7 +357,7 @@ function run_setup_script()
     echo
     echo "Copying the ORNL bblayers.conf file over... "
     echo
-    cp -f $YOCTO_DIR_LOCATION/ornl_layer/build/conf/bblayers.conf $YOCTO_DIR_LOCATION/$YOCTO_DIR_NAME/build_ornl/conf/
+    cp -f $this_directory/build/conf/bblayers.conf $YOCTO_DIR_LOCATION/build_ornl/conf/
     if [ $? -ne 0 ]
         then
             echo
@@ -351,6 +367,56 @@ function run_setup_script()
             exit 1
     fi
 
+    echo
+    echo "Copying the ORNL Variscite Build Script file over... "
+    echo
+        # Copy the Variscite script over
+    cp -f $this_directory/BuildScripts/var-create-yocto-sdcard.sh $YOCTO_DIR_LOCATION/sources/meta-variscite-fslc/scripts/var_mk_yocto_sdcard/var-create-yocto-sdcard.sh
+        if [ $? -ne 0 ]
+        then
+            echo
+            echo "================================================="
+            echo "${BOLD}Copy of SD card build script failed...${NORMAL}"
+            echo "================================================="
+            exit 1
+    fi
+}
+
+# =================================================================================
+#
+# =================================================================================
+function copy_ornl_layer()
+{
+    # Make sure the build directory actually exists
+    if [ ! -d $YOCTO_DIR_LOCATION ]
+        then 
+            echo
+            echo "====================================================================="
+            echo "${BOLD}$YOCTO_DIR_LOCATION/$YOCTO_DIR_NAME does not exist...${NORMAL}"
+            echo "====================================================================="
+            exit 1
+    fi
+
+    # Check to see if user sent the ornl_layer in directory
+    this_directory="${PWD}"
+    base=$(basename ${PWD})
+    if [ $base  == "BuildScripts" ]
+        then
+            this_directory=$(dirname ${PWD})
+    fi
+
+    echo
+    echo "Copying the ORNL source ... "
+    echo
+    cp -rf $this_directory/sources/meta-ornl $YOCTO_DIR_LOCATION/sources/meta-ornl
+    if [ $? -ne 0 ]
+        then
+            echo
+            echo "============================================"
+            echo "${BOLD}Copy of ornl layer source failed...${NORMAL}"
+            echo "============================================"
+            exit 1
+    fi
 }
 
 # =================================================================================
@@ -361,15 +427,15 @@ function help_menu()
     echo 
     echo "${BOLD}Looks like you need some assistence! No worries, lets get you fixed up.${NORMAL}"
     echo 
-    echo "Usage : . ornl-setup-yocto.sh [option [optarg1]] [arg1, arg2,]"
+    echo "Usage : ./ornl-setup-yocto.sh [option [optarg1]] [arg1, arg2,]"
     echo "--------------------------------------------------------------------------------"
     echo "options : "
-    echo "-b : Runs only the setup build environment [arg1 - location of yocto build directory]"
+    echo "-u : updates a current build directory with ornl source and config files [arg1 - location of yocto build directory]"
     echo "-c : Forces a new clone of ORNL Yocto repo [arg1 - name of branch to checkout]"
     echo "-h : A friendly reminder of how this script works"
     echo "--------------------------------------------------------------------------------"
     echo "${BOLD}If no options supplied it is assumed that the full build environment will be set up${NORMAL}"
-    echo "${BOLD}${CYAN}-b can only be used independently, it will ONLY run the setup-environment script${END_COLOR}${NORMAL}"
+    echo "${BOLD}${CYAN}-u can only be used independently, it will ONLY copy the edited config files${END_COLOR}${NORMAL}"
     echo 
     echo "arg1 - The location of where the new yocto build directory will be made"
     echo "arg2 - The version of Yocto to be used: i.e. sumo, thud..."
@@ -426,12 +492,12 @@ fi
 
 
 # Parse any / all options that were passed in to the script
-while getopts "h?b:c:" opt; do
+while getopts "h?u:c:" opt; do
     case "$opt" in
     h|\?)
         help_menu
         ;;
-    b)  temp_location="$2"
+    u)  temp_location="$2"
         # Check to see if the path exists
         if [[ ! -d $temp_location ]]
             then
@@ -447,17 +513,12 @@ while getopts "h?b:c:" opt; do
             YOCTO_DIR_LOCATION=${PWD}/$temp_location
         fi
 
-        # Check to see if user sent the ornl_layer in directory
-        base=$(basename $YOCTO_DIR_LOCATION)
-        if [ $base  == $YOCTO_DIR_NAME ]
-            then
-                YOCTO_DIR_LOCATION=$(dirname $2)
-        fi
 
         echo 
         echo "Current build location base is $YOCTO_DIR_LOCATION"
         echo
-        run_setup_script
+        copy_config_files
+        copy_ornl_layer
         exit 0
         ;;
     c)  ORNL_YOCTO_BRANCH=$2
