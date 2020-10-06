@@ -1,4 +1,4 @@
-SUMMARY = "Gstreamer Interpipes 1.0.5"
+SUMMARY = "Gstreamer Interpipe 1.1.3"
 DESCRIPTION = "GStreamer plug-in that allows communication between two independent pipelines"
 HOMEPAGE = "https://developer.ridgerun.com/wiki/index.php?title=GstInterpipe"
 SECTION = "multimedia"
