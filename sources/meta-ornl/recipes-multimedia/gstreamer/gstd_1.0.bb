@@ -8,10 +8,9 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 
 DEPENDS = "libsoup-2.4 gstreamer1.0 gstreamer1.0-plugins-base gstreamer1.0-plugins-bad gstreamer1.0-rtsp-server json-glib libdaemon jansson"
 
-PV = "v0.11.0"
+PV = "v0.10.0"
 SRCBRANCH ?= "master"
-SRCREV = "81b48da1c4dc3c1de3167af1c32838a96006edf3"
-SRC_URI = "git://github.com/RidgeRun/gstd-1.x.git;protocol=https;branch=${SRCBRANCH} \
+SRC_URI = "git://github.com/RidgeRun/gstd-1.x.git;protocol=https;tag=${PV} \
 	   file://0001-gstd-yocto-compatibility.patch"
 
 S = "${WORKDIR}/git"
