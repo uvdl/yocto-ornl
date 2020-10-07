@@ -13,7 +13,6 @@ IMAGE_FEATURES += " \
     debug-tweaks \
     tools-sdk \
     splash \
-    package-management \
     ssh-server-openssh \
     hwcodecs \
     tools-debug \
