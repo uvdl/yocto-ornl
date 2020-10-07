@@ -26,6 +26,6 @@ IMAGE_INSTALL_append += " \
     pkgconfig \
     gst-pylibgstc \
     gstd \
-    gst-interpipes \
+    gst-interpipe \
     ksz-initscripts \
 "
