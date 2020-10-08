@@ -37,4 +37,10 @@ RDEPENDS_${PN} = " \
 	libgps \
     ntp \
 	ntp-bin \
+	cockpit \
+    cockpit-ws \
+    cockpit-users \
+    cockpit-shell \
+    cockpit-networkmanager \
+    cockpit-systemd \
 "
