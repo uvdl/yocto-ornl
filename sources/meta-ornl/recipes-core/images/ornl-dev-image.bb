@@ -48,6 +48,9 @@ IMAGE_INSTALL_append += " \
 	python3-pyserial \
 	python3-pytz \
 	python3-urllib3 \
+	python3-MAVProxy \
+	python3-pymavlink \
+	python3-furture \
 	strace \
 	screen \
 	systemd-analyze \
