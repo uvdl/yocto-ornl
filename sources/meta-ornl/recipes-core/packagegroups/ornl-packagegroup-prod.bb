@@ -26,6 +26,8 @@ RDEPENDS_${PN} = " \
 	python3-pytz \
 	python3-urllib3 \
 	python3-pynmea2 \
+	python3-pymavlink \
+	python3-furture \
     minicom \
 	openssl \
     imx-test \
