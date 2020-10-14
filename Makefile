@@ -9,6 +9,7 @@ DATE := $(shell date +%Y-%m-%d_%H%M)
 ARCHIVE := /opt
 .EXPORT_ALL_VARIABLES:
 
+DEV=
 DOT_GZ=.gz
 EULA=1	# https://patchwork.openembedded.org/patch/100815/
 LOGDIR=$(HOME)/log
@@ -54,7 +55,7 @@ define LOG
   ($1) 2>&1 | tee -a $(LOGDIR)/$(YOCTO_ENV)-build.log && echo "$$(date --iso-8601='ns'): $1 completed." >>$(LOGDIR)/$(YOCTO_ENV)-make.log
 endef
 
-.PHONY: all archive build clean dependencies docker-deploy docker-image environment
+.PHONY: all archive build clean dependencies docker-deploy docker-image environment environment-update
 .PHONY: id kernel kernel-config kernel-pull locale mrproper see
 .PHONY: toaster toaster-stop
 
@@ -82,14 +83,28 @@ $(YOCTO_DIR)/setup-environment: $(REPO) $(YOCTO_DIR)
 $(YOCTO_DIR)/$(YOCTO_ENV)/conf:
 	mkdir -p $(YOCTO_DIR)/$(YOCTO_ENV)/conf
 
-environment: $(YOCTO_DIR)/setup-environment $(YOCTO_DIR)/$(YOCTO_ENV)/conf
-	# https://github.com/gmacario/easy-build/tree/master/build-yocto#bitbake-complains-if-run-as-root
+environment: $(YOCTO_DIR)/$(YOCTO_ENV)/conf
+	-rm $(YOCTO_DIR)/$(YOCTO_ENV)/conf/sanity.conf
 	cd $(YOCTO_DIR) && \
 		rm -rf $(YOCTO_DIR)/sources/meta-ornl && \
 		cp -r $(CURDIR)/sources/meta-ornl $(YOCTO_DIR)/sources && \
 		MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV) && \
 		cp $(CURDIR)/build/conf/local.conf $(YOCTO_DIR)/$(YOCTO_ENV)/conf/ && \
 		cp $(CURDIR)/build/conf/bblayers.conf $(YOCTO_DIR)/$(YOCTO_ENV)/conf/ && \
+		touch $(YOCTO_DIR)/$(YOCTO_ENV)/conf/sanity.conf && \
+		echo "*** ENVIRONMENT SETUP ***" && \
+		echo "Please execute the following in your shell before giving bitbake commands:" && \
+		echo "cd $(YOCTO_DIR) && MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV)"
+
+environment-update: $(YOCTO_DIR)/$(YOCTO_ENV)/conf
+	-rm $(YOCTO_DIR)/$(YOCTO_ENV)/conf/sanity.conf
+	cd $(YOCTO_DIR) && \
+		rm -rf $(YOCTO_DIR)/sources/meta-ornl && \
+		cp -r $(CURDIR)/sources/meta-ornl $(YOCTO_DIR)/sources && \
+		MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV) && \
+		cp $(CURDIR)/build/conf/local.conf $(YOCTO_DIR)/$(YOCTO_ENV)/conf/ && \
+		cp $(CURDIR)/build/conf/bblayers.conf $(YOCTO_DIR)/$(YOCTO_ENV)/conf/ && \
+		bitbake-layers add-layer $(YOCTO_DIR)/sources/meta-ornl && \
 		touch $(YOCTO_DIR)/$(YOCTO_ENV)/conf/sanity.conf && \
 		echo "*** ENVIRONMENT SETUP ***" && \
 		echo "Please execute the following in your shell before giving bitbake commands:" && \
@@ -107,23 +122,18 @@ all: $(LOGDIR)
 
 archive:
 	@mkdir -p $(ARCHIVE)/$(PROJECT)-$(DATE)/dts
-	-mv $(LOGDIR) $(ARCHIVE)/$(PROJECT)-$(DATE)
 	( for f in `find $(YOCTO_DIR)/$(YOCTO_ENV)/$(KERNEL_DTS) -name "*.dtb" -print` ; do n=$$(basename $$f) ; nb=$${n%.*} ; dtc -I dtb -O dts -o $(ARCHIVE)/$(PROJECT)-$(DATE)/dts/$${nb}.dts $$f ; cp $$f $(ARCHIVE)/$(PROJECT)-$(DATE)/dts/$${nb}.dtb ; done )
-	-cp sd.img$(DOT_GZ) $(ARCHIVE)/$(PROJECT)-$(DATE)
+	@mkdir -p $(ARCHIVE)/$(PROJECT)-$(DATE)/$(YOCTO_ENV)/tmp/deploy/images
+	@cp -r $(YOCTO_DIR)/$(YOCTO_ENV)/tmp/deploy/images/$(MACHINE) $(ARCHIVE)/$(PROJECT)-$(DATE)/$(YOCTO_ENV)/tmp/deploy/images/$(MACHINE)
+	@mkdir -p $(ARCHIVE)/$(PROJECT)-$(DATE)/$(YOCTO_ENV)/sources/meta-variscite-fslc/scripts
+	@cp -r $(YOCTO_DIR)/sources/meta-variscite-fslc/scripts/var_mk_yocto_sdcard $(ARCHIVE)/$(PROJECT)-$(DATE)/$(YOCTO_ENV)/sources/meta-variscite-fslc/scripts
+	@cp BuildScripts/var-create-yocto-sdcard.sh $(ARCHIVE)/$(PROJECT)-$(DATE)/$(YOCTO_ENV)/sources/meta-variscite-fslc/scripts
 	cp $(YOCTO_DIR)/$(YOCTO_ENV)/$(KERNEL_IMAGE) $(ARCHIVE)/$(PROJECT)-$(DATE)
 	tar czf $(ARCHIVE)/$(PROJECT)-$(DATE)/kernel-source.tgz -C $(YOCTO_DIR)/$(YOCTO_ENV)/tmp/work-shared/$(MACHINE) kernel-source
-	@( cd $(YOCTO_DIR)/$(YOCTO_ENV)/$(KERNEL_GIT) && commit=$$(git log | head -1 | tr -s ' ' | cut -f2 | tr -s ' ' | cut -f2 -d' ') ; touch $(ARCHIVE)/$(PROJECT)-$(DATE)/$$commit ) 
+	@( cd $(YOCTO_DIR)/$(YOCTO_ENV)/$(KERNEL_GIT) && commit=$$(git log | head -1 | tr -s ' ' | cut -f2 | tr -s ' ' | cut -f2 -d' ') ; touch $(ARCHIVE)/$(PROJECT)-$(DATE)/$$commit )
 	@echo "# To write image to MMC, do:" > $(ARCHIVE)/$(PROJECT)-$(DATE)/readme.txt
-ifeq ($(DOT_GZ),.gz)
-	@echo "gunzip -c sd.img$(DOT_GZ) > /tmp/sd.img" >> $(ARCHIVE)/$(PROJECT)-$(DATE)/readme.txt
-	@echo "$(SUDO) bmaptool copy /tmp/sd.img /dev/sda --nobmap" >> $(ARCHIVE)/$(PROJECT)-$(DATE)/readme.txt
-else
-	@echo "$(SUDO) bmaptool copy sd.img$(DOT_GZ) /dev/sda --nobmap" >> $(ARCHIVE)/$(PROJECT)-$(DATE)/readme.txt
-endif
-	@echo "# To write kernel to MMC, do:" >> $(ARCHIVE)/$(PROJECT)-$(DATE)/readme.txt
-	@echo "$(SUDO) mount -t vfat /dev/sda1 /mnt" >> $(ARCHIVE)/$(PROJECT)-$(DATE)/readme.txt
-	@echo "$(SUDO) cp dts/*.dtb uImage /mnt" >> $(ARCHIVE)/$(PROJECT)-$(DATE)/readme.txt
-	@echo "$(SUDO) umount /mnt" >> $(ARCHIVE)/$(PROJECT)-$(DATE)/readme.txt
+	@echo "DEV=/dev/sdx" >> $(ARCHIVE)/$(PROJECT)-$(DATE)/readme.txt
+	@echo "$(SUDO) MACHINE=$(MACHINE) $(YOCTO_ENV)/sources/meta-variscite-fslc/scripts/var_mk_yocto_sdcard/var-create-yocto-sdcard.sh -a -r $(YOCTO_ENV)/tmp/deploy/images/$(MACHINE)/$(YOCTO_CMD)-$(MACHINE) \$${DEV}" >> $(ARCHIVE)/$(PROJECT)-$(DATE)/readme.txt
 
 build: $(YOCTO_DIR)/setup-environment build/conf/local.conf build/conf/bblayers.conf sources/meta-ornl
 	@$(MAKE) --no-print-directory -B environment
@@ -206,11 +216,20 @@ locale:
 mrproper: clean toaster-stop
 	-rm -rf $(YOCTO_DIR)
 
+sd: $(YOCTO_DIR)/sources/meta-variscite-fslc/scripts/var_mk_yocto_sdcard/var-create-yocto-sdcard.sh $(YOCTO_DIR)/$(YOCTO_ENV)/tmp/deploy/images/$(MACHINE)/$(YOCTO_CMD)
+	@if ! [ -z "$(DEV)" ] ; then cd $(YOCTO_DIR) && \
+		MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV) && \
+		$(SUDO) MACHINE=$(MACHINE) $(YOCTO_DIR)/sources/meta-variscite-fslc/scripts/var_mk_yocto_sdcard/var-create-yocto-sdcard.sh -a -r $(YOCTO_DIR)/$(YOCTO_ENV)/tmp/deploy/images/$(MACHINE)/$(YOCTO_CMD) $(DEV) ; \
+	else \
+		echo "Please provide a DEV; make DEV=/dev/sdb sd" && false ; \
+	fi
+
 see:
 	@echo "CPUS=$(CPUS)"
 	@echo "SUDO=$(SUDO)"
 	@echo "YOCTO_DIR=$(YOCTO_DIR)"
 	@echo "ARCHIVE-TO=$(ARCHIVE)/$(PROJECT)-$(DATE)"
+	@echo "DEV=\$${DEV}1"
 	@echo -n "KERNEL=$(YOCTO_DIR)/$(YOCTO_ENV)/tmp/work-shared/$(MACHINE)/kernel-source: "
 	@( cd $(YOCTO_DIR)/$(YOCTO_ENV)/$(KERNEL_GIT) && commit=$$(git log | head -1 | tr -s ' ' | cut -f2 | tr -s ' ' | cut -f2 -d' ') ; echo $$commit ) 
 	-@echo "*** local.conf ***" && diff build/conf/local.conf $(YOCTO_DIR)/$(YOCTO_ENV)/conf/local.conf

@@ -17,7 +17,6 @@ case $1 in
 		# load module and configure
 		if modprobe -v spi-ksz9897 ; then
 			# set register to enable KSZ9893 switch
-			log_daemon_msg "echo 0x3301=$CONFIG > $SWREG"
 			echo 0x3301=$CONFIG > $SWREG
 		fi
 		;;
