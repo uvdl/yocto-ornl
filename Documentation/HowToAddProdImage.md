@@ -4,12 +4,12 @@ The basic point of Yocto is the being able to build a very flexible Linux image.
 
 The file structure is as follows:
 <pre>
-Sources/
+sources/
     meta-ornl/
         recipes-core/
             images/
                 ornl-dev-image.bb
-                ornal-tstar-image.bb
+                ornl-tstar-image.bb
             packagegroups/
                 ornlpackagegroup-prod.bb
 </pre>
@@ -34,3 +34,7 @@ bitbake < name-of-your-image >
 </pre>
 
 After how ever long it takes, you will then have a new *production* ready image.
+
+**SWUpdate Files**
+
+If SWUpdate files exist for the new image then they will need to be tracked as well.  Those typically reside in the recipes-support/ directory under swupdate.  See the Update Guide file for more information. The most important SWUpdate files to add are the artifact recipes, i.e. var-dev-image-swu.bb.  If this is a new project, you might consider adding a recipe to build a new update artifact or maybe just adding on to one that already exists.

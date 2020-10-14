@@ -1,1 +1,4 @@
-PACKAGECONFIG += " rtmp"
+PACKAGECONFIG += " \ 
+    rtmp \
+    voaacenc \
+"

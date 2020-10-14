@@ -1,0 +1,816 @@
+From 134b80825cec4a1ef796446c190475422f10ebf2 Mon Sep 17 00:00:00 2001
+From: Bogdan Vacaliuc <vacaliucb@ornl.gov>
+Date: Mon, 3 Feb 2020 09:31:00 -0500
+Subject: [PATCH 1/8] interpret gpio3[21] (SPDIFIN) to select
+ Nightcrawler/Iris2
+
+---
+ board/variscite/mx6var_som/mx6var_som.c | 100 +++++++++++++++++++++-----------
+ 1 file changed, 67 insertions(+), 33 deletions(-)
+
+diff --git a/board/variscite/mx6var_som/mx6var_som.c b/board/variscite/mx6var_som/mx6var_som.c
+index 863045e..2021681 100644
+--- a/board/variscite/mx6var_som/mx6var_som.c
++++ b/board/variscite/mx6var_som/mx6var_som.c
+@@ -130,48 +130,66 @@ static inline bool is_dart_board(void)
+ }
+ 
+ 
+-#define GPIO4_IO21_PAD_CTRL (PAD_CTL_PUS_100K_DOWN | \
++#define PUS_100K_DOWN_PAD_CTRL (PAD_CTL_PUS_100K_DOWN | \
+ 	PAD_CTL_SPEED_HIGH | PAD_CTL_DSE_40ohm |			\
+ 	PAD_CTL_SRE_FAST)
+-static iomux_v3_cfg_t const gpio4_21_en[] = {
+-	IOMUX_PADS(PAD_DISP0_DAT0__GPIO4_IO21	| MUX_PAD_CTRL(GPIO4_IO21_PAD_CTRL)),
++#define PUS_100K_UP_PAD_CTRL (PAD_CTL_PUS_100K_UP | \
++	PAD_CTL_SPEED_HIGH | PAD_CTL_DSE_40ohm |			\
++	PAD_CTL_SRE_FAST)
++
++static iomux_v3_cfg_t const gpio4_21_gpio3_21_en[] = {
++	IOMUX_PADS(PAD_DISP0_DAT0__GPIO4_IO21	| MUX_PAD_CTRL(PUS_100K_DOWN_PAD_CTRL)),
++	IOMUX_PADS(PAD_EIM_D21__GPIO3_IO21		| MUX_PAD_CTRL(PUS_100K_UP_PAD_CTRL)),
+ };
+-static iomux_v3_cfg_t const gpio4_21_dis[] = {
++static iomux_v3_cfg_t const gpio4_21_gpio3_21_dis[] = {
+ 	IOMUX_PADS(PAD_DISP0_DAT0__GPIO4_IO21	| MUX_PAD_CTRL(NO_PAD_CTRL)),
++	IOMUX_PADS(PAD_EIM_D21__GPIO3_IO21		| MUX_PAD_CTRL(NO_PAD_CTRL)),
++};
++
++enum iris2_ident {
++	UNKNOWN = 0,
++	IRIS2,
++	NIGHTCRAWLER,
+ };
+ 
+ /*
+- * Returns true if the carrier board is Iris2
++ * Returns 1 if the carrier board is Iris2, 2 if carrier is Nightcrawler
+  *  (and the SOM is DART-MX6)
+  */
+-static inline bool is_iris2_board(void)
++static inline int get_iris2_ident(void)
+ {
+-	bool ret = false;
++	int ident = UNKNOWN;
++
++	SETUP_IOMUX_PADS(gpio4_21_gpio3_21_en);
+ 
+-	SETUP_IOMUX_PADS(gpio4_21_en);
+-	
+ 	gpio_request(IMX_GPIO_NR(4, 21), "");
++	gpio_request(IMX_GPIO_NR(3, 21), "");
+ 	gpio_direction_input(IMX_GPIO_NR(4, 21));
++	gpio_direction_input(IMX_GPIO_NR(3, 21));
+ 
+-	ret = gpio_get_value(IMX_GPIO_NR(4, 21));
++	lsb = gpio_get_value(IMX_GPIO_NR(4, 21));
++	msb = gpio_get_value(IMX_GPIO_NR(3, 21));
+ 
+-	SETUP_IOMUX_PADS(gpio4_21_dis);
++	if(msb == 1){
++		if(lsb == 1) ret = IRIS2;
++		else ret = NIGHTCRAWLER;
++	}
++
++	SETUP_IOMUX_PADS(gpio4_21_gpio3_21_dis);
+ 	return ret;
+ }
+ 
+ enum iris2_rev {
+-	IRIS2_R0,
++	IRIS2_R0 = 0,
+ 	IRIS2_R1,
+ 	IRIS2_R2,
+ 	IRIS2_R3,
+ 	IRIS2_NONE,
+ };
+-#define GPIO4_IO29_30_PAD_CTRL (PAD_CTL_PUS_100K_UP | \
+-	PAD_CTL_SPEED_HIGH | PAD_CTL_DSE_40ohm |			\
+-	PAD_CTL_SRE_FAST)
++
+ static iomux_v3_cfg_t const gpio4_29_30_en[] = {
+-	IOMUX_PADS(PAD_DISP0_DAT8__GPIO4_IO29	| MUX_PAD_CTRL(GPIO4_IO29_30_PAD_CTRL)),
+-	IOMUX_PADS(PAD_DISP0_DAT9__GPIO4_IO30	| MUX_PAD_CTRL(GPIO4_IO29_30_PAD_CTRL)),
++	IOMUX_PADS(PAD_DISP0_DAT8__GPIO4_IO29	| MUX_PAD_CTRL(PUS_100K_UP_PAD_CTRL)),
++	IOMUX_PADS(PAD_DISP0_DAT9__GPIO4_IO30	| MUX_PAD_CTRL(PUS_100K_UP_PAD_CTRL)),
+ };
+ static iomux_v3_cfg_t const gpio4_29_30_dis[] = {
+ 	IOMUX_PADS(PAD_DISP0_DAT8__GPIO4_IO29	| MUX_PAD_CTRL(NO_PAD_CTRL)),
+@@ -179,7 +197,7 @@ static iomux_v3_cfg_t const gpio4_29_30_dis[] = {
+ };
+ 
+ /**
+- * Gets the iris2 revision
++ * Gets the iris2/nightcrawler revision
+  * GPIO4[30] 	GPIO4[29] 	Revision
+  * HIGH 		HIGH 		R0
+  * HIGH 		LOW 		R1
+@@ -1410,27 +1428,43 @@ int power_init_board(void)
+ #ifndef CONFIG_SPL_BUILD
+ int board_late_init(void)
+ {
++#ifdef CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG
++	int ident = 0;
++#endif
+ #ifdef CONFIG_ENV_IS_IN_MMC
+ 	mmc_late_init();
+ #endif
+ 	print_emmc_size();
+ 
+ #ifdef CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG
+-	if(is_iris2_board()){
+-		int board = get_iris2_rev();
+-
+-		if(board == IRIS2_R0)
+-			setenv("board_name", "IRIS2_R0");
+-		else if(board == IRIS2_R1)
+-			setenv("board_name", "IRIS2_R1");
+-		else if(board == IRIS2_R2)
+-			setenv("board_name", "IRIS2_R2");
+-		else if(board == IRIS2_R3)
+-			setenv("board_name", "IRIS2_R3");
+-		else
+-			setenv("board_name", "DT6CUSTOM");
+-	}
+-	else{
++	ident = get_iris2_ident();
++	if (ident != UNKNOWN) {
++		int revision = get_iris2_rev();
++
++		if (ident == IRIS2) {
++			if (revision == IRIS2_R0)
++				setenv("board_name", "IRIS2_R0");
++			else if (revision == IRIS2_R1)
++				setenv("board_name", "IRIS2_R1");
++			else if (revision == IRIS2_R2)
++				setenv("board_name", "IRIS2_R2");
++			else if (revision == IRIS2_R3)
++				setenv("board_name", "IRIS2_R3");
++			else
++				setenv("board_name", "DT6CUSTOM");
++		} else if (ident == NIGHTCRAWLER) {
++			if (revision == IRIS2_R0)
++				setenv("board_name", "NIGHTCRAWLER_R0");
++			else if (revision == IRIS2_R1)
++				setenv("board_name", "NIGHTCRAWLER_R1");
++			else if (revision == IRIS2_R2)
++				setenv("board_name", "NIGHTCRAWLER_R2");
++			else if (revision == IRIS2_R3)
++				setenv("board_name", "NIGHTCRAWLER_R3");
++			else
++				setenv("board_name", "DT6CUSTOM");
++		}
++	} else {
+ 		if (is_dart_board())
+ 			setenv("board_name", "DT6CUSTOM");
+ 		else if (is_solo_custom_board())
+-- 
+2.7.4
+
+
+From abc51ec8ad651aad5713e49a67f13f265a57653f Mon Sep 17 00:00:00 2001
+From: Bogdan Vacaliuc <vacaliucb@ornl.gov>
+Date: Mon, 3 Feb 2020 15:04:03 -0500
+Subject: [PATCH 2/8] assign default states for GPIOs once a Nightcrawler board
+ is detected
+
+---
+ board/variscite/mx6var_som/mx6var_som.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+
+diff --git a/board/variscite/mx6var_som/mx6var_som.c b/board/variscite/mx6var_som/mx6var_som.c
+index 2021681..9557ca1 100644
+--- a/board/variscite/mx6var_som/mx6var_som.c
++++ b/board/variscite/mx6var_som/mx6var_som.c
+@@ -152,6 +152,15 @@ enum iris2_ident {
+ 	NIGHTCRAWLER,
+ };
+ 
++/* List of GPIOs that need to be set to INPUT */
++static iomux_v3_cfg_t const gpio_nightcrawler_dis[] = {
++	IOMUX_PADS(PAD_ENET_MDC__GPIO1_IO31	| MUX_PAD_CTRL(NO_PAD_CTRL)), /* DART_IO_0 10K PD */
++	IOMUX_PADS(PAD_ENET_MDIO__GPIO1_IO22	| MUX_PAD_CTRL(NO_PAD_CTRL)), /* DART_IO_1 10K PD */
++	IOMUX_PADS(PAD_DISP0_DAT2__GPIO4_IO23	| MUX_PAD_CTRL(NO_PAD_CTRL)), /* DART_IO_2 10K PD */
++	IOMUX_PADS(PAD_DISP0_DAT15__GPIO5_IO09	| MUX_PAD_CTRL(NO_PAD_CTRL)), /* DART_IO_3 10K PD */
++	IOMUX_PADS(PAD_DISP0_DAT16__GPIO5_IO10	| MUX_PAD_CTRL(NO_PAD_CTRL)), /* SILVUS_SHUTDOWN 10K PD */
++};
++
+ /*
+  * Returns 1 if the carrier board is Iris2, 2 if carrier is Nightcrawler
+  *  (and the SOM is DART-MX6)
+@@ -1442,6 +1451,7 @@ int board_late_init(void)
+ 		int revision = get_iris2_rev();
+ 
+ 		if (ident == IRIS2) {
++			/*SETUP_IOMUX_PADS(gpio_iris2_dis);*/
+ 			if (revision == IRIS2_R0)
+ 				setenv("board_name", "IRIS2_R0");
+ 			else if (revision == IRIS2_R1)
+@@ -1453,6 +1463,7 @@ int board_late_init(void)
+ 			else
+ 				setenv("board_name", "DT6CUSTOM");
+ 		} else if (ident == NIGHTCRAWLER) {
++			SETUP_IOMUX_PADS(gpio_nightcrawler_dis);
+ 			if (revision == IRIS2_R0)
+ 				setenv("board_name", "NIGHTCRAWLER_R0");
+ 			else if (revision == IRIS2_R1)
+-- 
+2.7.4
+
+
+From 84aa23702189f7e57205209d7b48d8e383a03033 Mon Sep 17 00:00:00 2001
+From: UVDL Developer <uvdl@ornl.gov>
+Date: Fri, 28 Feb 2020 09:28:06 -0500
+Subject: [PATCH 3/8] fix build bugs; unfortunate conflict with UNKNOWN;
+ undeclared variables; unused variables; add output of IDENT and REV gpio
+ scans for diagnostics
+
+---
+ board/variscite/mx6var_som/mx6var_som.c | 31 ++++++++++++++++++-------------
+ 1 file changed, 18 insertions(+), 13 deletions(-)
+
+diff --git a/board/variscite/mx6var_som/mx6var_som.c b/board/variscite/mx6var_som/mx6var_som.c
+index 9557ca1..a99ece3 100644
+--- a/board/variscite/mx6var_som/mx6var_som.c
++++ b/board/variscite/mx6var_som/mx6var_som.c
+@@ -147,7 +147,7 @@ static iomux_v3_cfg_t const gpio4_21_gpio3_21_dis[] = {
+ };
+ 
+ enum iris2_ident {
+-	UNKNOWN = 0,
++	DT6C,
+ 	IRIS2,
+ 	NIGHTCRAWLER,
+ };
+@@ -167,7 +167,7 @@ static iomux_v3_cfg_t const gpio_nightcrawler_dis[] = {
+  */
+ static inline int get_iris2_ident(void)
+ {
+-	int ident = UNKNOWN;
++	int lsb, msb, ret = DT6C;
+ 
+ 	SETUP_IOMUX_PADS(gpio4_21_gpio3_21_en);
+ 
+@@ -179,11 +179,15 @@ static inline int get_iris2_ident(void)
+ 	lsb = gpio_get_value(IMX_GPIO_NR(4, 21));
+ 	msb = gpio_get_value(IMX_GPIO_NR(3, 21));
+ 
++	printf("IDENT: 0x%02x 0x%02x GPIO3[21] GPIO4[21]\n", msb, lsb);
++
+ 	if(msb == 1){
+ 		if(lsb == 1) ret = IRIS2;
+ 		else ret = NIGHTCRAWLER;
+ 	}
+ 
++	printf("IDENT: %d\n", ret);
++
+ 	SETUP_IOMUX_PADS(gpio4_21_gpio3_21_dis);
+ 	return ret;
+ }
+@@ -216,7 +220,7 @@ static iomux_v3_cfg_t const gpio4_29_30_dis[] = {
+  */
+ static inline int get_iris2_rev(void)
+ {
+-	int lsb, msb, board;
++	int lsb, msb, ret = IRIS2_R0;
+ 
+ 	SETUP_IOMUX_PADS(gpio4_29_30_en);
+ 	
+@@ -228,17 +232,21 @@ static inline int get_iris2_rev(void)
+ 	lsb = gpio_get_value(IMX_GPIO_NR(4, 29));
+ 	msb = gpio_get_value(IMX_GPIO_NR(4, 30));
+ 
++	printf("REV: 0x%02x 0x%02x GPIO4[30] GPIO4[29]\n", msb, lsb);
++
+ 	if(msb == 1){
+-		if(lsb == 1) board = IRIS2_R0;
+-		else board = IRIS2_R1;
++		if(lsb == 1) ret = IRIS2_R0;
++		else ret = IRIS2_R1;
+ 	}
+ 	else{
+-		if(lsb == 1) board = IRIS2_R2;
+-		else board = IRIS2_R3;
++		if(lsb == 1) ret = IRIS2_R2;
++		else ret = IRIS2_R3;
+ 	}
+ 
++	printf("REV: %d\n", ret);
++
+ 	SETUP_IOMUX_PADS(gpio4_29_30_dis);
+-	return board;
++	return ret;
+ }
+ 
+ /*
+@@ -1437,17 +1445,14 @@ int power_init_board(void)
+ #ifndef CONFIG_SPL_BUILD
+ int board_late_init(void)
+ {
+-#ifdef CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG
+-	int ident = 0;
+-#endif
+ #ifdef CONFIG_ENV_IS_IN_MMC
+ 	mmc_late_init();
+ #endif
+ 	print_emmc_size();
+ 
+ #ifdef CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG
+-	ident = get_iris2_ident();
+-	if (ident != UNKNOWN) {
++	int ident = get_iris2_ident();
++	if (ident != VARISCITE) {
+ 		int revision = get_iris2_rev();
+ 
+ 		if (ident == IRIS2) {
+-- 
+2.7.4
+
+
+From e79a2b1d8efab0ffbd3ae16a8af4faadff3b4a10 Mon Sep 17 00:00:00 2001
+From: UVDL Developer <uvdl@ornl.gov>
+Date: Fri, 28 Feb 2020 11:00:54 -0500
+Subject: [PATCH 4/8] fix syntax error
+
+---
+ board/variscite/mx6var_som/mx6var_som.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/board/variscite/mx6var_som/mx6var_som.c b/board/variscite/mx6var_som/mx6var_som.c
+index a99ece3..85d1464 100644
+--- a/board/variscite/mx6var_som/mx6var_som.c
++++ b/board/variscite/mx6var_som/mx6var_som.c
+@@ -147,7 +147,7 @@ static iomux_v3_cfg_t const gpio4_21_gpio3_21_dis[] = {
+ };
+ 
+ enum iris2_ident {
+-	DT6C,
++	VARISCITE,
+ 	IRIS2,
+ 	NIGHTCRAWLER,
+ };
+@@ -167,7 +167,7 @@ static iomux_v3_cfg_t const gpio_nightcrawler_dis[] = {
+  */
+ static inline int get_iris2_ident(void)
+ {
+-	int lsb, msb, ret = DT6C;
++	int lsb, msb, ret = VARISCITE;
+ 
+ 	SETUP_IOMUX_PADS(gpio4_21_gpio3_21_en);
+ 
+-- 
+2.7.4
+
+
+From a702c5d41b5ad8e16d88b269c268a97505e5b17f Mon Sep 17 00:00:00 2001
+From: UVDL Developer <uvdl@ornl.gov>
+Date: Fri, 28 Feb 2020 12:15:13 -0500
+Subject: [PATCH 5/8] fix msb/lsb mistake selecting VARISCITE vs Iris2/NC
+
+---
+ board/variscite/mx6var_som/mx6var_som.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/board/variscite/mx6var_som/mx6var_som.c b/board/variscite/mx6var_som/mx6var_som.c
+index 85d1464..8d1fa38 100644
+--- a/board/variscite/mx6var_som/mx6var_som.c
++++ b/board/variscite/mx6var_som/mx6var_som.c
+@@ -176,10 +176,10 @@ static inline int get_iris2_ident(void)
+ 	gpio_direction_input(IMX_GPIO_NR(4, 21));
+ 	gpio_direction_input(IMX_GPIO_NR(3, 21));
+ 
+-	lsb = gpio_get_value(IMX_GPIO_NR(4, 21));
+-	msb = gpio_get_value(IMX_GPIO_NR(3, 21));
++	msb = gpio_get_value(IMX_GPIO_NR(4, 21));
++	lsb = gpio_get_value(IMX_GPIO_NR(3, 21));
+ 
+-	printf("IDENT: 0x%02x 0x%02x GPIO3[21] GPIO4[21]\n", msb, lsb);
++	printf("IDENT: 0x%02x 0x%02x GPIO4[21] GPIO3[21]\n", msb, lsb);
+ 
+ 	if(msb == 1){
+ 		if(lsb == 1) ret = IRIS2;
+-- 
+2.7.4
+
+
+From ee1ded2559d3077b466586c9c527c17c09312a1f Mon Sep 17 00:00:00 2001
+From: Bogdan Vacaliuc <vacaliucb@ornl.gov>
+Date: Fri, 28 Feb 2020 13:35:58 -0500
+Subject: [PATCH 6/8] figure out that we also have to adjust u-boot environment
+ scripts; simplify IRIS2 and NIGHTCRAWLER support; drop other
+ boards/configurations - we don't emerge those .dtb files anyway
+
+---
+ board/variscite/mx6var_som/mx6var_som.c | 48 ++++++++++----------------
+ include/configs/mx6var_som.h            | 60 +++------------------------------
+ 2 files changed, 22 insertions(+), 86 deletions(-)
+
+diff --git a/board/variscite/mx6var_som/mx6var_som.c b/board/variscite/mx6var_som/mx6var_som.c
+index 8d1fa38..42b4914 100644
+--- a/board/variscite/mx6var_som/mx6var_som.c
++++ b/board/variscite/mx6var_som/mx6var_som.c
+@@ -193,11 +193,10 @@ static inline int get_iris2_ident(void)
+ }
+ 
+ enum iris2_rev {
+-	IRIS2_R0 = 0,
+-	IRIS2_R1,
+-	IRIS2_R2,
+-	IRIS2_R3,
+-	IRIS2_NONE,
++	R0 = 0,
++	R1,
++	R2,
++	R3,
+ };
+ 
+ static iomux_v3_cfg_t const gpio4_29_30_en[] = {
+@@ -220,7 +219,7 @@ static iomux_v3_cfg_t const gpio4_29_30_dis[] = {
+  */
+ static inline int get_iris2_rev(void)
+ {
+-	int lsb, msb, ret = IRIS2_R0;
++	int lsb, msb, ret = R0;
+ 
+ 	SETUP_IOMUX_PADS(gpio4_29_30_en);
+ 	
+@@ -235,12 +234,12 @@ static inline int get_iris2_rev(void)
+ 	printf("REV: 0x%02x 0x%02x GPIO4[30] GPIO4[29]\n", msb, lsb);
+ 
+ 	if(msb == 1){
+-		if(lsb == 1) ret = IRIS2_R0;
+-		else ret = IRIS2_R1;
++		if(lsb == 1) ret = R0;
++		else ret = R1;
+ 	}
+ 	else{
+-		if(lsb == 1) ret = IRIS2_R2;
+-		else ret = IRIS2_R3;
++		if(lsb == 1) ret = R2;
++		else ret = R3;
+ 	}
+ 
+ 	printf("REV: %d\n", ret);
+@@ -1454,31 +1453,20 @@ int board_late_init(void)
+ 	int ident = get_iris2_ident();
+ 	if (ident != VARISCITE) {
+ 		int revision = get_iris2_rev();
++		char str[32];
+ 
+ 		if (ident == IRIS2) {
+ 			/*SETUP_IOMUX_PADS(gpio_iris2_dis);*/
+-			if (revision == IRIS2_R0)
+-				setenv("board_name", "IRIS2_R0");
+-			else if (revision == IRIS2_R1)
+-				setenv("board_name", "IRIS2_R1");
+-			else if (revision == IRIS2_R2)
+-				setenv("board_name", "IRIS2_R2");
+-			else if (revision == IRIS2_R3)
+-				setenv("board_name", "IRIS2_R3");
+-			else
+-				setenv("board_name", "DT6CUSTOM");
++			sprintf(str, "imx6q-iris2-R%d.dtb", revision);
++			setenv("board_name", "IRIS2");
++            setenv("board_fdt", str);
+ 		} else if (ident == NIGHTCRAWLER) {
+ 			SETUP_IOMUX_PADS(gpio_nightcrawler_dis);
+-			if (revision == IRIS2_R0)
+-				setenv("board_name", "NIGHTCRAWLER_R0");
+-			else if (revision == IRIS2_R1)
+-				setenv("board_name", "NIGHTCRAWLER_R1");
+-			else if (revision == IRIS2_R2)
+-				setenv("board_name", "NIGHTCRAWLER_R2");
+-			else if (revision == IRIS2_R3)
+-				setenv("board_name", "NIGHTCRAWLER_R3");
+-			else
+-				setenv("board_name", "DT6CUSTOM");
++			sprintf(str, "imx6q-nightcrawler-R%d.dtb", revision);
++			setenv("board_name", "NIGHTCRAWLER");
++            setenv("board_fdt", str);
++		} else {
++			setenv("board_name", "DT6CUSTOM");
+ 		}
+ 	} else {
+ 		if (is_dart_board())
+diff --git a/include/configs/mx6var_som.h b/include/configs/mx6var_som.h
+index 9196d6c..f348b27 100644
+--- a/include/configs/mx6var_som.h
++++ b/include/configs/mx6var_som.h
+@@ -197,7 +197,6 @@
+ 		"setenv bootargs ${bootargs} " \
+ 			"video=mxcfb1:off video=mxcfb2:off video=mxcfb3:off;\0"
+ 
+-
+ #define CONFIG_EXTRA_ENV_SETTINGS \
+ 	MMC_BOOT_ENV_SETTINGS \
+ 	NAND_BOOT_ENV_SETTINGS \
+@@ -243,71 +242,20 @@
+ 		"fi;\0" \
+ 	"findfdt="\
+ 		"if test $fdt_file = undefined; then " \
+-			"if test $board_name = IRIS2_R0; then " \
+-				"setenv fdt_file imx6q-iris2-R0.dtb; " \
+-			"fi; " \
+-			"if test $board_name = IRIS2_R1; then " \
+-				"setenv fdt_file imx6q-iris2-R1.dtb; " \
+-			"fi; " \
+-			"if test $board_name = IRIS2_R2; then " \
+-				"setenv fdt_file imx6q-iris2-R2.dtb; " \
++			"if test $board_name = IRIS2; then " \
++				"setenv fdt_file $board_fdt; " \
+ 			"fi; " \
+-			"if test $board_name = IRIS2_R3; then " \
+-				"setenv fdt_file imx6q-iris2-R3.dtb; " \
++			"if test $board_name = NIGHTCRAWLER; then " \
++				"setenv fdt_file $board_fdt; " \
+ 			"fi; " \
+ 			"if test $board_name = DT6CUSTOM && test $board_rev = MX6Q; then " \
+ 				"setenv fdt_file imx6q-var-dart.dtb; " \
+ 			"fi; " \
+-			"if test $board_name = SOLOCUSTOM && test $board_rev = MX6QP; then " \
+-				"setenv fdt_file imx6qp-var-som-vsc.dtb; " \
+-			"fi; " \
+-			"if test $board_name = SOLOCUSTOM && test $board_rev = MX6Q; then " \
+-				"setenv fdt_file imx6q-var-som-vsc.dtb; " \
+-			"fi; " \
+-			"if test $board_name = SOLOCUSTOM && test $board_rev = MX6DL && test $board_som = SOM-SOLO; then " \
+-				"setenv fdt_file imx6dl-var-som-solo-vsc.dtb; " \
+-			"fi; " \
+-			"if test $board_name = SOLOCUSTOM && test $board_rev = MX6DL && test $board_som = SOM-MX6; then " \
+-				"setenv fdt_file imx6dl-var-som-vsc.dtb; " \
+-			"fi; " \
+-			"if test $board_name = MX6CUSTOM && test $board_rev = MX6QP; then " \
+-				"i2c dev 2; " \
+-				"if i2c probe 0x38; then " \
+-					"setenv fdt_file imx6qp-var-som-cap.dtb; " \
+-				"else " \
+-					"setenv fdt_file imx6qp-var-som-res.dtb; " \
+-				"fi; " \
+-			"fi; " \
+-			"if test $board_name = MX6CUSTOM && test $board_rev = MX6Q; then " \
+-				"i2c dev 2; " \
+-				"if i2c probe 0x38; then " \
+-					"setenv fdt_file imx6q-var-som-cap.dtb; " \
+-				"else " \
+-					"setenv fdt_file imx6q-var-som-res.dtb; " \
+-				"fi; " \
+-			"fi; " \
+-			"if test $board_name = MX6CUSTOM && test $board_rev = MX6DL && test $board_som = SOM-SOLO; then " \
+-				"i2c dev 2; " \
+-				"if i2c probe 0x38; then " \
+-					"setenv fdt_file imx6dl-var-som-solo-cap.dtb; " \
+-				"else " \
+-					"setenv fdt_file imx6dl-var-som-solo-res.dtb; " \
+-				"fi; " \
+-			"fi; " \
+-			"if test $board_name = MX6CUSTOM && test $board_rev = MX6DL && test $board_som = SOM-MX6; then " \
+-				"i2c dev 2; " \
+-				"if i2c probe 0x38; then " \
+-					"setenv fdt_file imx6dl-var-som-cap.dtb; " \
+-				"else " \
+-					"setenv fdt_file imx6dl-var-som-res.dtb; " \
+-				"fi; " \
+-			"fi; " \
+ 			"if test $fdt_file = undefined; then " \
+ 				"echo WARNING: Could not determine dtb to use; " \
+ 			"fi; " \
+ 		"fi;\0"
+ 
+-
+ #define CONFIG_ARP_TIMEOUT		200UL
+ 
+ #define CONFIG_SYS_MEMTEST_START	0x10000000
+-- 
+2.7.4
+
+
+From be0a5b60a4bd1286c216b9900f46b2d63a8a0a1f Mon Sep 17 00:00:00 2001
+From: Bogdan Vacaliuc <vacaliucb@ornl.gov>
+Date: Sat, 9 May 2020 10:43:45 -0400
+Subject: [PATCH 7/8] refactor board selection; follow variscite use of
+ board_rev
+
+---
+ board/variscite/mx6var_som/mx6var_som.c | 75 ++++++++++++++++++---------------
+ include/configs/mx6var_som.h            |  7 +--
+ 2 files changed, 44 insertions(+), 38 deletions(-)
+
+diff --git a/board/variscite/mx6var_som/mx6var_som.c b/board/variscite/mx6var_som/mx6var_som.c
+index 42b4914..c31614c 100644
+--- a/board/variscite/mx6var_som/mx6var_som.c
++++ b/board/variscite/mx6var_som/mx6var_som.c
+@@ -146,14 +146,16 @@ static iomux_v3_cfg_t const gpio4_21_gpio3_21_dis[] = {
+ 	IOMUX_PADS(PAD_EIM_D21__GPIO3_IO21		| MUX_PAD_CTRL(NO_PAD_CTRL)),
+ };
+ 
+-enum iris2_ident {
+-	VARISCITE,
+-	IRIS2,
+-	NIGHTCRAWLER,
++enum uvdl_ident {
++	VARISCITE = 0,
++	PIXC3,
++	PIXC4,
+ };
+ 
+ /* List of GPIOs that need to be set to INPUT */
+-static iomux_v3_cfg_t const gpio_nightcrawler_dis[] = {
++//static iomux_v3_cfg_t const gpio_pixc3_dis[] = {
++//};
++static iomux_v3_cfg_t const gpio_pixc4_dis[] = {
+ 	IOMUX_PADS(PAD_ENET_MDC__GPIO1_IO31	| MUX_PAD_CTRL(NO_PAD_CTRL)), /* DART_IO_0 10K PD */
+ 	IOMUX_PADS(PAD_ENET_MDIO__GPIO1_IO22	| MUX_PAD_CTRL(NO_PAD_CTRL)), /* DART_IO_1 10K PD */
+ 	IOMUX_PADS(PAD_DISP0_DAT2__GPIO4_IO23	| MUX_PAD_CTRL(NO_PAD_CTRL)), /* DART_IO_2 10K PD */
+@@ -162,10 +164,10 @@ static iomux_v3_cfg_t const gpio_nightcrawler_dis[] = {
+ };
+ 
+ /*
+- * Returns 1 if the carrier board is Iris2, 2 if carrier is Nightcrawler
++ * Returns 1 if the carrier board is PixC3, 2 if carrier is PixC4, otherwise 0
+  *  (and the SOM is DART-MX6)
+  */
+-static inline int get_iris2_ident(void)
++static inline int get_uvdl_ident(void)
+ {
+ 	int lsb, msb, ret = VARISCITE;
+ 
+@@ -182,8 +184,8 @@ static inline int get_iris2_ident(void)
+ 	printf("IDENT: 0x%02x 0x%02x GPIO4[21] GPIO3[21]\n", msb, lsb);
+ 
+ 	if(msb == 1){
+-		if(lsb == 1) ret = IRIS2;
+-		else ret = NIGHTCRAWLER;
++		if(lsb == 1) ret = PIXC3;
++		else ret = PIXC4;
+ 	}
+ 
+ 	printf("IDENT: %d\n", ret);
+@@ -192,7 +194,7 @@ static inline int get_iris2_ident(void)
+ 	return ret;
+ }
+ 
+-enum iris2_rev {
++enum uvdl_rev {
+ 	R0 = 0,
+ 	R1,
+ 	R2,
+@@ -209,7 +211,7 @@ static iomux_v3_cfg_t const gpio4_29_30_dis[] = {
+ };
+ 
+ /**
+- * Gets the iris2/nightcrawler revision
++ * Gets the uvdl board revision
+  * GPIO4[30] 	GPIO4[29] 	Revision
+  * HIGH 		HIGH 		R0
+  * HIGH 		LOW 		R1
+@@ -217,7 +219,7 @@ static iomux_v3_cfg_t const gpio4_29_30_dis[] = {
+  * LOW 			LOW 		R3
+  * 
+  */
+-static inline int get_iris2_rev(void)
++static inline int get_uvdl_rev(void)
+ {
+ 	int lsb, msb, ret = R0;
+ 
+@@ -1450,24 +1452,31 @@ int board_late_init(void)
+ 	print_emmc_size();
+ 
+ #ifdef CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG
+-	int ident = get_iris2_ident();
++	int ident = get_uvdl_ident();
+ 	if (ident != VARISCITE) {
+-		int revision = get_iris2_rev();
+-		char str[32];
+-
+-		if (ident == IRIS2) {
+-			/*SETUP_IOMUX_PADS(gpio_iris2_dis);*/
+-			sprintf(str, "imx6q-iris2-R%d.dtb", revision);
+-			setenv("board_name", "IRIS2");
+-            setenv("board_fdt", str);
+-		} else if (ident == NIGHTCRAWLER) {
+-			SETUP_IOMUX_PADS(gpio_nightcrawler_dis);
+-			sprintf(str, "imx6q-nightcrawler-R%d.dtb", revision);
+-			setenv("board_name", "NIGHTCRAWLER");
+-            setenv("board_fdt", str);
++		int revision = get_uvdl_rev();
++
++		if (ident == PIXC3) {
++			/*SETUP_IOMUX_PADS(gpio_pixc3_dis);*/
++			setenv("board_name", "iris2");		// NB: coupled with kernel dtb
++		} else if (ident == PIXC4) {
++			SETUP_IOMUX_PADS(gpio_pixc4_dis);
++			setenv("board_name", "nightcrawler");	// NB: coupled with kernel dtb
+ 		} else {
+ 			setenv("board_name", "DT6CUSTOM");
+ 		}
++
++		if(revision == R0)
++			setenv("board_rev", "R0");
++		else if(revision == R1)
++			setenv("board_rev", "R1");
++		else if(revision == R2)
++			setenv("board_rev", "R2");
++		else if(revision == R3)
++			setenv("board_rev", "R3");
++		else
++			setenv("board_rev", "MX6Q");
++		}
+ 	} else {
+ 		if (is_dart_board())
+ 			setenv("board_name", "DT6CUSTOM");
+@@ -1475,6 +1484,13 @@ int board_late_init(void)
+ 			setenv("board_name", "SOLOCUSTOM");
+ 		else
+ 			setenv("board_name", "MX6CUSTOM");
++
++		if (is_mx6dqp())
++			setenv("board_rev", "MX6QP");
++		else if (is_mx6dq())
++			setenv("board_rev", "MX6Q");
++		else if (is_mx6sdl())
++			setenv("board_rev", "MX6DL");
+ 	}
+ 
+ 	if (is_som_solo())
+@@ -1483,13 +1499,6 @@ int board_late_init(void)
+ 		setenv("board_som", "DART-MX6");
+ 	else
+ 		setenv("board_som", "SOM-MX6");
+-
+-	if (is_mx6dqp())
+-		setenv("board_rev", "MX6QP");
+-	else if (is_mx6dq())
+-		setenv("board_rev", "MX6Q");
+-	else if (is_mx6sdl())
+-		setenv("board_rev", "MX6DL");
+ #endif
+ 
+ 	return 0;
+diff --git a/include/configs/mx6var_som.h b/include/configs/mx6var_som.h
+index f348b27..6295b5c 100644
+--- a/include/configs/mx6var_som.h
++++ b/include/configs/mx6var_som.h
+@@ -242,11 +242,8 @@
+ 		"fi;\0" \
+ 	"findfdt="\
+ 		"if test $fdt_file = undefined; then " \
+-			"if test $board_name = IRIS2; then " \
+-				"setenv fdt_file $board_fdt; " \
+-			"fi; " \
+-			"if test $board_name = NIGHTCRAWLER; then " \
+-				"setenv fdt_file $board_fdt; " \
++			"if test $board_name = iris2 || test $board_name = nightcrawler; then " \
++				"setenv fdt_file imx6q-${board_name}-${board_rev}.dtb; " \
+ 			"fi; " \
+ 			"if test $board_name = DT6CUSTOM && test $board_rev = MX6Q; then " \
+ 				"setenv fdt_file imx6q-var-dart.dtb; " \
+-- 
+2.7.4
+
+
+From 7a70a5b5fe517a89391c309d801a0a2e9fd06c5f Mon Sep 17 00:00:00 2001
+From: UVDL Developer <uvdl@ornl.gov>
+Date: Mon, 11 May 2020 18:21:38 -0400
+Subject: [PATCH 8/8] fix syntax error with extra }; remove use of // for
+ comment - this is C after all
+
+---
+ board/variscite/mx6var_som/mx6var_som.c | 7 ++-----
+ 1 file changed, 2 insertions(+), 5 deletions(-)
+
+diff --git a/board/variscite/mx6var_som/mx6var_som.c b/board/variscite/mx6var_som/mx6var_som.c
+index c31614c..df33f93 100644
+--- a/board/variscite/mx6var_som/mx6var_som.c
++++ b/board/variscite/mx6var_som/mx6var_som.c
+@@ -153,8 +153,6 @@ enum uvdl_ident {
+ };
+ 
+ /* List of GPIOs that need to be set to INPUT */
+-//static iomux_v3_cfg_t const gpio_pixc3_dis[] = {
+-//};
+ static iomux_v3_cfg_t const gpio_pixc4_dis[] = {
+ 	IOMUX_PADS(PAD_ENET_MDC__GPIO1_IO31	| MUX_PAD_CTRL(NO_PAD_CTRL)), /* DART_IO_0 10K PD */
+ 	IOMUX_PADS(PAD_ENET_MDIO__GPIO1_IO22	| MUX_PAD_CTRL(NO_PAD_CTRL)), /* DART_IO_1 10K PD */
+@@ -1458,10 +1456,10 @@ int board_late_init(void)
+ 
+ 		if (ident == PIXC3) {
+ 			/*SETUP_IOMUX_PADS(gpio_pixc3_dis);*/
+-			setenv("board_name", "iris2");		// NB: coupled with kernel dtb
++			setenv("board_name", "iris2");		/* NB: coupled with kernel dtb */
+ 		} else if (ident == PIXC4) {
+ 			SETUP_IOMUX_PADS(gpio_pixc4_dis);
+-			setenv("board_name", "nightcrawler");	// NB: coupled with kernel dtb
++			setenv("board_name", "nightcrawler");	/* NB: coupled with kernel dtb */
+ 		} else {
+ 			setenv("board_name", "DT6CUSTOM");
+ 		}
+@@ -1476,7 +1474,6 @@ int board_late_init(void)
+ 			setenv("board_rev", "R3");
+ 		else
+ 			setenv("board_rev", "MX6Q");
+-		}
+ 	} else {
+ 		if (is_dart_board())
+ 			setenv("board_name", "DT6CUSTOM");
+-- 
+2.7.4

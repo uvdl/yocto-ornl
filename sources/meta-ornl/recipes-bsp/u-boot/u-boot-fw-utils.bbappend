@@ -1,7 +1,10 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}/${MACHINE}:"
+FILESEXTRAPATHS_prepend := "${THISDIR}/u-boot-variscite/${MACHINE}:"
 
 SRC_URI_append_var-som-mx6-ornl = " \
     file://fw_env.config \
+	file://0001-adding-iris2-support.patch \
+	file://0002-adding-more-iris2-support.patch \
     "
 
 do_compile_var-som-mx6-ornl () {

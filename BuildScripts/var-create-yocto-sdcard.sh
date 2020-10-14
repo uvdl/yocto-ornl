@@ -159,7 +159,7 @@ fi
 
 # allow only removable/loopback devices, to protect host PC
 echo "MACHINE=${MACHINE}"
-echo "SD card rootfs:  ${YOCTO_DEFAULT_IMAGE}-${MACHINE}"
+echo "SD card rootfs:  ${YOCTO_RECOVERY_ROOTFS_BASE_IN_NAME}"
 echo "Recovery rootfs: ${YOCTO_RECOVERY_ROOTFS_BASE_IN_NAME}"
 echo "================================================"
 check_device $node
@@ -274,15 +274,15 @@ function install_yocto
 {
 	echo
 	echo "Installing Yocto Boot partition"
-	cp ${YOCTO_IMGS_PATH}/?Image-imx*.dtb		${P1_MOUNT_DIR}/
-	rename 's/.Image-//' ${P1_MOUNT_DIR}/?Image-*
+	# FIXME: not handing zImage because bash does not do regex
+	for STR in uImage ; do for f in ${YOCTO_IMGS_PATH}/${STR}-imx*.dtb ; do cp $f ${P1_MOUNT_DIR}/$(basename ${f/${STR}-/}) ; done ; done
 
 	pv ${YOCTO_IMGS_PATH}/?Image >			${P1_MOUNT_DIR}/`cd ${YOCTO_IMGS_PATH}; ls ?Image`
 	sync
 
 	echo
 	echo "Installing Yocto Root File System"
-	pv ${YOCTO_IMGS_PATH}/${YOCTO_DEFAULT_IMAGE}-${MACHINE}.tar.gz | tar -xz -C ${P2_MOUNT_DIR}/
+	pv ${YOCTO_RECOVERY_ROOTFS_PATH}/${YOCTO_RECOVERY_ROOTFS_BASE_IN_NAME}.tar.gz | tar -xz -C ${P2_MOUNT_DIR}/
 }
 
 function copy_images
@@ -290,9 +290,8 @@ function copy_images
 	echo
 	echo "Copying Yocto images to /opt/images/"
 	mkdir -p ${P2_MOUNT_DIR}/opt/images/Yocto
-
-	cp ${YOCTO_RECOVERY_ROOTFS_PATH}/?Image-imx*.dtb		${P2_MOUNT_DIR}/opt/images/Yocto/
-	rename 's/.Image-//' ${P2_MOUNT_DIR}/opt/images/Yocto/?Image-*
+	# FIXME: not handing zImage because bash does not do regex
+	for STR in uImage ; do for f in ${YOCTO_RECOVERY_ROOTFS_PATH}/${STR}-imx*.dtb ; do cp $f ${P2_MOUNT_DIR}/opt/images/Yocto/$(basename ${f/${STR}-/}) ; done ; done
 
 	cp ${YOCTO_RECOVERY_ROOTFS_PATH}/?Image				${P2_MOUNT_DIR}/opt/images/Yocto/
 
@@ -304,14 +303,14 @@ function copy_images
 	fi
 
 	# Copy image for NAND flash
+	_ubi=false
 	for f in ${YOCTO_RECOVERY_ROOTFS_PATH}/${YOCTO_RECOVERY_ROOTFS_BASE_IN_NAME}_*.ubi; do
 		if [ -f "$f" ]; then
-			pv $f > ${P2_MOUNT_DIR}/opt/images/Yocto/`basename $f`
+			pv $f > ${P2_MOUNT_DIR}/opt/images/Yocto/$(basename ${f/$YOCTO_RECOVERY_ROOTFS_BASE_IN_NAME/})
+			_ubi=true
 		fi
 	done
-	if ls ${P2_MOUNT_DIR}/opt/images/Yocto/*.ubi &> /dev/null; then
-		STR=$YOCTO_RECOVERY_ROOTFS_BASE_IN_NAME rename 's/\Q$ENV{STR}\E/rootfs/' ${P2_MOUNT_DIR}/opt/images/Yocto/*.ubi
-	else
+	if ! $_ubi ; then
 		echo "UBI rootfs images are not present. Installation on \"NAND flash\" will not be supported."
 	fi
 

@@ -44,7 +44,6 @@ MACHINE_EXTRA_RDEPENDS += " \
 			   imx-kobs \
 			   iw \
 			   kernel-modules \
-			   packagegroup-tools-bluetooth \
 			   pm-utils \
 			   rng-tools \
 			   hdparm \
@@ -54,7 +53,6 @@ MACHINE_EXTRA_RDEPENDS += " \
 			   u-boot-fw-utils \
 			   u-boot-splash \
 			   wpa-supplicant \
-			   ${@bb.utils.contains('DISTRO_FEATURES', 'x11', "x11vnc", "", d)} \
 			   "
 
 # Packages added to all images (including core-image-minimal)
@@ -63,7 +61,6 @@ IMAGE_INSTALL_append = " \
 "
 
 BBMASK_prepend = "fsl-image-mfgtool-initramfs "
-BBMASK += "meta-freescale/dynamic-layers/browser-layer/recipes-browser/chromium"
 
 WKS_FILE = "imx-uboot-spl-bootpart.wks"
 IMAGE_FSTYPES += "tar.gz multiubi"
