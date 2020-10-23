@@ -83,5 +83,11 @@ IMAGE_INSTALL_append += " \
 	systemd-analyze \
 	v4l-utils \
 	webcam-tools \
+	x265 \
+	tcpdump \
+	htop \
+	iotop \
+	perf \
+	powertop \
 "
 
