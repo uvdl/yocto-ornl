@@ -30,9 +30,9 @@ IMAGE_INSTALL_append += " \
 	gstd \
 	gst-interpipe \
 	gst-pylibgstc \
-	imx-test \
+	${@base_contains("MACHINE", "var-som-mx6-ornl", "imx-test", "",d)} \
 	iperf3 \
-	ksz-initscripts \
+	${@base_contains("MACHINE", "var-som-mx6-ornl", "ksz-initscripts", "",d)} \
 	libgps \
 	libsodium \
 	libsodium-dev \
@@ -49,14 +49,14 @@ IMAGE_INSTALL_append += " \
 	ntp-bin \
 	openssl \
 	packagegroup-core-full-cmdline \
-	packagegroup-fsl-gstreamer1.0 \
-	packagegroup-fsl-gstreamer1.0-full \
-	packagegroup-fsl-tools-benchmark \
-	packagegroup-fsl-tools-gpu \
-	packagegroup-fsl-tools-gpu-external \
-	packagegroup-fsl-tools-testapps \
-	packagegroup-imx-tools-audio \
-	packagegroup-tools-bluetooth \
+	${@base_contains("MACHINE", "var-som-mx6-ornl", "packagegroup-fsl-gstreamer1.0", "",d)} \
+	${@base_contains("MACHINE", "var-som-mx6-ornl", "packagegroup-fsl-gstreamer1.0-full", "",d)} \
+	${@base_contains("MACHINE", "var-som-mx6-ornl", "packagegroup-fsl-tools-benchmark", "",d)} \
+	${@base_contains("MACHINE", "var-som-mx6-ornl", "packagegroup-fsl-tools-gpu", "",d)} \
+	${@base_contains("MACHINE", "var-som-mx6-ornl", "packagegroup-fsl-tools-gpu-external", "",d)} \
+	${@base_contains("MACHINE", "var-som-mx6-ornl", "packagegroup-fsl-tools-testapps", "",d)} \
+	${@base_contains("MACHINE", "var-som-mx6-ornl", "packagegroup-imx-tools-audio", "",d)} \
+	${@base_contains("MACHINE", "var-som-mx6-ornl", "packagegroup-tools-bluetooth", "",d)} \
 	pkgconfig \
 	postinstall \
 	python-compiler \
