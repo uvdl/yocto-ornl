@@ -34,7 +34,7 @@ REPO_SUM=d73f3885d717c1dc89eba0563433cec787486a0089b9b04b4e8c56e7c07c7610
 TOASTER_PORT := 8000
 
 # Known variations
-YOCTO_DIR := $(HOME)/ornl-dart-yocto
+YOCTO_DIR := $(HOME)/ornl-yocto-build
 YOCTO_DISTRO=fslc-framebuffer
 YOCTO_ENV=build_ornl
 YOCTO_IMG=var-dev-update-full-image
@@ -135,8 +135,24 @@ archive:
 	@echo "DEV=/dev/sdx" >> $(ARCHIVE)/$(PROJECT)-$(DATE)/readme.txt
 	@echo "$(SUDO) MACHINE=$(MACHINE) $(YOCTO_ENV)/sources/meta-variscite-fslc/scripts/var-create-yocto-sdcard.sh -a -r $(YOCTO_ENV)/tmp/deploy/images/$(MACHINE)/$(YOCTO_CMD)-$(MACHINE) \$${DEV}" >> $(ARCHIVE)/$(PROJECT)-$(DATE)/readme.txt
 
-build: $(YOCTO_DIR)/setup-environment build/conf/local.conf build/conf/bblayers.conf sources/meta-ornl
-	@$(MAKE) --no-print-directory -B environment
+# build: $(YOCTO_DIR)/setup-environment build/conf/local.conf build/conf/bblayers.conf sources/meta-ornl
+# 	@$(MAKE) --no-print-directory -B environment
+# 	cd $(YOCTO_DIR) && \
+# 		MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV) && \
+# 		cd $(YOCTO_DIR)/$(YOCTO_ENV) && \
+# 			if [ -e .toaster ] ; then source toaster stop ; source toaster start ; /bin/true ; fi && \
+# 			LANG=$(LANG) bitbake $(YOCTO_CMD)
+
+build-xavier:
+	BuildScripts/ornl-setup-yocto.sh -m jetson-xavier-nx-devkit-emmc $(YOCTO_DIR)
+	cd $(YOCTO_DIR) && \
+		. $(YOCTO_DIR)/sources/poky/oe-init-build-env $(YOCTO_ENV) && \
+		cd $(YOCTO_DIR)/$(YOCTO_ENV) && \
+			if [ -e .toaster ] ; then source toaster stop ; source toaster start ; /bin/true ; fi && \
+			LANG=$(LANG) bitbake core-image-sato-dev
+
+build-variscite:
+	BuildScripts/ornl-setup-yocto.sh -m var-mx6-som-ornl $(YOCTO_DIR)
 	cd $(YOCTO_DIR) && \
 		MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV) && \
 		cd $(YOCTO_DIR)/$(YOCTO_ENV) && \

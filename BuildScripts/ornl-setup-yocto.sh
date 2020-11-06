@@ -7,11 +7,9 @@
 # =================================================================================
 # GLOBAL VARIABLES
 # =================================================================================
-ORNL_YOCTO_BRANCH="develop"
-YOCTO_DIR_LOCATION=${PWD}
+YOCTO_DIR_LOCATION="$HOME"
 YOCTO_VERSION=sumo
-TARGET_MACHINE=var-som-mx6-ornl
-readonly YOCTO_DIR_NAME=ornl-dart-yocto
+TARGET_MACHINE=""
 
 # =================================================================================
 # GLOBAL TERMINAL MODIFIERS
@@ -25,7 +23,7 @@ END_COLOR=$'\e[0m'
 # =================================================================================
 # FUNCTIONS
 # =================================================================================
-function run_all()
+function install_dependencies()
 {
     echo 
     echo "${BOLD}Installing host dependencies${NORMAL}"
@@ -103,29 +101,40 @@ function run_all()
             echo "================================================="
             exit 1
     fi
+}
 
+# =================================================================================
+#
+# =================================================================================
+function run_build()
+{
+    
     # Need to have git configuration set for repo
-    if (($(git config --get user.name) == "" ))
+    if [[ $(git config --get user.name) == "" ]]
         then
             prompt_user_git_info
     fi
     
-    # Need repo in the next steps
-    check_for_bin_repo
-
     # Need to prepare the machine platorm, default is Variscite
     case "$TARGET_MACHINE" in
-    *)
+    var-som-mx6-ornl)
         sync_variscite_platform
+        ;;
+    jetson-xavier-nx-devkit-emmc)
+        sync_xavier_platform
         ;;
     esac
 
     # Check the current ornl yocto repo
-    checking_ornl_layer
-    # make the build directory
-    make_build_dir
+    copying_ornl_layer
+    # make the build directory and
     # Run the setup script
-    YOCTO_DIR_LOCATION="$YOCTO_DIR_LOCATION/$YOCTO_DIR_NAME"
+    if [ ! -d $YOCTO_DIR_LOCATION/build_ornl ]
+        then
+            make_build_dir
+    fi
+
+    # copy config files for the desired TARGET_MACHINE
     copy_config_files
 
     echo
@@ -141,7 +150,10 @@ function run_all()
 # =================================================================================
 function sync_variscite_platform()
 {
-    mkdir -p $YOCTO_DIR_LOCATION/$YOCTO_DIR_NAME
+    # Need repo in the next steps
+    check_for_bin_repo
+
+    mkdir -p $YOCTO_DIR_LOCATION
     if [ $? -ne 0 ]
         then
             echo
@@ -151,7 +163,7 @@ function sync_variscite_platform()
             exit 1
     fi
     OLD_LOCATION=$PWD
-    eval cd $YOCTO_DIR_LOCATION/$YOCTO_DIR_NAME
+    eval cd $YOCTO_DIR_LOCATION
     repo init -u https://github.com/varigit/variscite-bsp-platform.git -b $YOCTO_VERSION
     if [ $? -ne 0 ]
         then
@@ -169,6 +181,74 @@ function sync_variscite_platform()
             echo "${BOLD}Failed to sync Varisicte repo${NORMAL}"
             echo "==============================================="
             exit 1
+    fi
+    eval cd $OLD_LOCATION
+}
+
+# =================================================================================
+#
+# =================================================================================
+function sync_xavier_platform()
+{
+    mkdir -p $YOCTO_DIR_LOCATION/sources
+    if [ $? -ne 0 ]
+        then
+            echo
+            echo "========================================================="
+            echo "${BOLD}Creating Yocto build directory failed...${NORMAL}"
+            echo "========================================================="
+            exit 1
+    fi
+
+    OLD_LOCATION=$PWD
+    eval cd $YOCTO_DIR_LOCATION/sources
+    if [ ! -d "poky" ]
+        then
+        git clone -b gatesgarth git://git.yoctoproject.org/poky.git
+        if [ $? -ne 0 ]
+        then
+            echo
+            echo "==============================================="
+            echo "${BOLD}Failed to clone Poky${NORMAL}"
+            echo "==============================================="
+            exit 1
+        fi
+    fi
+    if [ ! -d "meta-openembedded" ]
+        then
+        git clone -b gatesgarth https://github.com/openembedded/meta-openembedded.git
+        if [ $? -ne 0 ]
+            then
+                echo
+                echo "==============================================="
+                echo "${BOLD}Failed to clone openembedded${NORMAL}"
+                echo "==============================================="
+                exit 1
+        fi
+    fi
+    if [ ! -d "meta-swupdate" ]
+        then
+        git clone -b master https://github.com/sbabic/meta-swupdate.git
+        if [ $? -ne 0 ]
+            then
+                echo
+                echo "==============================================="
+                echo "${BOLD}Failed to clone swupdate${NORMAL}"
+                echo "==============================================="
+                exit 1
+        fi
+    fi
+    if [ ! -d "meta-tegra" ]
+        then
+        git clone -b master https://github.com/OE4T/meta-tegra.git
+        if [ $? -ne 0 ]
+            then
+                echo
+                echo "==============================================="
+                echo "${BOLD}Failed to clone tegridy farms${NORMAL}"
+                echo "==============================================="
+                exit 1
+        fi
     fi
     eval cd $OLD_LOCATION
 }
@@ -212,29 +292,10 @@ function check_for_bin_repo()
 # =================================================================================
 #
 # =================================================================================
-function checking_ornl_layer()
+function copying_ornl_layer()
 {
-    # I'm assuming that IF you are running this script you have cloned the yocto-ornl repo
-    # but lets check to make sure everything is here... unless they used the -c option
-    if [ $ORNL_YOCTO_BRANCH != "" ]; then
-        download_ornl_layer
-    else
-        if [ ! -d "../sources/meta-ornl" ]
-            then   
-                echo
-                echo "No ORNL Yocto Layer found, cloning the yocto-ornl repo"
-                download_ornl_layer
-        fi
-        if [! -d "../build/conf" ]
-            then
-                echo
-                echo "No ORNL conf directory found, cloning the yocto-ornl repo"
-                download_ornl_layer
-        fi
-    fi
-
     # Ok now we know to some extent that the directories are available to us, move on.
-    cp -r $YOCTO_DIR_LOCATION/ornl_layer/sources/meta-ornl $YOCTO_DIR_LOCATION/$YOCTO_DIR_NAME/sources
+    cp -r sources/meta-ornl $YOCTO_DIR_LOCATION/sources
     if [ $? -ne 0 ]
         then
             echo
@@ -244,37 +305,6 @@ function checking_ornl_layer()
             exit 1
     fi
 
-}
-
-# =================================================================================
-# 
-# =================================================================================
-function download_ornl_layer()
-{
-    if [ ! -d $YOCTO_DIR_LOCATION/ornl_layer ] || [ -z "$(ls -A $YOCTO_DIR_LOCATION/ornl_layer)" ]
-        then
-            # Clone ORNL repo and check to make sure the command succeeded
-            git clone https://github.com/uvdl/yocto-ornl.git $YOCTO_DIR_LOCATION/ornl_layer
-            if [ $? -ne 0 ]
-                then
-                    echo
-                    echo "============================================"
-                    echo "${BOLD}Git clone failed...${NORMAL}"
-                    echo "============================================"
-                    exit 1
-            fi
-    fi
-    
-    # Checkout the branch needed
-    git -C $YOCTO_DIR_LOCATION/ornl_layer checkout $ORNL_YOCTO_BRANCH
-    if [ $? -ne 0 ]
-        then
-            echo
-            echo "============================================"
-            echo "${BOLD}Git failed to get branch...${NORMAL}"
-            echo "============================================"
-            exit 1
-    fi
 }
 
 # =================================================================================
@@ -300,18 +330,33 @@ function make_build_dir()
 {
     OLD_DIR=${PWD}
     # From scope of script change into the directory.
-    eval cd $YOCTO_DIR_LOCATION/$YOCTO_DIR_NAME
+    eval cd $YOCTO_DIR_LOCATION/
 
-    # Run Variscite environment script
-    MACHINE=$TARGET_MACHINE DISTRO=fslc-framebuffer . $YOCTO_DIR_LOCATION/$YOCTO_DIR_NAME/setup-environment build_ornl
-    if [ $? -ne 0 ]
-        then
-            echo
-            echo "======================================================"
-            echo "${BOLD}Variscite environment script failed...${Normal}"
-            echo "======================================================"
-            exit 1
-    fi
+    case "$TARGET_MACHINE" in
+    var-som-mx6-ornl)
+        # Run Variscite environment script
+        MACHINE=$TARGET_MACHINE DISTRO=fslc-framebuffer . $YOCTO_DIR_LOCATION/setup-environment build_ornl
+        if [ $? -ne 0 ]
+            then
+                echo
+                echo "======================================================"
+                echo "${BOLD}Variscite environment script failed...${Normal}"
+                echo "======================================================"
+                exit 1
+        fi
+        ;;
+    jetson-xavier-nx-devkit-emmc)
+        . $YOCTO_DIR_LOCATION/sources/poky/oe-init-build-env build_ornl
+        if [ $? -ne 0 ]
+            then
+                echo
+                echo "======================================================"
+                echo "${BOLD}Variscite environment script failed...${Normal}"
+                echo "======================================================"
+                exit 1
+        fi
+        ;;
+    esac
 
     eval cd ${OLD_DIR}
 }
@@ -331,20 +376,12 @@ function copy_config_files()
             exit 1
     fi
 
-        # Check to see if user sent the ornl_layer in directory
-    this_directory="${PWD}"
-    base=$(basename ${PWD})
-    if [ $base  == "BuildScripts" ]
-        then
-            this_directory=$(dirname ${PWD})
-    fi
-
     # lets do our copying of modified config files IF a new setup was completed
     # TODO :: This copies no matter what, we should do a file compare here.
     echo
     echo "Copying the ORNL local.conf file over... "
     echo
-    cp -f $this_directory/build/conf/local.conf $YOCTO_DIR_LOCATION/build_ornl/conf/
+    cp -f build/conf/$TARGET_MACHINE/local.conf $YOCTO_DIR_LOCATION/build_ornl/conf/
     if [ $? -ne 0 ]
         then
             echo
@@ -357,7 +394,7 @@ function copy_config_files()
     echo
     echo "Copying the ORNL bblayers.conf file over... "
     echo
-    cp -f $this_directory/build/conf/bblayers.conf $YOCTO_DIR_LOCATION/build_ornl/conf/
+    cp -f build/conf/$TARGET_MACHINE/bblayers.conf $YOCTO_DIR_LOCATION/build_ornl/conf/
     if [ $? -ne 0 ]
         then
             echo
@@ -367,18 +404,21 @@ function copy_config_files()
             exit 1
     fi
 
-    echo
-    echo "Copying the ORNL Variscite Build Script file over... "
-    echo
-        # Copy the Variscite script over
-    cp -f $this_directory/BuildScripts/var-create-yocto-sdcard.sh $YOCTO_DIR_LOCATION/sources/meta-variscite-fslc/scripts/var_mk_yocto_sdcard/var-create-yocto-sdcard.sh
-        if [ $? -ne 0 ]
+    if [ $TARGET_MACHINE == "var-mx6-som-ornl" ]
         then
             echo
-            echo "================================================="
-            echo "${BOLD}Copy of SD card build script failed...${NORMAL}"
-            echo "================================================="
-            exit 1
+            echo "Copying the ORNL Variscite Build Script file over... "
+            echo
+                # Copy the Variscite script over
+            cp -f BuildScripts/var-create-yocto-sdcard.sh $YOCTO_DIR_LOCATION/sources/meta-variscite-fslc/scripts/var_mk_yocto_sdcard/var-create-yocto-sdcard.sh
+            if [ $? -ne 0 ]
+                then
+                    echo
+                    echo "================================================="
+                    echo "${BOLD}Copy of SD card build script failed...${NORMAL}"
+                    echo "================================================="
+                    exit 1
+            fi
     fi
 }
 
@@ -397,18 +437,10 @@ function copy_ornl_layer()
             exit 1
     fi
 
-    # Check to see if user sent the ornl_layer in directory
-    this_directory="${PWD}"
-    base=$(basename ${PWD})
-    if [ $base  == "BuildScripts" ]
-        then
-            this_directory=$(dirname ${PWD})
-    fi
-
     echo
     echo "Copying the ORNL source ... "
     echo
-    cp -rf $this_directory/sources/meta-ornl $YOCTO_DIR_LOCATION/sources/meta-ornl
+    cp -rf ../sources/meta-ornl $YOCTO_DIR_LOCATION/sources/meta-ornl
     if [ $? -ne 0 ]
         then
             echo
@@ -427,18 +459,14 @@ function help_menu()
     echo 
     echo "${BOLD}Looks like you need some assistence! No worries, lets get you fixed up.${NORMAL}"
     echo 
-    echo "Usage : ./ornl-setup-yocto.sh [option [optarg1]] [arg1, arg2,]"
+    echo "Usage : ./ornl-setup-yocto.sh [option [optarg1]] abs_build_directory"
     echo "--------------------------------------------------------------------------------"
     echo "options : "
-    echo "-u : updates a current build directory with ornl source and config files [arg1 - location of yocto build directory]"
-    echo "-c : Forces a new clone of ORNL Yocto repo [arg1 - name of branch to checkout]"
+    echo "-m : target machine: var-mx6-som-ornl or jetson-xavier-nx-devkit-emmc"
     echo "-h : A friendly reminder of how this script works"
     echo "--------------------------------------------------------------------------------"
-    echo "${BOLD}If no options supplied it is assumed that the full build environment will be set up${NORMAL}"
-    echo "${BOLD}${CYAN}-u can only be used independently, it will ONLY copy the edited config files${END_COLOR}${NORMAL}"
-    echo 
-    echo "arg1 - The location of where the new yocto build directory will be made"
-    echo "arg2 - The version of Yocto to be used: i.e. sumo, thud..."
+    echo
+    echo "${BOLD}Before running this script please set git config user.name and user.email${NORMAL}"
     echo
     echo
     exit 0
@@ -450,7 +478,7 @@ function help_menu()
 
 # This looks awful, TODO :: change this to not be so clunky
 # Basically we have to have > 1 arguments and less than 5. and no odd numbers 
-if [ $# -lt 2 ] || [ $# -eq 3 ] || [ $# -gt 4 ] || [ $# -eq 0 ]
+if [ $# -ne 3 ]
     then
         help_menu
 fi
@@ -471,122 +499,45 @@ if [ "$EUID" -eq 0 ]
         esac
 fi
 
+YOCTO_DIR_LOCATION=$3
+
 # Check what version of Ubuntu we are running.  We are compatible with 16.04
 ubuntu_release=$(cut -f2 <<< "$(lsb_release -r)")
-echo "Using Ubuntu Version ${BOLD}$ubuntu_release${NORMAL}"
 
-if [ "$ubuntu_release" != "16.04" ]
+if [[ ("$ubuntu_release" != "16.04") && ("$ubuntu_release" != "18.04") ]]
     then
         echo
-        echo "This build is only guaranteed to work with Ubuntu 16.04"
-        read -p "Do you wish to proceed [y/N]: " answer
-        answer=${answer:-N}
-        case "$answer" in
-            N|n)
-                exit0
-                ;;
-            *)
-                ;;
-        esac
+        echo "${BOLD}Using Ubuntu Version $ubuntu_release${NORMAL}"
+        echo "${BOLD}This build is only guaranteed to work with Ubuntu 16.04 or Ubuntu 18.04${NORMAL}"
 fi
 
-
 # Parse any / all options that were passed in to the script
-while getopts "h?u:c:" opt; do
+while getopts "h?m:c:" opt; do
     case "$opt" in
     h|\?)
         help_menu
         ;;
-    u)  temp_location="$2"
-        # Check to see if the path exists
-        if [[ ! -d $temp_location ]]
-            then
-                echo
-                echo "${BOLD}${CYAN}Location does not exist!${END_COLOR}${NORMAL}"
-                help_menu
-        fi
-        # Check to see if it is relative or absolute. We need an absolute
-        if [[ "$temp_location" = /* ]]
-        then
-            YOCTO_DIR_LOCATION=$temp_location
-        else
-            YOCTO_DIR_LOCATION=${PWD}/$temp_location
-        fi
-
-
-        echo 
-        echo "Current build location base is $YOCTO_DIR_LOCATION"
-        echo
-        copy_config_files
-        copy_ornl_layer
-        exit 0
-        ;;
-    c)  ORNL_YOCTO_BRANCH=$2
-        echo
-        echo "ORNL Branch chosen to checkout is $ORNL_YOCTO_BRANCH"
-        echo  
+    m)
+        TARGET_MACHINE=$2
         ;;
     esac
 done
 
-# Really crappy logic to determine argurment numbers.  There exists a much better way
-# TODO :: Figure out that much better way
-if [ $# -eq 2 ] 
+if [ "$TARGET_MACHINE" == "var-mx6-som-ornl" ]
     then
-        temp_location=$1
-        YOCTO_VERSION=$2
-else
-    temp_location=$3
-    YOCTO_VERSION=$4
+        YOCTO_VERSION="sumo"
 fi
-
-# Check the Yocto version being used is compatible with our system
-if [[ "$YOCTO_VERSION" != "sumo" ]] || [[ "$YOCTO_VERSION" != "sumo" ]]
+if [ "$TARGET_MACHINE" == "jetson-xavier-nx-devkit-emmc" ]
     then
-        echo
-        echo "============================================================================"
-        echo "Please choose a version of Yocto compatible with this system: sumo or thud"
-        echo "============================================================================"
-        exit 1
-fi
-
-if [ ! -d $temp_location ]
-    then
-        echo
-        echo "============================================================="
-        echo "${BOLD}${CYAN}Location does not exist!!!!${END_COLOR}${NORMAL}"
-        echo "For more info just use the -h to access the help menu"
-        echo "============================================================="
-        echo
-        echo
-        exit 0
-fi
-# Check to see if it is relative or absolute. We need an absolute
-if [[ "$temp_location" = /* ]]
-then
-    YOCTO_DIR_LOCATION=$temp_location
-else
-    YOCTO_DIR_LOCATION=${PWD}/$temp_location
+        YOCTO_VERSION="gatesgarth"
 fi
 
 # Give user a review of what has been entered
 echo 
 echo "Yocto Version is ${BOLD}$YOCTO_VERSION${NORMAL}"
 echo "Build Location is ${BOLD}$YOCTO_DIR_LOCATION${NORMAL}"
-read -p "Are these correct [Y/n]: " acceptance
-acceptance=${acceptance:-Y}
-
-case "$acceptance" in
-    Y|y) 
-        ;;
-    *)
-        echo
-        echo "${BOLD}Next time, Please use one of the letters given to answer :-)${NORMAL}"
-        echo
-        exit
-        ;;
-esac
+echo
 
 # Run the full environment build at this point
-run_all
+run_build
 
