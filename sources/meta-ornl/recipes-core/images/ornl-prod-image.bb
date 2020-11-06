@@ -10,9 +10,9 @@ inherit core-image
 
 IMAGE_INSTALL_append += " \
     ornl-packagegroup-prod \
-	packagegroup-imx-tools-audio \
-	packagegroup-fsl-gstreamer1.0-full \
-	packagegroup-fsl-gstreamer1.0 \
+    ${@base_contains("MACHINE", "var-som-mx6-ornl", "packagegroup-imx-tools-audio", "",d)} \
+    ${@base_contains("MACHINE", "var-som-mx6-ornl", "packagegroup-fsl-gstreamer1.0-full", "",d)} \
+    ${@base_contains("MACHINE", "var-som-mx6-ornl", "packagegroup-fsl-gstreamer1.0", "",d)} \
 	git \
 	libsodium \
 	libsodium-dev \
@@ -27,5 +27,5 @@ IMAGE_INSTALL_append += " \
     gst-pylibgstc \
     gstd \
     gst-interpipe \
-    ksz-initscripts \
+    ${@base_contains("MACHINE", "var-som-mx6-ornl", "ksz-initscripts", "",d)} \
 "

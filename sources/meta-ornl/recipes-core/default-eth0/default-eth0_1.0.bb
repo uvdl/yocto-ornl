@@ -1,6 +1,6 @@
 DESCRIPTION = "Default static IP for eth0"
 
-SRC_URI = "file://eth0.network \
+SRC_URI_var-som-mx6-ornl = "file://eth0.network \
 "
 
 LICENSE = "MIT"
@@ -14,7 +14,7 @@ SYSTEMD_AUTO_ENABLE = "enable"
 
 FILES_${PN} += "/etc/systemd/network/*.network"
 
-do_install() {
+do_install_var-som-mx6-ornl() {
 	install -d ${D}/etc/systemd/network
 
 	if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)}; then

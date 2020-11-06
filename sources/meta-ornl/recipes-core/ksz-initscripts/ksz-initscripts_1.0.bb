@@ -1,6 +1,6 @@
 DESCRIPTION = "KSZ init scripts"
 
-SRC_URI = "file://init-ksz8795.sh \
+SRC_URI_var-som-mx6-ornl = "file://init-ksz8795.sh \
     file://init-ksz9897.sh \
     file://init-ksz8795.service \
     file://init-ksz9897.service \
@@ -18,7 +18,7 @@ SYSTEMD_AUTO_ENABLE = "enable"
 FILES_${PN} += "${systemd_unitdir}/system/*.service"
 FILES_${PN} += "${base_sbindir}/*.sh"
 
-do_install() {
+do_install_var-som-mx6-ornl() {
   install -d ${D}${base_sbindir}
   install -m 0755 ${WORKDIR}/init-ksz8795.sh ${D}${base_sbindir}
   install -m 0755 ${WORKDIR}/init-ksz9897.sh ${D}${base_sbindir}
