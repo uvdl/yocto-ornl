@@ -135,14 +135,6 @@ archive:
 	@echo "DEV=/dev/sdx" >> $(ARCHIVE)/$(PROJECT)-$(DATE)/readme.txt
 	@echo "$(SUDO) MACHINE=$(MACHINE) $(YOCTO_ENV)/sources/meta-variscite-fslc/scripts/var-create-yocto-sdcard.sh -a -r $(YOCTO_ENV)/tmp/deploy/images/$(MACHINE)/$(YOCTO_CMD)-$(MACHINE) \$${DEV}" >> $(ARCHIVE)/$(PROJECT)-$(DATE)/readme.txt
 
-# build: $(YOCTO_DIR)/setup-environment build/conf/local.conf build/conf/bblayers.conf sources/meta-ornl
-# 	@$(MAKE) --no-print-directory -B environment
-# 	cd $(YOCTO_DIR) && \
-# 		MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV) && \
-# 		cd $(YOCTO_DIR)/$(YOCTO_ENV) && \
-# 			if [ -e .toaster ] ; then source toaster stop ; source toaster start ; /bin/true ; fi && \
-# 			LANG=$(LANG) bitbake $(YOCTO_CMD)
-
 build-xavier:
 	BuildScripts/ornl-setup-yocto.sh -m jetson-xavier-nx-devkit-emmc $(YOCTO_DIR)
 	cd $(YOCTO_DIR) && \
