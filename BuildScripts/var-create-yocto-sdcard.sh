@@ -333,27 +333,6 @@ function copy_scripts
 		cp ${YOCTO_SCRIPTS_PATH}/mx6ul_mx7_install_yocto.sh	${P2_MOUNT_DIR}/usr/bin/install_yocto.sh
 	fi
 
-	if [ -d ${P2_MOUNT_DIR}/usr/share/applications ]; then
-		cp ${YOCTO_SCRIPTS_PATH}/${MACHINE}*.desktop		${P2_MOUNT_DIR}/usr/share/applications/
-
-		# Remove inactive icons
-		if [ ! -f ${P2_MOUNT_DIR}/opt/images/Yocto/rootfs.tar.gz ]; then
-			rm -rf ${P2_MOUNT_DIR}/usr/share/applications/${MACHINE}*yocto*emmc*.desktop
-		fi
-
-		if ! ls ${P2_MOUNT_DIR}/opt/images/Yocto/rootfs*.ubi &> /dev/null; then
-			rm -rf ${P2_MOUNT_DIR}/usr/share/applications/${MACHINE}*yocto*nand*.desktop
-		fi
-
-		if [ ${RELEASE_NOTES_FILE} ] && [ -f ${RELEASE_NOTES_FILE} ]; then
-			cp ${YOCTO_SCRIPTS_PATH}/release_notes.desktop		${P2_MOUNT_DIR}/usr/share/applications/
-		fi
-
-		if [[ ${YOCTO_RECOVERY_ROOTFS_BASE_IN_NAME} == var-image-swupdate* ]]; then
-			sed -i 's/install_yocto.sh/& -u/' ${P2_MOUNT_DIR}/usr/share/applications/${MACHINE}*yocto*emmc*.desktop
-		fi
-	fi
-
 	if [ ${RELEASE_NOTES_FILE} ] && [ -f ${RELEASE_NOTES_FILE} ]; then
 		cp ${RELEASE_NOTES_FILE} 				${P2_MOUNT_DIR}/opt/images/release_notes.txt
 	fi
