@@ -141,7 +141,7 @@ build-xavier:
 		. $(YOCTO_DIR)/sources/poky/oe-init-build-env $(YOCTO_ENV) && \
 		cd $(YOCTO_DIR)/$(YOCTO_ENV) && \
 			if [ -e .toaster ] ; then source toaster stop ; source toaster start ; /bin/true ; fi && \
-			LANG=$(LANG) bitbake core-image-sato-dev
+			LANG=$(LANG) bitbake core-image-x11
 
 build-variscite:
 	BuildScripts/ornl-setup-yocto.sh -m var-mx6-som-ornl $(YOCTO_DIR)
