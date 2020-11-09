@@ -83,7 +83,7 @@ $(YOCTO_DIR)/setup-environment: $(REPO) $(YOCTO_DIR)
 $(YOCTO_DIR)/$(YOCTO_ENV)/conf:
 	mkdir -p $(YOCTO_DIR)/$(YOCTO_ENV)/conf
 
-environment: $(YOCTO_DIR)/$(YOCTO_ENV)/conf
+environment: $(YOCTO_DIR)/$(YOCTO_ENV)/conf $(YOCTO_DIR)/setup-environment
 	-rm $(YOCTO_DIR)/$(YOCTO_ENV)/conf/sanity.conf
 	cd $(YOCTO_DIR) && \
 		rm -rf $(YOCTO_DIR)/sources/meta-ornl && \
