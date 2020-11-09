@@ -55,7 +55,7 @@ define LOG
   ($1) 2>&1 | tee -a $(LOGDIR)/$(YOCTO_ENV)-build.log && echo "$$(date --iso-8601='ns'): $1 completed." >>$(LOGDIR)/$(YOCTO_ENV)-make.log
 endef
 
-.PHONY: all archive build clean dependencies docker-deploy docker-image environment environment-update
+.PHONY: all archive build clean dependencies docker-deploy docker-image environment
 .PHONY: id kernel kernel-config kernel-pull locale mrproper see
 .PHONY: toaster toaster-stop
 
@@ -84,19 +84,6 @@ $(YOCTO_DIR)/$(YOCTO_ENV)/conf:
 	mkdir -p $(YOCTO_DIR)/$(YOCTO_ENV)/conf
 
 environment: $(YOCTO_DIR)/$(YOCTO_ENV)/conf
-	-rm $(YOCTO_DIR)/$(YOCTO_ENV)/conf/sanity.conf
-	cd $(YOCTO_DIR) && \
-		rm -rf $(YOCTO_DIR)/sources/meta-ornl && \
-		cp -r $(CURDIR)/sources/meta-ornl $(YOCTO_DIR)/sources && \
-		MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV) && \
-		cp $(CURDIR)/build/conf/local.conf $(YOCTO_DIR)/$(YOCTO_ENV)/conf/ && \
-		cp $(CURDIR)/build/conf/bblayers.conf $(YOCTO_DIR)/$(YOCTO_ENV)/conf/ && \
-		touch $(YOCTO_DIR)/$(YOCTO_ENV)/conf/sanity.conf && \
-		echo "*** ENVIRONMENT SETUP ***" && \
-		echo "Please execute the following in your shell before giving bitbake commands:" && \
-		echo "cd $(YOCTO_DIR) && MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV)"
-
-environment-update: $(YOCTO_DIR)/$(YOCTO_ENV)/conf
 	-rm $(YOCTO_DIR)/$(YOCTO_ENV)/conf/sanity.conf
 	cd $(YOCTO_DIR) && \
 		rm -rf $(YOCTO_DIR)/sources/meta-ornl && \
@@ -156,28 +143,11 @@ dependencies:
 	$(SUDO) apt-get install -y $(PKGDEPS1)
 	$(SUDO) apt-get install -y $(PKGDEPS2)
 
-Dockerfile: Makefile
-	@echo "FROM ubuntu:16.04" > $@
-	@echo "RUN apt-get -y update && apt-get -y upgrade" >> $@
-	@echo "RUN apt-get -y install git make sudo vim" >> $@
-ifeq ($(PROJECT_TAG),base)
-	@echo "RUN apt-get -y install $(PKGDEPS1) && apt-get -y install $(PKGDEPS2)" >> $@
-endif
-	@echo "RUN apt-get -y install locales && locale-gen $(LANG) && update-locale LC ALL=$(LANG) LANG=$(LANG)" >> $@
-	@echo "RUN id build 2>/dev/null || useradd --uid 1000 --create-home build" >> $@
-	@echo "RUN echo \"build ALL=(ALL) NOPASSWD: ALL\" | tee -a /etc/sudoers" >> $@
-	@echo "USER build" >> $@
-	@echo "WORKDIR /home/build/$(PROJECT)" >> $@
-	@echo "COPY . /home/build/$(PROJECT)" >> $@
-	@echo "RUN sudo chown -R build:build /home/build/$(PROJECT)" >> $@
-	@echo "CMD \"$(SHELL)\"" >> $@
-
-docker-deploy: docker-image
-	docker tag $(PROJECT):$(PROJECT_TAG) $(PROJECT_REMOTE)/$(PROJECT):$(PROJECT_TAG)
-	docker push $(PROJECT_REMOTE)/$(PROJECT):$(PROJECT_TAG)
-
 docker-image: Dockerfile
 	docker build -t $(PROJECT):$(PROJECT_TAG) .
+
+docker-run: Dockerfile
+	docker run -v $(ARCHIVE):/opt -it $(PROJECT):$(PROJECT_TAG)
 
 id:
 	git config --global user.name "UVDL Developer"
