@@ -127,7 +127,7 @@ build: $(YOCTO_DIR)/setup-environment build/conf/local.conf build/conf/bblayers.
 	cd $(YOCTO_DIR) && \
 		MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV) && \
 		cd $(YOCTO_DIR)/$(YOCTO_ENV) && \
-			if [ -e .toaster ] ; then source toaster stop ; source toaster start ; /bin/true ; fi && \
+			if [ -e .toaster ] ; then source toaster stop ; source toaster start webport=0.0.0.0:8000 ; /bin/true ; fi && \
 			LANG=$(LANG) bitbake $(YOCTO_CMD)
 
 clean:
@@ -147,7 +147,7 @@ docker-image: Dockerfile
 	docker build -t $(PROJECT):$(PROJECT_TAG) .
 
 docker-run: Dockerfile
-	docker run -v $(ARCHIVE):/opt -it $(PROJECT):$(PROJECT_TAG)
+	docker run -p 8000:8000 -v $(ARCHIVE):/opt -it $(PROJECT):$(PROJECT_TAG)
 
 id:
 	git config --global user.name "UVDL Developer"
