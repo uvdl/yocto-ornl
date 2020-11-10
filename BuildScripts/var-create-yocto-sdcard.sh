@@ -274,8 +274,11 @@ function install_yocto
 {
 	echo
 	echo "Installing Yocto Boot partition"
-	# FIXME: not handing zImage because bash does not do regex
-	for STR in uImage ; do for f in ${YOCTO_IMGS_PATH}/${STR}-imx*.dtb ; do cp $f ${P1_MOUNT_DIR}/$(basename ${f/${STR}-/}) ; done ; done
+	for f in ${YOCTO_IMGS_PATH}/*.dtb; do
+		if [[ -L $f ]] && [[ $f != *${MACHINE}.dtb ]]; then
+			cp $f	${P1_MOUNT_DIR}/
+		fi
+	done
 
 	pv ${YOCTO_IMGS_PATH}/?Image >			${P1_MOUNT_DIR}/`cd ${YOCTO_IMGS_PATH}; ls ?Image`
 	sync
