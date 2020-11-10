@@ -10,7 +10,7 @@ PV = "v0.11.3"
 SRCBRANCH ?= "master"
 SRC_URI = "git://github.com/RidgeRun/gstd-1.x.git;protocol=https;tag=${PV}"
 
-S = "${WORKDIR}/git/libgstc"
+S = "${WORKDIR}/git/libgstc/python"
 
 FILES_${PN} += "/run/gstd"
 

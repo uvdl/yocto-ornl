@@ -9,6 +9,8 @@ SRC_URI[sha256sum] = "0b1265b169f809c6ca94911ad2d7649b8e087a7cc573a0a6ea62ade9be
 
 inherit pypi setuptools3
 
+DEPENDS += "python3-future-native"
+
 RDEPENDS_${PN} += " python3-future python"
 
 do_get_lic() {
