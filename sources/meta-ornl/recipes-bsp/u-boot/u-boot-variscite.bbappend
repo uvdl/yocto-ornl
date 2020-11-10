@@ -11,8 +11,6 @@ SRC_URI_append_var-som-mx6-ornl = " \
 			   	  "
 SRCREV = "a7869c2cde98e5f5b1886d8f54dff321a7aa0597"
 
-SRC_URI = "${UBOOT_SRC};branch=${SRCBRANCH}"
-
 S = "${WORKDIR}/git"
 
 COMPATIBLE_MACHINE_var-som-mx6-ornl = "var-som-mx6-ornl"
