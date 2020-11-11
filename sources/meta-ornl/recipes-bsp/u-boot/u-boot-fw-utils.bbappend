@@ -2,7 +2,7 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}/${MACHINE}:"
 FILESEXTRAPATHS_prepend := "${THISDIR}/u-boot-variscite/${MACHINE}:"
 
 SRCBRANCH = "iris2"
-UBOOT_SRC = "https://github.com/uvdl/uboot-imx.git;protocol=git"
+UBOOT_SRC = "git://github.com/uvdl/uboot-imx.git;protocol=git"
 SRC_URI_append_var-som-mx6-ornl = " \
 	${UBOOT_SRC};branch=${SRCBRANCH} \
 	file://fw_env.config \
