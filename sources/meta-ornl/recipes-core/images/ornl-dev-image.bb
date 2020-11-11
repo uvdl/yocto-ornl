@@ -29,7 +29,6 @@ IMAGE_INSTALL_append += " \
 	gps-utils \
 	gstd \
 	gst-interpipe \
-	gst-pylibgstc \
 	imx-test \
 	iperf3 \
 	ksz-initscripts \
