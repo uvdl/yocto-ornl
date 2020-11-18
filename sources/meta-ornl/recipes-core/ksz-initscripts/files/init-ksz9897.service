@@ -3,7 +3,7 @@ Description=start initscript upon first boot
 
 [Service]
 Type=simple
-ExecStart=/bin/sh /sbin/init-ksz9897.sh
+ExecStart=/bin/sh /sbin/init-ksz9897.sh start
 
 [Install]
 WantedBy=multi-user.target

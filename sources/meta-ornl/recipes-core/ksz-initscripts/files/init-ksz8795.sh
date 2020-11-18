@@ -19,7 +19,6 @@ case $1 in
 		rmmod spi-ksz8795
 		if modprobe -v spi-ksz8795 ; then
 			# set register to enable KSZ8794 switch
-			log_daemon_msg "echo 0x56=$CONFIG > $SWREG"
 			echo 0x56=$CONFIG > $SWREG
 		fi
 		;;
