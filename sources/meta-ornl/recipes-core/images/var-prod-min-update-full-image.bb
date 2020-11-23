@@ -16,5 +16,5 @@ IMAGE_INSTALL_append = " \
     swupdate-www \
     kernel-image \
     kernel-devicetree \
-    u-boot-variscite \
+    ${@base_contains("MACHINE", "var-som-mx6-ornl", "u-boot-variscite", "",d)} \
 "

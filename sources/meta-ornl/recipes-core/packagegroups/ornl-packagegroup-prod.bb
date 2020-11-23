@@ -7,8 +7,8 @@ inherit packagegroup
 
 RDEPENDS_${PN} = " \
     packagegroup-core-full-cmdline \
-    packagegroup-fsl-tools-gpu \
-	packagegroup-fsl-tools-gpu-external \
+	${@base_contains("MACHINE", "var-som-mx6-ornl", "packagegroup-fsl-tools-gpu", "",d)} \
+	${@base_contains("MACHINE", "var-som-mx6-ornl", "packagegroup-fsl-tools-gpu-external", "",d)} \
     nodejs \
 	flex \
     m4 \
@@ -31,7 +31,7 @@ RDEPENDS_${PN} = " \
 	python3-mavproxy \
     minicom \
 	openssl \
-    imx-test \
+	${@base_contains("MACHINE", "var-som-mx6-ornl", "imx-test", "",d)} \
 	networkmanager \
     v4l-utils \
     dtc \
