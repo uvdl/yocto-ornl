@@ -3,7 +3,7 @@ SUMMARY = "ORNL packagegroup - basic needs for production"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
-inherit packagegroup
+inherit packagegroup utils
 
 RDEPENDS_${PN} = " \
     packagegroup-core-full-cmdline \

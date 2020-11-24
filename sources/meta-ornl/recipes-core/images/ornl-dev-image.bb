@@ -7,7 +7,7 @@ LICENSE = "MIT"
 # https://wiki.yoctoproject.org/wiki/FAQ:How_do_I_set_or_change_the_root_password
 EXTRA_USERS_PARAMS = "usermod -P root root;"
 
-inherit core-image distro_features_check extrausers
+inherit core-image distro_features_check extrausers utils
 
 IMAGE_FEATURES += " \
     debug-tweaks \

@@ -8,6 +8,7 @@ EXTRA_USERS_PARAMS = "usermod -P root root;"
 LICENSE = "MIT"
 
 require ornl-prod-min-image.bb
+inherit utils
 
 # Do to how the DART boot is organized for SWUpdate to work we have to have
 # the kernel, dtb, uboot in a /boot/ folder on both rootfs

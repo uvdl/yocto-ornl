@@ -5,6 +5,7 @@ IMAGE_FEATURES += "ssh-server-dropbear splash "
 LICENSE = "MIT"
 
 require ornl-dev-image.bb
+inherit utils
 
 # Do to how the DART boot is organized for SWUpdate to work we have to have
 # the kernel, dtb, uboot in a /boot/ folder on both rootfs

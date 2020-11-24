@@ -6,7 +6,7 @@ IMAGE_FEATURES += " ssh-server-openssh "
 
 LICENSE = "MIT"
 
-inherit core-image
+inherit core-image utils
 
 IMAGE_INSTALL_append += " \
     ornl-packagegroup-prod \
