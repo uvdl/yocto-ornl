@@ -216,7 +216,7 @@ function sync_xavier_platform()
     fi
     if [ ! -d "meta-openembedded" ]
         then
-        git clone -b gatesgarth https://github.com/openembedded/meta-openembedded.git
+        git clone -b master https://github.com/openembedded/meta-openembedded.git
         if [ $? -ne 0 ]
             then
                 echo

@@ -1,4 +1,3 @@
-COMPATIBLE_MACHINE = "var-som-mx6-ornl"
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}/${MACHINE}:"
 
 LOCALVERSION_var-som-mx6-ornl = "-mx6"
