@@ -1,3 +1,4 @@
+COMPATIBLE_MACHINE = "var-som-mx6-ornl"
 DESCRIPTION = "Artifact recipe for a Ground Robotics image"
 SECTION = ""
 

@@ -1,3 +1,4 @@
+COMPATIBLE_MACHINE = "var-som-mx6-ornl"
 DESCRIPTION = "Example compound image for Variscite boards"
 SECTION = ""
 
