@@ -1,3 +1,4 @@
+COMPATIBLE_MACHINE = "var-som-mx6-ornl"
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}/${MACHINE}:"
 FILESEXTRAPATHS_prepend := "${THISDIR}/u-boot-variscite/${MACHINE}:"
 
