@@ -6,13 +6,20 @@ IMAGE_FEATURES += " ssh-server-openssh "
 
 LICENSE = "MIT"
 
-inherit core-image utils
+inherit core-image
+
+IMAGE_INSTALL_append_var-som-mx6-ornl += " \
+    packagegroup-imx-tools-audio \
+    packagegroup-fsl-gstreamer1.0-full \
+    packagegroup-fsl-gstreamer1.0 \
+    packagegroup-fsl-tools-gpu \
+    packagegroup-fsl-tools-gpu-external \
+    imx-test \
+    ksz-initscripts \
+"
 
 IMAGE_INSTALL_append += " \
     ornl-packagegroup-prod \
-    ${@base_contains("MACHINE", "var-som-mx6-ornl", "packagegroup-imx-tools-audio", "",d)} \
-    ${@base_contains("MACHINE", "var-som-mx6-ornl", "packagegroup-fsl-gstreamer1.0-full", "",d)} \
-    ${@base_contains("MACHINE", "var-som-mx6-ornl", "packagegroup-fsl-gstreamer1.0", "",d)} \
 	git \
 	libsodium \
 	libsodium-dev \
@@ -27,5 +34,4 @@ IMAGE_INSTALL_append += " \
     gst-pylibgstc \
     gstd \
     gst-interpipe \
-    ${@base_contains("MACHINE", "var-som-mx6-ornl", "ksz-initscripts", "",d)} \
 "
