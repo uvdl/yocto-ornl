@@ -29,6 +29,7 @@ IMAGE_INSTALL_append_var-som-mx6-ornl += " \
 	packagegroup-fsl-tools-testapps \
 	packagegroup-imx-tools-audio \ 
 	packagegroup-tools-bluetooth \
+	postinstall \
 "
 
 IMAGE_INSTALL_append += " \
@@ -61,7 +62,6 @@ IMAGE_INSTALL_append += " \
 	openssl \
 	packagegroup-core-full-cmdline \
 	pkgconfig \
-	postinstall \
 	python-compiler \
 	python3 \
 	python3-dev \
