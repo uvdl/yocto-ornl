@@ -226,6 +226,18 @@ function sync_xavier_platform()
                 exit 1
         fi
     fi
+    if [ ! -d "meta-python2" ]
+        then
+        git clone https://git.openembedded.org/meta-python2/
+        if [ $? -ne 0 ]
+            then
+                echo
+                echo "==============================================="
+                echo "${BOLD}Failed to clone python2${NORMAL}"
+                echo "==============================================="
+                exit 1
+        fi
+    fi
     if [ ! -d "meta-swupdate" ]
         then
         git clone -b master https://github.com/sbabic/meta-swupdate.git
