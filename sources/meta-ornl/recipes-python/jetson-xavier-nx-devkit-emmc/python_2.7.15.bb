@@ -1,7 +1,6 @@
 require python.inc
 
-DEPENDS = "python-native libffi bzip2 gdbm openssl \
-           readline sqlite3 zlib virtual/crypt"
+DEPENDS = "python-native libffi bzip2 gdbm openssl readline sqlite3 zlib"
 
 PR = "${INC_PR}"
 
@@ -154,7 +153,6 @@ py_package_preprocess () {
 	(cd ${PKGD}; python -m py_compile ./${libdir}/python${PYTHON_MAJMIN}/_sysconfigdata.py)
 }
 
-PACKAGES_remove = "${PN}"
 
 # manual dependency additions
 RPROVIDES_${PN}-core = "${PN}"
@@ -180,9 +178,9 @@ FILES_${PN}-man = "${datadir}/man"
 # Nasty but if bdb isn't enabled the package won't be generated
 RDEPENDS_${PN}-modules_remove = "${@bb.utils.contains('PACKAGECONFIG', 'bdb', '', '${PN}-bsddb', d)}"
 
-RDEPENDS_${PN}-dev = ""
-
 BBCLASSEXTEND = "nativesdk"
+
+RPROVIDES_${PN} += "${PN}-modules"
 
 # We want bytecode precompiled .py files (.pyc's) by default
 # but the user may set it on their own conf
@@ -190,7 +188,7 @@ BBCLASSEXTEND = "nativesdk"
 INCLUDE_PYCS ?= "1"
 
 python(){
-    import collections, json
+    import json
 
     filename = os.path.join(d.getVar('THISDIR'), 'python', 'python2-manifest.json')
     # This python changes the datastore based on the contents of a file, so mark
@@ -198,11 +196,7 @@ python(){
     bb.parse.mark_dependency(d, filename)
 
     with open(filename) as manifest_file:
-        manifest_str =  manifest_file.read()
-        json_start = manifest_str.find('# EOC') + 6
-        manifest_file.seek(json_start)
-        manifest_str = manifest_file.read()
-        python_manifest = json.loads(manifest_str, object_pairs_hook=collections.OrderedDict)
+        python_manifest=json.load(manifest_file)
 
     include_pycs = d.getVar('INCLUDE_PYCS')
 
@@ -227,6 +221,7 @@ python(){
                 if value.endswith('.py'):
                     d.appendVar('FILES_' + pypackage, ' ' + value + 'c')
 
+        d.setVar('RDEPENDS_' + pypackage, '')
         for value in python_manifest[key]['rdepends']:
             # Make it work with or without $PN
             if '${PN}' in value:
@@ -234,6 +229,8 @@ python(){
             d.appendVar('RDEPENDS_' + pypackage, ' ' + pn + '-' + value)
         d.setVar('SUMMARY_' + pypackage, python_manifest[key]['summary'])
 
+    # We need to ensure staticdev packages match for files first so we sort in reverse
+    newpackages.sort(reverse=True)
     # Prepending so to avoid python-misc getting everything
     packages = newpackages + packages
     d.setVar('PACKAGES', ' '.join(packages))
