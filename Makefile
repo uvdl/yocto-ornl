@@ -144,7 +144,7 @@ build-xavier:
 			LANG=$(LANG) bitbake core-image-x11
 
 build-variscite:
-	BuildScripts/ornl-setup-yocto.sh -m var-mx6-som-ornl $(YOCTO_DIR)
+	BuildScripts/ornl-setup-yocto.sh -m var-som-mx6-ornl $(YOCTO_DIR)
 	cd $(YOCTO_DIR) && \
 		MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV) && \
 		cd $(YOCTO_DIR)/$(YOCTO_ENV) && \
