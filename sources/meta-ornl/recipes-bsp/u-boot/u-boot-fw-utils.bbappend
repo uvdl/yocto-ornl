@@ -2,13 +2,13 @@ COMPATIBLE_MACHINE = "var-som-mx6-ornl"
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}/${MACHINE}:"
 FILESEXTRAPATHS_prepend := "${THISDIR}/u-boot-variscite/${MACHINE}:"
 
-SRC_URI_append_var-som-mx6-ornl = " \
+SRC_URI_append = " \
     file://fw_env.config \
 	file://0001-adding-iris2-support.patch \
 	file://0002-adding-more-iris2-support.patch \
     "
 
-do_compile_var-som-mx6-ornl () {
+do_compile () {
 	oe_runmake mx6var_som_sd_defconfig
 	oe_runmake env
 	mv tools/env/fw_printenv tools/env/fw_printenv-mmc
