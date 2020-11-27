@@ -123,6 +123,9 @@ function run_build()
     jetson-xavier-nx-devkit-emmc)
         sync_xavier_platform
         ;;
+    *)
+        echo "${BOLD}No matching machine listed... ${NORMAL}"
+        exit 1
     esac
 
     # Check the current ornl yocto repo
