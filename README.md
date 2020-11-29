@@ -180,6 +180,29 @@ Afterwards, you may issue `bitbake` commands:
 $YOCTO_DIR/$YOCTO_ENV> bitbake var-dev-update-full-image
 </pre>
 
+#### Creating and Using an SDK
+
+You may wish to create an SDK cross-compiler that has the same toolchain and installed libraries as the full image above.  To get this:
+
+<pre>
+$YOCTO_DIR/$YOCTO_ENV> bitbake -c populate-sdk var-dev-update-full-image
+</pre>
+
+Upon success a shell archive will be available in `$YOCTO_DIR/$YOCTO_ENV/tmp/deploy/sdk/fslc-framebuffer-glibc-x86_64-var-dev-update-full-image-armv7at2hf-neon-toolchain-2.6.2.sh`.  Copy this file to a new machine and execute it to unpack the SDK.  *(it will ask you where to extract it, refer to that folder as SDK_DIR)*
+
+Once this is done, please do the following:
+
+<pre>
+> source $SDK_DIR/environment-setup-armv7at2hf-neon-fslc-linux-gnueabi
+> $CC --version
+arm-fslc-linux-gnueabi-gcc (GCC) 8.2.0
+Copyright (C) 2018 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+</pre>
+
+It is important to use the `$CC` variable when compiling as it has been setup with the correct compiler, the needed libraries, etc.
+
 #### Using Toaster
 
 You may wish to use 'Toaster', a dashboard for Yocto builds.  To prepare for using it, do:
