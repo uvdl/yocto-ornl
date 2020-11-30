@@ -1,20 +1,21 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}/${MACHINE}:"
+COMPATIBLE_MACHINE = "var-som-mx6-ornl"
 
-LOCALVERSION_var-som-mx6-ornl = "-mx6"
+LOCALVERSION = "-mx6"
 
-SRCBRANCH_var-som-mx6-ornl = "feature/develop"
-SRCREV_var-som-mx6-ornl = "1e242ad670734608c59eb0ee3974d98c3603f1a1"
+SRCBRANCH = "feature/develop"
+SRCREV = "1e242ad670734608c59eb0ee3974d98c3603f1a1"
 
-KERNEL_SRC_var-som-mx6-ornl ?= "git://github.com/uvdl/linux-imx.git;protocol=git"
+KERNEL_SRC ?= "git://github.com/uvdl/linux-imx.git;protocol=git"
 
-SRC_URI_append_var-som-mx6-ornl = " \
+SRC_URI_append = " \
 	${KERNEL_SRC};branch=${SRCBRANCH} \
 "
 ORNL_CONFIG = "imx_v7_iris2_defconfig"
 
 # Let's try an in-tree defconfig:
-KERNEL_DEFCONFIG_var-som-mx6-ornl ?= "${S}/arch/arm/configs/${ORNL_CONFIG}"
-KBUILD_DEFCONFIG_var-som-mx6-ornl ?= "${S}/arch/arm/configs/${ORNL_CONFIG}"
+KERNEL_DEFCONFIG ?= "${S}/arch/arm/configs/${ORNL_CONFIG}"
+KBUILD_DEFCONFIG ?= "${S}/arch/arm/configs/${ORNL_CONFIG}"
 KCONFIG_MODE="--alldefconfig"
 
 S = "${WORKDIR}/git"
@@ -27,4 +28,3 @@ do_overwrite_defconfig() {
 }
 addtask do_overwrite_defconfig before do_patch after merge_delta_config
 
-COMPATIBLE_MACHINE_var-som-mx6-ornl = "var-som-mx6-ornl"
