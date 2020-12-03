@@ -89,5 +89,11 @@ IMAGE_INSTALL_append += " \
 	iotop \
 	perf \
 	powertop \
+	cockpit \
+    cockpit-ws \
+    cockpit-users \
+    cockpit-shell \
+    cockpit-networkmanager \
+    cockpit-systemd \
 "
 
