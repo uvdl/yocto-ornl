@@ -23,7 +23,6 @@ help2man make gcc g++ desktop-file-utils libgl1-mesa-dev libglu1-mesa-dev \
 mercurial automake groff curl lzop asciidoc u-boot-tools dos2unix mtd-utils pv \
 libncurses5 libncurses5-dev libncursesw5-dev libelf-dev zlib1g-dev device-tree-compiler
 PLATFORM_GIT=https://github.com/varigit/variscite-bsp-platform.git
-PLATFORM_BRANCH=sumo
 PROJECT=yocto-ornl
 PROJECT_REMOTE := $(USER)
 PROJECT_TAG := core
@@ -34,7 +33,8 @@ REPO_SUM=d73f3885d717c1dc89eba0563433cec787486a0089b9b04b4e8c56e7c07c7610
 TOASTER_PORT := 8000
 
 # Known variations
-YOCTO_DIR := $(HOME)/ornl-dart-yocto
+YOCTO_VERSION=sumo
+YOCTO_DIR := $(HOME)/$(PROJECT)-$(YOCTO_VERSION)
 YOCTO_DISTRO=fslc-framebuffer
 YOCTO_ENV=build_ornl
 YOCTO_IMG=var-dev-update-full-image
@@ -77,27 +77,25 @@ $(YOCTO_DIR):
 
 $(YOCTO_DIR)/setup-environment: $(REPO) $(YOCTO_DIR)
 	cd $(YOCTO_DIR) && \
-		$(REPO) init -u $(PLATFORM_GIT) -b $(PLATFORM_BRANCH) && \
+		$(REPO) init -u $(PLATFORM_GIT) -b $(YOCTO_VERSION) && \
 		$(REPO) sync -j$(CPUS)
 
 $(YOCTO_DIR)/$(YOCTO_ENV)/conf:
 	mkdir -p $(YOCTO_DIR)/$(YOCTO_ENV)/conf
 
-environment: $(YOCTO_DIR)/$(YOCTO_ENV)/conf
-	-rm $(YOCTO_DIR)/$(YOCTO_ENV)/conf/sanity.conf
+environment: $(YOCTO_DIR)/setup-environment $(YOCTO_DIR)/$(YOCTO_ENV)/conf
+	@echo "$(YOCTO_DIR)/sources/poky/bitbake/bin/../../meta-poky/conf" > $(YOCTO_DIR)/$(YOCTO_ENV)/conf/templateconf.cfg
 	cd $(YOCTO_DIR) && \
 		rm -rf $(YOCTO_DIR)/sources/meta-ornl && \
 		cp -r $(CURDIR)/sources/meta-ornl $(YOCTO_DIR)/sources && \
 		MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV) && \
 		cp $(CURDIR)/build/conf/local.conf $(YOCTO_DIR)/$(YOCTO_ENV)/conf/ && \
 		cp $(CURDIR)/build/conf/bblayers.conf $(YOCTO_DIR)/$(YOCTO_ENV)/conf/ && \
-		touch $(YOCTO_DIR)/$(YOCTO_ENV)/conf/sanity.conf && \
 		echo "*** ENVIRONMENT SETUP ***" && \
 		echo "Please execute the following in your shell before giving bitbake commands:" && \
 		echo "cd $(YOCTO_DIR) && MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV)"
 
 environment-update: $(YOCTO_DIR)/$(YOCTO_ENV)/conf
-	-rm $(YOCTO_DIR)/$(YOCTO_ENV)/conf/sanity.conf
 	cd $(YOCTO_DIR) && \
 		rm -rf $(YOCTO_DIR)/sources/meta-ornl && \
 		cp -r $(CURDIR)/sources/meta-ornl $(YOCTO_DIR)/sources && \
@@ -105,7 +103,6 @@ environment-update: $(YOCTO_DIR)/$(YOCTO_ENV)/conf
 		cp $(CURDIR)/build/conf/local.conf $(YOCTO_DIR)/$(YOCTO_ENV)/conf/ && \
 		cp $(CURDIR)/build/conf/bblayers.conf $(YOCTO_DIR)/$(YOCTO_ENV)/conf/ && \
 		bitbake-layers add-layer $(YOCTO_DIR)/sources/meta-ornl && \
-		touch $(YOCTO_DIR)/$(YOCTO_ENV)/conf/sanity.conf && \
 		echo "*** ENVIRONMENT SETUP ***" && \
 		echo "Please execute the following in your shell before giving bitbake commands:" && \
 		echo "cd $(YOCTO_DIR) && MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV)"
@@ -149,7 +146,6 @@ clean:
 	-rm -rf $(YOCTO_DIR)/sources
 	-rm $(YOCTO_DIR)/$(YOCTO_ENV)/conf/local.conf
 	-rm $(YOCTO_DIR)/$(YOCTO_ENV)/conf/bblayers.conf
-	-rm $(YOCTO_DIR)/$(YOCTO_ENV)/conf/sanity.conf
 
 dependencies:
 	$(SUDO) apt-get update
