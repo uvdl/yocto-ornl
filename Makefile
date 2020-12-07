@@ -23,7 +23,8 @@ help2man make gcc g++ desktop-file-utils libgl1-mesa-dev libglu1-mesa-dev \
 mercurial automake groff curl lzop asciidoc u-boot-tools dos2unix mtd-utils pv \
 libncurses5 libncurses5-dev libncursesw5-dev libelf-dev zlib1g-dev device-tree-compiler
 PLATFORM_GIT=https://github.com/varigit/variscite-bsp-platform.git
-PROJECT=yocto-ornl	# FIXME: requires mod to BuildScripts/ornl-setup-yocto.sh
+# FIXME: requires mod to BuildScripts/ornl-setup-yocto.sh
+PROJECT=yocto-ornl
 PROJECT_REMOTE := $(USER)
 PROJECT_TAG := core
 REPO=/usr/local/bin/repo
@@ -33,7 +34,8 @@ REPO_SUM=d73f3885d717c1dc89eba0563433cec787486a0089b9b04b4e8c56e7c07c7610
 TOASTER_PORT := 8000
 
 # Known variations
-YOCTO_VERSION=sumo	# FIXME: requires mod to BuildScripts/ornl-setup-yocto.sh
+# FIXME: requires mod to BuildScripts/ornl-setup-yocto.sh
+YOCTO_VERSION=sumo
 YOCTO_DIR := $(HOME)/$(PROJECT)-$(YOCTO_VERSION)
 YOCTO_DISTRO=fslc-framebuffer
 YOCTO_ENV=build_ornl
