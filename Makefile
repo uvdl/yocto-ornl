@@ -27,10 +27,10 @@ PLATFORM_GIT=https://github.com/varigit/variscite-bsp-platform.git
 PROJECT=yocto-ornl
 PROJECT_REMOTE := $(USER)
 PROJECT_TAG := core
-REPO=/usr/local/bin/repo
-REPO_LOC=https://gerrit.googlesource.com/git-repo
-REPO_SUM=d73f3885d717c1dc89eba0563433cec787486a0089b9b04b4e8c56e7c07c7610
-REPO_TAG=v2.8
+# https://source.android.com/setup/develop
+REPO=$(EPHEMERAL)/repo
+REPO_LOC=https://storage.googleapis.com/git-repo-downloads/repo-1
+REPO_SUM=b5caa4be6496419057c5e1b1cdff1e4bdd3c1845eec87bd89ecb2e463a3ee62c
 TOASTER_PORT := 8000
 
 # Known variations
@@ -60,9 +60,9 @@ $(ARCHIVE):
 	mkdir -p $(ARCHIVE)
 
 $(REPO): $(shell dirname $(REPO))
-	-( cd $(EPHEMERAL) && git clone $(REPO_LOC) -b $(REPO_TAG) git-repo )
-	echo "$(REPO_SUM)  -" > /tmp/sum.txt && cat $(EPHEMERAL)/git-repo/repo | $(SUDO) tee $@ | sha256sum -c /tmp/sum.txt
-	$(SUDO) chmod a+x $@
+	# https://github.com/curl/curl/issues/1399
+	echo "$(REPO_SUM)  -" > /tmp/sum.txt && curl -fLs $(REPO_LOC) | tee $@ | sha256sum -c /tmp/sum.txt
+	chmod a+x $@
 
 $(YOCTO_DIR):
 	mkdir -p $(YOCTO_DIR)
