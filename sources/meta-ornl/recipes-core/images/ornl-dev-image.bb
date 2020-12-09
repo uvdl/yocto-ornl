@@ -75,7 +75,6 @@ IMAGE_INSTALL_append += " \
 	python3-urllib3 \
 	python3-pymavlink \
 	python3-mavproxy \
-	python3-python-dateutil \
 	python3-bottle \
 	strace \
 	screen \
