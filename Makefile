@@ -12,7 +12,6 @@ ARCHIVE := /opt
 DEV=
 DOT_GZ=.gz
 EULA=1	# https://patchwork.openembedded.org/patch/100815/
-LOGDIR=$(HOME)/log
 MACHINE=var-som-mx6-ornl
 PKGDEPS1=gawk wget git-core diffstat unzip texinfo gcc-multilib \
 build-essential chrpath socat cpio python python3 python3-pip python3-pexpect \
@@ -50,13 +49,6 @@ KERNEL_IMAGE=tmp/deploy/images/$(MACHINE)/uImage
 KERNEL_DTS=tmp/deploy/images/$(MACHINE)
 KERNEL_TEMP=$(_KERNEL_RELATIVE_PATH)/temp
 
-# https://stackoverflow.com/questions/16488581/looking-for-well-logged-make-output
-# Invoke this with $(call LOG,<cmdline>)
-define LOG
-@echo "$$(date --iso-8601='ns'): $1 started. ($(YOCTO_DIR)/$(YOCTO_ENV))" >>$(LOGDIR)/$(YOCTO_ENV)-make.log
-($1) 2>&1 | tee -a $(LOGDIR)/$(YOCTO_ENV)-build.log && echo "$$(date --iso-8601='ns'): $1 completed." >>$(LOGDIR)/$(YOCTO_ENV)-make.log
-endef
-
 .PHONY: all archive build clean dependencies docker-deploy docker-image environment environment-update
 .PHONY: id kernel kernel-config kernel-pull locale mrproper see
 .PHONY: toaster toaster-stop
@@ -65,9 +57,6 @@ default: see
 
 $(ARCHIVE):
 	mkdir -p $(ARCHIVE)
-
-$(LOGDIR):
-	mkdir -p $(LOGDIR)
 
 $(REPO): $(shell dirname $(REPO))
 	# https://github.com/curl/curl/issues/1399
@@ -114,12 +103,13 @@ environment-update: $(YOCTO_DIR)/$(YOCTO_ENV)/conf
 sd.img$(DOT_GZ): $(YOCTO_DIR)/$(YOCTO_ENV)/tmp/deploy/images/$(MACHINE)/$(YOCTO_IMG)-$(MACHINE).wic$(DOT_GZ)
 	ln -sf $(YOCTO_DIR)/$(YOCTO_ENV)/tmp/deploy/images/$(MACHINE)/$(YOCTO_IMG)-$(MACHINE).wic$(DOT_GZ) $@
 
-all: $(LOGDIR)
-	$(call LOG, $(MAKE) dependencies )
-	$(call LOG, $(MAKE) see )
-	$(call LOG, $(MAKE) environment )
-	#$(call LOG, $(MAKE) build )
-	#$(call LOG, $(MAKE) sd.img$(DOT_GZ) )
+all:
+	@$(MAKE) --no-print-directory -B dependencies
+	@$(MAKE) --no-print-directory -B see
+	@$(MAKE) --no-print-directory -B environment
+	#@$(MAKE) --no-print-directory -B toaster
+	#@$(MAKE) --no-print-directory -B build
+	#@$(MAKE) --no-print-directory -B archive
 
 archive:
 	@mkdir -p $(ARCHIVE)/$(PROJECT)-$(DATE)/dts
@@ -145,8 +135,6 @@ build: $(YOCTO_DIR)/setup-environment build/conf/local.conf build/conf/bblayers.
 			LANG=$(LANG) bitbake $(YOCTO_CMD)
 
 clean:
-	-rm -f $(LOGDIR)/*-build.log $(LOGDIR)/*-make.log
-	-rm sd.img$(DOT_GZ)
 	-rm -rf $(YOCTO_DIR)/sources
 	-rm $(YOCTO_DIR)/$(YOCTO_ENV)/conf/local.conf
 	-rm $(YOCTO_DIR)/$(YOCTO_ENV)/conf/bblayers.conf
@@ -188,7 +176,7 @@ id:
 # https://community.nxp.com/docs/DOC-95003
 # https://github.com/uvdl/yocto-ornl/issues/11#issuecomment-462969336
 # Edison's email from 2019-03-15 Re: FEC driver debugging
-kernel: $(LOGDIR)
+kernel:
 	-rm sd.img$(DOT_GZ)
 	cd $(YOCTO_DIR) && \
 		MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV) && \
@@ -197,7 +185,7 @@ kernel: $(LOGDIR)
 		./run.do_compile_kernelmodules && \
 		echo "kernel built in $(YOCTO_DIR)/$(YOCTO_ENV)/$(KERNEL_IMAGE)"
 
-kernel-config: $(LOGDIR)
+kernel-config:
 	cd $(YOCTO_DIR) && \
 		MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV) && \
 		cd $(YOCTO_DIR)/$(YOCTO_ENV)/$(KERNEL_TEMP) && \
