@@ -53,8 +53,8 @@ KERNEL_TEMP=$(_KERNEL_RELATIVE_PATH)/temp
 # https://stackoverflow.com/questions/16488581/looking-for-well-logged-make-output
 # Invoke this with $(call LOG,<cmdline>)
 define LOG
-  @echo "$$(date --iso-8601='ns'): $1 started. ($(YOCTO_DIR)/$(YOCTO_ENV))" >>$(LOGDIR)/$(YOCTO_ENV)-make.log
-  ($1) 2>&1 | tee -a $(LOGDIR)/$(YOCTO_ENV)-build.log && echo "$$(date --iso-8601='ns'): $1 completed." >>$(LOGDIR)/$(YOCTO_ENV)-make.log
+@echo "$$(date --iso-8601='ns'): $1 started. ($(YOCTO_DIR)/$(YOCTO_ENV))" >>$(LOGDIR)/$(YOCTO_ENV)-make.log
+($1) 2>&1 | tee -a $(LOGDIR)/$(YOCTO_ENV)-build.log && echo "$$(date --iso-8601='ns'): $1 completed." >>$(LOGDIR)/$(YOCTO_ENV)-make.log
 endef
 
 .PHONY: all archive build clean dependencies docker-deploy docker-image environment environment-update
@@ -93,6 +93,7 @@ environment: $(YOCTO_DIR)/setup-environment $(YOCTO_DIR)/$(YOCTO_ENV)/conf
 		MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV) && \
 		cp $(CURDIR)/build/conf/local.conf $(YOCTO_DIR)/$(YOCTO_ENV)/conf/ && \
 		cp $(CURDIR)/build/conf/bblayers.conf $(YOCTO_DIR)/$(YOCTO_ENV)/conf/ && \
+		cp -f $(CURDIR)/BuildScripts/mx6_install_yocto_emmc.sh $(YOCTO_DIR)/sources/meta-variscite-fslc/scripts/var_mk_yocto_sdcard/variscite_scripts/
 		echo "*** ENVIRONMENT SETUP ***" && \
 		echo "Please execute the following in your shell before giving bitbake commands:" && \
 		echo "cd $(YOCTO_DIR) && MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV)"
