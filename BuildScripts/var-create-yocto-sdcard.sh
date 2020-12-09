@@ -275,11 +275,8 @@ function install_yocto
 	echo
 	echo "Installing Yocto Boot partition"
 	# FIXME: not handing zImage because bash does not do regex
-		for f in ${YOCTO_IMGS_PATH}/*.dtb; do
-			if [[ -L $f ]] ; then
-				cp $f	${P1_MOUNT_DIR}/
-			fi
-		done
+	# FIXME: hard coded .dtb file participles are ugly
+	for f in var-dart iris2-R0 iris2-R1 nightcrawler-R0 ; do cp ${YOCTO_IMGS_PATH}/imx6q-${f}.dtb ${P1_MOUNT_DIR}/. ; done
 
 	pv ${YOCTO_IMGS_PATH}/?Image >			${P1_MOUNT_DIR}/`cd ${YOCTO_IMGS_PATH}; ls ?Image`
 	sync
@@ -295,12 +292,8 @@ function copy_images
 	echo "Copying Yocto images to /opt/images/"
 	mkdir -p ${P2_MOUNT_DIR}/opt/images/Yocto
 	# FIXME: not handing zImage because bash does not do regex
-	for f in ${YOCTO_RECOVERY_ROOTFS_PATH}/*.dtb; do
-		if [[ -L $f ]] ; then
-			cp $f	${P2_MOUNT_DIR}/opt/images/Yocto/
-		fi
-	done	
-
+	# FIXME: hard coded .dtb file participles are ugly
+	for f in var-dart iris2-R0 iris2-R1 nightcrawler-R0 ; do cp ${YOCTO_RECOVERY_ROOTFS_PATH}/imx6q-${f}.dtb ${P2_MOUNT_DIR}/opt/images/Yocto/. ; done
 
 	cp ${YOCTO_RECOVERY_ROOTFS_PATH}/?Image				${P2_MOUNT_DIR}/opt/images/Yocto/
 
