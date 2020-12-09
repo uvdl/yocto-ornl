@@ -10,12 +10,12 @@ EXTRA_USERS_PARAMS = "usermod -P root root;"
 inherit core-image distro_features_check extrausers
 
 IMAGE_FEATURES += " \
-    debug-tweaks \
-    tools-sdk \
-    splash \
-    ssh-server-openssh \
-    hwcodecs \
-    tools-debug \
+	debug-tweaks \
+	tools-sdk \
+	splash \
+	ssh-server-openssh \
+	hwcodecs \
+	tools-debug \
 "
 
 IMAGE_INSTALL_append += " \
@@ -90,10 +90,10 @@ IMAGE_INSTALL_append += " \
 	perf \
 	powertop \
 	cockpit \
-    cockpit-ws \
-    cockpit-users \
-    cockpit-shell \
-    cockpit-networkmanager \
-    cockpit-systemd \
+	cockpit-ws \
+	cockpit-users \
+	cockpit-shell \
+	cockpit-networkmanager \
+	cockpit-systemd \
 "
 

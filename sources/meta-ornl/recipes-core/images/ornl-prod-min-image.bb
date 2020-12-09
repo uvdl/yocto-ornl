@@ -1,4 +1,4 @@
-SUMMARY = "T-Star Base Production Image"
+SUMMARY = "Minimal Base Production Image"
 
 IMAGE_FEATURES += " read-only-rootfs"
 
@@ -10,9 +10,9 @@ LICENSE = "MIT"
 inherit core-image
 
 IMAGE_INSTALL_append = " \
-    ornl-packagegroup-prod \
-    python-compiler \
+	ornl-packagegroup-prod \
+	python-compiler \
 	python3 \
-    python3-pip \
-    postinstall \
+	python3-pip \
+	postinstall \
 "
