@@ -7,6 +7,7 @@ SUDO := $(shell test $${EUID} -ne 0 && echo "sudo")
 LANG := en_US.UTF-8
 DATE := $(shell date +%Y-%m-%d_%H%M)
 ARCHIVE := /opt
+EPHEMERAL := /tmp
 .EXPORT_ALL_VARIABLES:
 
 DEV=
@@ -27,15 +28,15 @@ PROJECT=yocto-ornl
 PROJECT_REMOTE := $(USER)
 PROJECT_TAG := core
 REPO=/usr/local/bin/repo
-REPO_LOC=https://storage.googleapis.com/git-repo-downloads/repo
-# repo version 2.8
+REPO_LOC=https://gerrit.googlesource.com/git-repo
 REPO_SUM=d73f3885d717c1dc89eba0563433cec787486a0089b9b04b4e8c56e7c07c7610
+REPO_TAG=v2.8
 TOASTER_PORT := 8000
 
 # Known variations
 # FIXME: requires mod to BuildScripts/ornl-setup-yocto.sh
 YOCTO_VERSION=thud
-YOCTO_DIR := $(HOME)/$(PROJECT)-$(YOCTO_VERSION)
+YOCTO_DIR := $(EPHEMERAL)/$(PROJECT)-$(YOCTO_VERSION)
 YOCTO_DISTRO=fslc-framebuffer
 YOCTO_ENV=build_ornl
 YOCTO_IMG=var-dev-update-full-image
@@ -59,8 +60,8 @@ $(ARCHIVE):
 	mkdir -p $(ARCHIVE)
 
 $(REPO): $(shell dirname $(REPO))
-	# https://github.com/curl/curl/issues/1399
-	echo "$(REPO_SUM)  -" > /tmp/sum.txt && curl -fLs $(REPO_LOC) | $(SUDO) tee $@ | sha256sum -c /tmp/sum.txt
+	-( cd $(EPHEMERAL) && git clone $(REPO_LOC) -b $(REPO_TAG) git-repo )
+	echo "$(REPO_SUM)  -" > /tmp/sum.txt && cat $(EPHEMERAL)/git-repo/repo | $(SUDO) tee $@ | sha256sum -c /tmp/sum.txt
 	$(SUDO) chmod a+x $@
 
 $(YOCTO_DIR):
@@ -105,7 +106,6 @@ sd.img$(DOT_GZ): $(YOCTO_DIR)/$(YOCTO_ENV)/tmp/deploy/images/$(MACHINE)/$(YOCTO_
 
 all:
 	@$(MAKE) --no-print-directory -B dependencies
-	@$(MAKE) --no-print-directory -B see
 	@$(MAKE) --no-print-directory -B environment
 	#@$(MAKE) --no-print-directory -B toaster
 	#@$(MAKE) --no-print-directory -B build
