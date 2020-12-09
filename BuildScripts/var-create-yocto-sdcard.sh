@@ -275,7 +275,11 @@ function install_yocto
 	echo
 	echo "Installing Yocto Boot partition"
 	# FIXME: not handing zImage because bash does not do regex
-	for STR in uImage ; do for f in ${YOCTO_IMGS_PATH}/${STR}-imx*.dtb ; do cp $f ${P1_MOUNT_DIR}/$(basename ${f/${STR}-/}) ; done ; done
+		for f in ${YOCTO_IMGS_PATH}/*.dtb; do
+			if [[ -L $f ]] ; then
+				cp $f	${P1_MOUNT_DIR}/
+			fi
+		done
 
 	pv ${YOCTO_IMGS_PATH}/?Image >			${P1_MOUNT_DIR}/`cd ${YOCTO_IMGS_PATH}; ls ?Image`
 	sync
@@ -291,7 +295,12 @@ function copy_images
 	echo "Copying Yocto images to /opt/images/"
 	mkdir -p ${P2_MOUNT_DIR}/opt/images/Yocto
 	# FIXME: not handing zImage because bash does not do regex
-	for STR in uImage ; do for f in ${YOCTO_RECOVERY_ROOTFS_PATH}/${STR}-imx*.dtb ; do cp $f ${P2_MOUNT_DIR}/opt/images/Yocto/$(basename ${f/${STR}-/}) ; done ; done
+	for f in ${YOCTO_RECOVERY_ROOTFS_PATH}/*.dtb; do
+		if [[ -L $f ]] ; then
+			cp $f	${P2_MOUNT_DIR}/opt/images/Yocto/
+		fi
+	done	
+
 
 	cp ${YOCTO_RECOVERY_ROOTFS_PATH}/?Image				${P2_MOUNT_DIR}/opt/images/Yocto/
 
