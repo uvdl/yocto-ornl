@@ -47,6 +47,7 @@ IMAGE_INSTALL_append += " \
 	ntp \
 	ntp-bin \
 	openssl \
+	openssl-bin \
 	packagegroup-core-full-cmdline \
 	packagegroup-fsl-gstreamer1.0 \
 	packagegroup-fsl-gstreamer1.0-full \
