@@ -84,17 +84,11 @@ IMAGE_INSTALL_append += " \
 	systemd-analyze \
 	v4l-utils \
 	webcam-tools \
-	x265 \
+	x264 \
 	tcpdump \
 	htop \
 	iotop \
 	perf \
 	powertop \
-	cockpit \
-	cockpit-ws \
-	cockpit-users \
-	cockpit-shell \
-	cockpit-networkmanager \
-	cockpit-systemd \
 "
 
