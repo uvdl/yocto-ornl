@@ -6,7 +6,7 @@ OfflineMode=false
 Description = Network configuration
 
 [Wired]
-Enable=false
+Enable=true
 
 [WiFi]
 Enable=true

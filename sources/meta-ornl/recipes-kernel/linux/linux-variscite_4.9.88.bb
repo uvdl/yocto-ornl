@@ -12,15 +12,16 @@ RDEPENDS_${KERNEL_PACKAGE_NAME}-base = ""
 LOCALVERSION_var-som-mx6 = "-mx6"
 LOCALVERSION_imx6ul-var-dart = "-mx6ul"
 LOCALVERSION_imx7-var-som = "-mx7"
+LOCALVERSION_var-som-mx6-ornl = "-mx6"
 
-SRCBRANCH = "imx_4.9.88_2.0.0_ga-var01"
-SRCREV = "ec7d7d8ccb4960ee382c97f3b08db16086382d4b"
-KERNEL_SRC ?= "git://github.com/varigit/linux-imx.git;protocol=git"
+SRCBRANCH_var-som-mx6-ornl = "feature/develop"
+SRCREV_var-som-mx6-ornl = "1e242ad670734608c59eb0ee3974d98c3603f1a1"
+KERNEL_SRC ?= "git://github.com/uvdl/linux-imx.git;protocol=git"
 SRC_URI = "${KERNEL_SRC};branch=${SRCBRANCH}"
 
 DEFAULT_PREFERENCE = "1"
 
-KERNEL_DEFCONFIG = "${S}/arch/arm/configs/imx_v7_var_defconfig"
+KERNEL_DEFCONFIG = "${S}/arch/arm/configs/imx_v7_iris2_defconfig"
 
 do_merge_delta_config[dirs] = "${B}"
 

@@ -1,0 +1,77 @@
+diff --git a/autogen.sh b/autogen.sh
+index c9e8d0c..8146951 100755
+--- a/autogen.sh
++++ b/autogen.sh
+@@ -21,7 +21,11 @@
+ # ACLOCAL, AUTOPOINT and/or LIBTOOLIZE to the right versions, or leave them
+ # unset and get the defaults
+ 
+-gtkdocize || exit 1
++test -n "$srcdir" || srcdir=`dirname "$0"`
++test -n "$srcdir" || srcdir=.
++
++olddir=`pwd`
++cd "$srcdir"
+ 
+ autoreconf --verbose --force --install || {
+  echo 'autogen.sh failed';
+@@ -38,3 +42,5 @@ fi
+ echo
+ echo "Now run './configure' with your system settings followed by 'make' to compile this module."
+ echo
++
++cd "$olddir"
+\ No newline at end of file
+diff --git a/docs/reference/gstd/Makefile.am b/docs/reference/gstd/Makefile.am
+index 62870da..393ab0b 100644
+--- a/docs/reference/gstd/Makefile.am
++++ b/docs/reference/gstd/Makefile.am
+@@ -66,7 +66,7 @@ GTKDOC_LIBS=$(top_builddir)/gstd/libgstd-core.la
+ 
+ 
+ # This includes the standard gtk-doc make rules, copied by gtkdocize.
+-include $(top_builddir)/docs/gtk-doc.make
++#include $(top_builddir)/docs/gtk-doc.make
+ 
+ # Comment this out if you want 'make check' to test you doc status
+ # and run some sanity checks
+diff --git a/gst_client/Makefile.am b/gst_client/Makefile.am
+index ec5a03c..4be2645 100644
+--- a/gst_client/Makefile.am
++++ b/gst_client/Makefile.am
+@@ -6,9 +6,9 @@ gst_client_@GSTD_API_VERSION@_LDFLAGS = $(GST_LIBS) $(GIO_LIBS) $(GIO_UNIX_LIBS)
+ 
+ install-exec-hook:
+ 	$(RM) $(DESTDIR)$(bindir)/gstd-client $(DESTDIR)$(bindir)/gst-client
+-	$(LN_S) $(DESTDIR)$(bindir)/gst-client-@GSTD_API_VERSION@ \
++	$(LN_S) $(bindir)/gst-client-@GSTD_API_VERSION@ \
+            $(DESTDIR)$(bindir)/gstd-client
+-	$(LN_S) $(DESTDIR)$(bindir)/gst-client-@GSTD_API_VERSION@ \
++	$(LN_S) $(bindir)/gst-client-@GSTD_API_VERSION@ \
+            $(DESTDIR)$(bindir)/gst-client
+ 
+ uninstall-hook:
+diff --git a/gstd/Makefile.am b/gstd/Makefile.am
+index 66b1248..8b6ea80 100644
+--- a/gstd/Makefile.am
++++ b/gstd/Makefile.am
+@@ -84,8 +84,7 @@ gstd_LDFLAGS = $(GST_LIBS)					\
+ 	       $(GIO_UNIX_LIBS)					\
+ 	       $(GJSON_LIBS)					\
+ 	       $(LIBD_LIBS)					\
+-	       $(LIBSOUP_LIBS)					\
+-	       -Wl,-rpath -Wl,$(libdir)
++	       $(LIBSOUP_LIBS)	
+ 
+ gstd_LDADD = libgstd-core.la
+ 
+diff --git a/libgstc/Makefile.am b/libgstc/Makefile.am
+index 8ab8676..1dc8d73 100644
+--- a/libgstc/Makefile.am
++++ b/libgstc/Makefile.am
+@@ -1,4 +1,3 @@
+ SUBDIRS=c	\
+-    javascript  \
+-    python
++    javascript  
+ 
