@@ -27,7 +27,7 @@ PROJECT=yocto-ornl
 PROJECT_REMOTE := $(USER)
 PROJECT_TAG := core
 REPO=/usr/local/bin/repo
-REPO_LOC=https://storage.googleapis.com/git-repo-downloads/repo
+REPO_LOC=https://storage.googleapis.com/git-repo-downloads/repo/+/refs/tags/v2.3
 # repo version 2.8
 REPO_SUM=d73f3885d717c1dc89eba0563433cec787486a0089b9b04b4e8c56e7c07c7610
 TOASTER_PORT := 8000
@@ -66,15 +66,15 @@ $(REPO): $(shell dirname $(REPO))
 $(YOCTO_DIR):
 	mkdir -p $(YOCTO_DIR)
 
-$(YOCTO_DIR)/setup-environment: $(REPO) $(YOCTO_DIR)
-	cd $(YOCTO_DIR) && \
+#$(YOCTO_DIR)/setup-environment: #$(REPO) $(YOCTO_DIR)
+	#:dfcd $(YOCTO_DIR) && \
 		$(REPO) init -u $(PLATFORM_GIT) -b $(YOCTO_VERSION) && \
-		$(REPO) sync -j$(CPUS)
+		$(REPO) sync -j $(CPUS)
 
 $(YOCTO_DIR)/$(YOCTO_ENV)/conf:
 	mkdir -p $(YOCTO_DIR)/$(YOCTO_ENV)/conf
 
-environment: $(YOCTO_DIR)/setup-environment $(YOCTO_DIR)/$(YOCTO_ENV)/conf
+environment: $(YOCTO_DIR)/$(YOCTO_ENV)/conf
 	@echo "$(YOCTO_DIR)/sources/poky/bitbake/bin/../../meta-poky/conf" > $(YOCTO_DIR)/$(YOCTO_ENV)/conf/templateconf.cfg
 	cd $(YOCTO_DIR) && \
 		rm -rf $(YOCTO_DIR)/sources/meta-ornl && \
@@ -126,7 +126,7 @@ archive:
 	@echo "DEV=/dev/sdx" >> $(ARCHIVE)/$(PROJECT)-$(DATE)/readme.txt
 	@echo "$(SUDO) MACHINE=$(MACHINE) $(YOCTO_ENV)/sources/meta-variscite-fslc/scripts/var-create-yocto-sdcard.sh -a -r $(YOCTO_ENV)/tmp/deploy/images/$(MACHINE)/$(YOCTO_CMD)-$(MACHINE) \$${DEV}" >> $(ARCHIVE)/$(PROJECT)-$(DATE)/readme.txt
 
-build: $(YOCTO_DIR)/setup-environment build/conf/local.conf build/conf/bblayers.conf sources/meta-ornl
+build: build/conf/local.conf build/conf/bblayers.conf sources/meta-ornl
 	@$(MAKE) --no-print-directory -B environment
 	cd $(YOCTO_DIR) && \
 		MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV) && \
