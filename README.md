@@ -185,7 +185,7 @@ $YOCTO_DIR/$YOCTO_ENV> bitbake var-dev-update-full-image
 You may wish to create an SDK cross-compiler that has the same toolchain and installed libraries as the full image above.  To get this:
 
 <pre>
-$YOCTO_DIR/$YOCTO_ENV> bitbake -c populate-sdk var-dev-update-full-image
+$YOCTO_DIR/$YOCTO_ENV> bitbake -c populate_sdk var-dev-update-full-image
 </pre>
 
 Upon success a shell archive will be available in `$YOCTO_DIR/$YOCTO_ENV/tmp/deploy/sdk/fslc-framebuffer-glibc-x86_64-var-dev-update-full-image-armv7at2hf-neon-toolchain-2.6.2.sh`.  Copy this file to a new machine and execute it to unpack the SDK.  *(it will ask you where to extract it, refer to that folder as SDK_DIR)*
