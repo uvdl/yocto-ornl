@@ -1,0 +1,268 @@
+diff --git a/board/variscite/mx6var_som/mx6var_som.c b/board/variscite/mx6var_som/mx6var_som.c
+index f98a397248..96ef7bac8b 100644
+--- a/board/variscite/mx6var_som/mx6var_som.c
++++ b/board/variscite/mx6var_som/mx6var_som.c
+@@ -145,6 +145,125 @@ static inline bool is_dart_board(void)
+ 	return is_cpu_pop_packaged();
+ }
+ 
++
++#define PUS_100K_DOWN_PAD_CTRL (PAD_CTL_PUS_100K_DOWN | \
++	PAD_CTL_SPEED_HIGH | PAD_CTL_DSE_40ohm |			\
++	PAD_CTL_SRE_FAST)
++#define PUS_100K_UP_PAD_CTRL (PAD_CTL_PUS_100K_UP | \
++	PAD_CTL_SPEED_HIGH | PAD_CTL_DSE_40ohm |			\
++	PAD_CTL_SRE_FAST)
++
++static iomux_v3_cfg_t const gpio4_21_gpio3_21_en[] = {
++	IOMUX_PADS(PAD_DISP0_DAT0__GPIO4_IO21	| MUX_PAD_CTRL(PUS_100K_DOWN_PAD_CTRL)),
++	IOMUX_PADS(PAD_EIM_D21__GPIO3_IO21		| MUX_PAD_CTRL(PUS_100K_UP_PAD_CTRL)),
++};
++static iomux_v3_cfg_t const gpio4_21_gpio3_21_dis[] = {
++	IOMUX_PADS(PAD_DISP0_DAT0__GPIO4_IO21	| MUX_PAD_CTRL(NO_PAD_CTRL)),
++	IOMUX_PADS(PAD_EIM_D21__GPIO3_IO21		| MUX_PAD_CTRL(NO_PAD_CTRL)),
++};
++
++enum uvdl_ident {
++	VARISCITE = 0,
++	PIXC3,
++	PIXC4,
++};
++
++/* List of GPIOs that need to be set to INPUT */
++static iomux_v3_cfg_t const gpio_pixc4_dis[] = {
++	IOMUX_PADS(PAD_ENET_MDC__GPIO1_IO31	| MUX_PAD_CTRL(NO_PAD_CTRL)), /* DART_IO_0 10K PD */
++	IOMUX_PADS(PAD_ENET_MDIO__GPIO1_IO22	| MUX_PAD_CTRL(NO_PAD_CTRL)), /* DART_IO_1 10K PD */
++	IOMUX_PADS(PAD_DISP0_DAT2__GPIO4_IO23	| MUX_PAD_CTRL(NO_PAD_CTRL)), /* DART_IO_2 10K PD */
++	IOMUX_PADS(PAD_DISP0_DAT15__GPIO5_IO09	| MUX_PAD_CTRL(NO_PAD_CTRL)), /* DART_IO_3 10K PD */
++	IOMUX_PADS(PAD_DISP0_DAT16__GPIO5_IO10	| MUX_PAD_CTRL(NO_PAD_CTRL)), /* SILVUS_SHUTDOWN 10K PD */
++};
++
++/*
++ * Returns 1 if the carrier board is PixC3, 2 if carrier is PixC4, otherwise 0
++ *  (and the SOM is DART-MX6)
++ */
++static inline int get_uvdl_ident(void)
++{
++	int lsb, msb, ret = VARISCITE;
++
++	SETUP_IOMUX_PADS(gpio4_21_gpio3_21_en);
++
++	gpio_request(IMX_GPIO_NR(4, 21), "");
++	gpio_request(IMX_GPIO_NR(3, 21), "");
++	gpio_direction_input(IMX_GPIO_NR(4, 21));
++	gpio_direction_input(IMX_GPIO_NR(3, 21));
++
++	msb = gpio_get_value(IMX_GPIO_NR(4, 21));
++	lsb = gpio_get_value(IMX_GPIO_NR(3, 21));
++
++	printf("IDENT: 0x%02x 0x%02x GPIO4[21] GPIO3[21]\n", msb, lsb);
++
++	if(msb == 1){
++		if(lsb == 1) ret = PIXC3;
++		else ret = PIXC4;
++	}
++
++	printf("IDENT: %d\n", ret);
++
++	SETUP_IOMUX_PADS(gpio4_21_gpio3_21_dis);
++	return ret;
++}
++
++enum uvdl_rev {
++	R0 = 0,
++	R1,
++	R2,
++	R3,
++};
++
++static iomux_v3_cfg_t const gpio4_29_30_en[] = {
++	IOMUX_PADS(PAD_DISP0_DAT8__GPIO4_IO29	| MUX_PAD_CTRL(PUS_100K_UP_PAD_CTRL)),
++	IOMUX_PADS(PAD_DISP0_DAT9__GPIO4_IO30	| MUX_PAD_CTRL(PUS_100K_UP_PAD_CTRL)),
++};
++static iomux_v3_cfg_t const gpio4_29_30_dis[] = {
++	IOMUX_PADS(PAD_DISP0_DAT8__GPIO4_IO29	| MUX_PAD_CTRL(NO_PAD_CTRL)),
++	IOMUX_PADS(PAD_DISP0_DAT9__GPIO4_IO30	| MUX_PAD_CTRL(NO_PAD_CTRL)),
++};
++
++/**
++ * Gets the uvdl board revision
++ * GPIO4[30] 	GPIO4[29] 	Revision
++ * HIGH 		HIGH 		R0
++ * HIGH 		LOW 		R1
++ * LOW 			HIGH 		R2
++ * LOW 			LOW 		R3
++ * 
++ */
++static inline int get_uvdl_rev(void)
++{
++	int lsb, msb, ret = R0;
++
++	SETUP_IOMUX_PADS(gpio4_29_30_en);
++	
++	gpio_request(IMX_GPIO_NR(4, 29), "");
++	gpio_request(IMX_GPIO_NR(4, 30), "");
++	gpio_direction_input(IMX_GPIO_NR(4, 29));
++	gpio_direction_input(IMX_GPIO_NR(4, 30));
++
++	lsb = gpio_get_value(IMX_GPIO_NR(4, 29));
++	msb = gpio_get_value(IMX_GPIO_NR(4, 30));
++
++	printf("REV: 0x%02x 0x%02x GPIO4[30] GPIO4[29]\n", msb, lsb);
++
++	if(msb == 1){
++		if(lsb == 1) ret = R0;
++		else ret = R1;
++	}
++	else{
++		if(lsb == 1) ret = R2;
++		else ret = R3;
++	}
++
++	printf("REV: %d\n", ret);
++
++	SETUP_IOMUX_PADS(gpio4_29_30_dis);
++	return ret;
++}
++
+ /*
+  * Returns true iff the carrier board is VAR-MX6CustomBoard
+  */
+@@ -1359,6 +1478,51 @@ int board_late_init(void)
+ 	else
+ 		env_set("board_name", "MX6CUSTOM");
+ 
++	int ident = get_uvdl_ident();
++	if (ident != VARISCITE) 
++	{
++		int revision = get_uvdl_rev();   	
++		if (ident == PIXC3) 
++		{
++			/*SETUP_IOMUX_PADS(gpio_pixc3_dis);*/
++			setenv("board_name", "iris2");    /* NB: coupled with kernel dtb */
++		} 
++		else if (ident == PIXC4) 
++		{
++			SETUP_IOMUX_PADS(gpio_pixc4_dis);
++			setenv("board_name", "nightcrawler"); /* NB: coupled with kernel dtb */
++		} 
++		else 
++		{
++			setenv("board_name", "DT6CUSTOM");
++		}   	
++		if(revision == R0)
++			setenv("board_rev", "R0");
++		else if(revision == R1)
++			setenv("board_rev", "R1");
++		else if(revision == R2)
++			setenv("board_rev", "R2");
++		else if(revision == R3)
++			setenv("board_rev", "R3");
++		else
++			setenv("board_rev", "MX6Q");
++	}
++	else 
++	{
++		if (is_dart_board())
++			setenv("board_name", "DT6CUSTOM");
++		else if (is_solo_custom_board())
++			setenv("board_name", "SOLOCUSTOM");
++		else
++			setenv("board_name", "MX6CUSTOM");   	
++		if (is_mx6dqp())
++			setenv("board_rev", "MX6QP");
++		else if (is_mx6dq())
++			setenv("board_rev", "MX6Q");
++		else if (is_mx6sdl())
++			setenv("board_rev", "MX6DL");
++	}
++
+ 	if (is_som_solo())
+ 		env_set("board_som", "SOM-SOLO");
+ 	else if (is_dart_board())
+@@ -1366,12 +1530,6 @@ int board_late_init(void)
+ 	else
+ 		env_set("board_som", "SOM-MX6");
+ 
+-	if (is_mx6dqp())
+-		env_set("board_rev", "MX6QP");
+-	else if (is_mx6dq())
+-		env_set("board_rev", "MX6Q");
+-	else if (is_mx6sdl())
+-		env_set("board_rev", "MX6DL");
+ #endif
+ 
+ 	return 0;
+diff --git a/include/configs/mx6var_som.h b/include/configs/mx6var_som.h
+index 3708cad8ca..4b3f7fc25f 100644
+--- a/include/configs/mx6var_som.h
++++ b/include/configs/mx6var_som.h
+@@ -244,65 +244,12 @@
+ 		"fi;\0" \
+ 	"findfdt="\
+ 		"if test $fdt_file = undefined; then " \
++			"if test $board_name = iris2 || test $board_name = nightcrawler; then " \
++				"setenv fdt_file imx6q-${board_name}-${board_rev}.dtb; " \
++			"fi; " \
+ 			"if test $board_name = DT6CUSTOM && test $board_rev = MX6Q; then " \
+ 				"setenv fdt_file imx6q-var-dart.dtb; " \
+ 			"fi; " \
+-			"if test $board_name = SOLOCUSTOM && test $board_rev = MX6QP; then " \
+-				"setenv fdt_file imx6qp-var-som-vsc.dtb; " \
+-			"fi; " \
+-			"if test $board_name = SOLOCUSTOM && test $board_rev = MX6Q; then " \
+-				"setenv fdt_file imx6q-var-som-vsc.dtb; " \
+-			"fi; " \
+-			"if test $board_name = SOLOCUSTOM && test $board_rev = MX6DL && test $board_som = SOM-SOLO; then " \
+-				"setenv fdt_file imx6dl-var-som-solo-vsc.dtb; " \
+-			"fi; " \
+-			"if test $board_name = SOLOCUSTOM && test $board_rev = MX6DL && test $board_som = SOM-MX6; then " \
+-				"setenv fdt_file imx6dl-var-som-vsc.dtb; " \
+-			"fi; " \
+-			"if test $board_name = SYMPHONY && test $board_rev = MX6QP; then " \
+-				"setenv fdt_file imx6qp-var-som-symphony.dtb; " \
+-			"fi; " \
+-			"if test $board_name = SYMPHONY && test $board_rev = MX6Q; then " \
+-				"setenv fdt_file imx6q-var-som-symphony.dtb; " \
+-			"fi; " \
+-			"if test $board_name = SYMPHONY && test $board_rev = MX6DL && test $board_som = SOM-SOLO; then " \
+-				"setenv fdt_file imx6dl-var-som-solo-symphony.dtb; " \
+-			"fi; " \
+-			"if test $board_name = SYMPHONY && test $board_rev = MX6DL && test $board_som = SOM-MX6; then " \
+-				"setenv fdt_file imx6dl-var-som-symphony.dtb; " \
+-			"fi; " \
+-			"if test $board_name = MX6CUSTOM && test $board_rev = MX6QP; then " \
+-				"i2c dev 2; " \
+-				"if i2c probe 0x38; then " \
+-					"setenv fdt_file imx6qp-var-som-cap.dtb; " \
+-				"else " \
+-					"setenv fdt_file imx6qp-var-som-res.dtb; " \
+-				"fi; " \
+-			"fi; " \
+-			"if test $board_name = MX6CUSTOM && test $board_rev = MX6Q; then " \
+-				"i2c dev 2; " \
+-				"if i2c probe 0x38; then " \
+-					"setenv fdt_file imx6q-var-som-cap.dtb; " \
+-				"else " \
+-					"setenv fdt_file imx6q-var-som-res.dtb; " \
+-				"fi; " \
+-			"fi; " \
+-			"if test $board_name = MX6CUSTOM && test $board_rev = MX6DL && test $board_som = SOM-SOLO; then " \
+-				"i2c dev 2; " \
+-				"if i2c probe 0x38; then " \
+-					"setenv fdt_file imx6dl-var-som-solo-cap.dtb; " \
+-				"else " \
+-					"setenv fdt_file imx6dl-var-som-solo-res.dtb; " \
+-				"fi; " \
+-			"fi; " \
+-			"if test $board_name = MX6CUSTOM && test $board_rev = MX6DL && test $board_som = SOM-MX6; then " \
+-				"i2c dev 2; " \
+-				"if i2c probe 0x38; then " \
+-					"setenv fdt_file imx6dl-var-som-cap.dtb; " \
+-				"else " \
+-					"setenv fdt_file imx6dl-var-som-res.dtb; " \
+-				"fi; " \
+-			"fi; " \
+ 			"if test $fdt_file = undefined; then " \
+ 				"echo WARNING: Could not determine dtb to use; " \
+ 			"fi; " \
