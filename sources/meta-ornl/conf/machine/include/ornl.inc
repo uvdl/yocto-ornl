@@ -24,9 +24,19 @@ UBI_VOLNAME  = "rootfs"
 
 # Variscite BSP default providers
 PREFERRED_PROVIDER_virtual/kernel ?= "linux-variscite"
-PREFERRED_VERSION_linux-variscite_dunfell = "5.4"
-# PREFERRED_VERSION_linux-variscite_thud = "4.9.88"
-# PREFERRED_VERSION_linux-variscite_sumo = "4.9.88"
+python() {
+	PRE_VERSION = d.getVar('DISTRO_CODENAME', True)
+	if PRE_VERSION == "sumo":
+		theVersion = "4.9.88"
+	elif PRE_VERSION == "thud":
+		theVersion = "4.9.88"
+	elif PRE_VERSION == "dunfell":
+		theVersion = "5.4"
+	else:
+		raise Exception("DISTRO_VERSION '%s' is note supported" % PRE_VERSION)
+	d.setVar('PREFERRED_VERSION_linux-variscite', theVersion)
+}
+# PREFERRED_VERSION_linux-variscite = "4.9.88"
 
 PREFERRED_PROVIDER_u-boot = "u-boot-variscite"
 PREFERRED_PROVIDER_virtual/bootloader = "u-boot-variscite"
