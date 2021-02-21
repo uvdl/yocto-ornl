@@ -6,14 +6,14 @@ CPUS := $(shell nproc)
 SUDO := $(shell test $${EUID} -ne 0 && echo "sudo")
 LANG := en_US.UTF-8
 DATE := $(shell date +%Y-%m-%d_%H%M)
-ARCHIVE := /opt
+ARCHIVE := $(HOME)/archive_yocto/
 EPHEMERAL := /tmp
 .EXPORT_ALL_VARIABLES:
 
 DEV=
 DOT_GZ=.gz
 EULA=1	# https://patchwork.openembedded.org/patch/100815/
-MACHINE=var-som-mx6-ornl
+MACHINE=jetson-xavier-nx-devkit-emmc
 PKGDEPS1=gawk wget git-core diffstat unzip texinfo gcc-multilib \
 build-essential chrpath socat cpio python python3 python3-pip python3-pexpect \
 xz-utils debianutils iputils-ping libsdl1.2-dev xterm
@@ -41,8 +41,6 @@ YOCTO_DISTRO=fslc-framebuffer
 YOCTO_ENV=build_ornl
 YOCTO_IMG=ornl-dev-image
 YOCTO_CMD := $(YOCTO_IMG)
-
-TEGRA_MACHINE=jetson-xavier-nx-devkit-emmc
 
 # Kernel rebuilding; paths relative to $(YOCTO_DIR)/$(YOCTO_ENV)
 _KERNEL_RELATIVE_PATH := tmp/work/var_som_mx6_ornl-fslc-linux-gnueabi/linux-variscite/4.9.88-r0
@@ -114,6 +112,7 @@ all:
 	#@$(MAKE) --no-print-directory -B archive
 
 archive:
+ifeq ($(MACHINE), var-som-mx6-ornl)
 	@mkdir -p $(ARCHIVE)/$(PROJECT)-$(DATE)/dts
 	( for f in `find $(YOCTO_DIR)/$(YOCTO_ENV)/$(KERNEL_DTS) -name "*.dtb" -print` ; do n=$$(basename $$f) ; nb=$${n%.*} ; dtc -I dtb -O dts -o $(ARCHIVE)/$(PROJECT)-$(DATE)/dts/$${nb}.dts $$f ; cp $$f $(ARCHIVE)/$(PROJECT)-$(DATE)/dts/$${nb}.dtb ; done )
 	@mkdir -p $(ARCHIVE)/$(PROJECT)-$(DATE)/$(YOCTO_ENV)/tmp/deploy/images
@@ -127,11 +126,15 @@ archive:
 	@echo "# To write image to MMC, do:" > $(ARCHIVE)/$(PROJECT)-$(DATE)/readme.txt
 	@echo "DEV=/dev/sdx" >> $(ARCHIVE)/$(PROJECT)-$(DATE)/readme.txt
 	@echo "$(SUDO) MACHINE=$(MACHINE) $(YOCTO_ENV)/sources/meta-variscite-fslc/scripts/var-create-yocto-sdcard.sh -a -r $(YOCTO_ENV)/tmp/deploy/images/$(MACHINE)/$(YOCTO_CMD)-$(MACHINE) \$${DEV}" >> $(ARCHIVE)/$(PROJECT)-$(DATE)/readme.txt
+else
+	@mkdir -p $(ARCHIVE)/$(PROJECT)-$(DATE)
+	@tar -xf $(YOCTO_DIR)/$(YOCTO_ENV)/tmp/deploy/images/$(MACHINE)/$(YOCTO_IMG)-$(MACHINE).tegraflash.tar.gz -C $(ARCHIVE)/$(PROJECT)-$(DATE)
+endif
 
 build-tegra:
-	BuildScripts/ornl-setup-yocto.sh -m $(TEGRA_MACHINE) $(YOCTO_DIR)
+	BuildScripts/ornl-setup-yocto.sh -m $(MACHINE) $(YOCTO_DIR)
 	cd $(YOCTO_DIR) && \
-		. $(YOCTO_DIR)/sources/poky/oe-init-build-env $(YOCTO_ENV) && \
+		. $(YOCTO_DIR)/ornl-yocto-tegra/setup-env --machine $(MACHINE) --distro ornl-tegra $(YOCTO_ENV) && \
 		cd $(YOCTO_DIR)/$(YOCTO_ENV) && \
 			if [ -e .toaster ] ; then source toaster stop ; source toaster start ; /bin/true ; fi && \
 			LANG=$(LANG) bitbake $(YOCTO_CMD)

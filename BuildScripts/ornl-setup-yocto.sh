@@ -110,7 +110,7 @@ function run_build()
 {
     
     # Need to have git configuration set for repo
-    if [ [ $(git config --get user.name) == "" ] ]
+    if [[ $(git config --get user.name) == "" ]]
         then
             prompt_user_git_info
     fi
@@ -376,10 +376,10 @@ function copy_config_files()
             echo
             echo "====================================================================="
             echo "${BOLD}$YOCTO_DIR_LOCATION/ does not exist...${NORMAL}"
-            echo "Creating it now"
             echo "====================================================================="
-            mkdir -p $YOCTO_DIR_LOCATION/build_ornl/conf
     fi
+    # Lets go ahead and make this directory if it doesn't exist
+    mkdir -p $YOCTO_DIR_LOCATION/build_ornl/conf
 
     echo
     echo "Copying the ORNL bblayers.conf file over... "
@@ -479,9 +479,8 @@ function help_menu()
 # Script Start
 # =================================================================================
 
-# This looks awful, TODO :: change this to not be so clunky
-# Basically we have to have > 1 arguments and less than 5. and no odd numbers 
-if [ $# -ne 3 ]
+# TODO :: change this to not be so clunky
+if [ $# -eq 3 ]
     then
         help_menu
 fi
@@ -502,7 +501,7 @@ if [ "$EUID" -eq 0 ]
         esac
 fi
 
-YOCTO_DIR_LOCATION=$3
+YOCTO_DIR_LOCATION=${!#}
 
 # Check what version of Ubuntu we are running.  We are compatible with 16.04
 ubuntu_release=$(cut -f2 <<< "$(lsb_release -r)")
@@ -515,16 +514,17 @@ if [[ ("$ubuntu_release" != "16.04") && ("$ubuntu_release" != "18.04") ]]
 fi
 
 # Parse any / all options that were passed in to the script
-while getopts "h?m:c:" opt; do
+while getopts "h?m:" opt; do
     case "$opt" in
     h|\?)
         help_menu
         ;;
     m)
-        TARGET_MACHINE=$2
+        TARGET_MACHINE=${OPTARG}
         ;;
     esac
 done
+shift $((OPTIND-1))
 
 if [ "$TARGET_MACHINE" == "var-mx6-som-ornl" ]
     then
