@@ -5,17 +5,15 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 inherit packagegroup
 
+
 RDEPENDS_${PN} = " \
     packagegroup-core-full-cmdline \
-    packagegroup-fsl-tools-gpu \
-	packagegroup-fsl-tools-gpu-external \
     nodejs \
 	flex \
     m4 \
 	make \
     iperf3 \
 	libtool \
-    python-compiler \
 	python3 \
 	python3-lxml \
 	python3-pip \
@@ -31,7 +29,6 @@ RDEPENDS_${PN} = " \
 	python3-mavproxy \
     minicom \
 	openssl \
-    imx-test \
 	networkmanager \
     v4l-utils \
     dtc \
@@ -40,4 +37,10 @@ RDEPENDS_${PN} = " \
 	libgps \
     ntp \
 	ntp-bin \
+"
+
+RDEPENDS_${PN}_append_var-som-mx6-ornl += " \
+    packagegroup-fsl-tools-gpu \
+	packagegroup-fsl-tools-gpu-external \
+    imx-test \
 "
