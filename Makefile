@@ -39,8 +39,10 @@ YOCTO_VERSION=dunfell
 YOCTO_DIR := $(EPHEMERAL)/$(PROJECT)-$(YOCTO_VERSION)
 YOCTO_DISTRO=fslc-framebuffer
 YOCTO_ENV=build_ornl
-YOCTO_IMG=var-dev-update-full-image
+YOCTO_IMG=ornl-dev-image
 YOCTO_CMD := $(YOCTO_IMG)
+
+TEGRA_MACHINE=jetson-xavier-nx-devkit-emmc
 
 # Kernel rebuilding; paths relative to $(YOCTO_DIR)/$(YOCTO_ENV)
 _KERNEL_RELATIVE_PATH := tmp/work/var_som_mx6_ornl-fslc-linux-gnueabi/linux-variscite/4.9.88-r0
@@ -125,6 +127,14 @@ archive:
 	@echo "# To write image to MMC, do:" > $(ARCHIVE)/$(PROJECT)-$(DATE)/readme.txt
 	@echo "DEV=/dev/sdx" >> $(ARCHIVE)/$(PROJECT)-$(DATE)/readme.txt
 	@echo "$(SUDO) MACHINE=$(MACHINE) $(YOCTO_ENV)/sources/meta-variscite-fslc/scripts/var-create-yocto-sdcard.sh -a -r $(YOCTO_ENV)/tmp/deploy/images/$(MACHINE)/$(YOCTO_CMD)-$(MACHINE) \$${DEV}" >> $(ARCHIVE)/$(PROJECT)-$(DATE)/readme.txt
+
+build-tegra:
+	BuildScripts/ornl-setup-yocto.sh -m $(TEGRA_MACHINE) $(YOCTO_DIR)
+	cd $(YOCTO_DIR) && \
+		. $(YOCTO_DIR)/sources/poky/oe-init-build-env $(YOCTO_ENV) && \
+		cd $(YOCTO_DIR)/$(YOCTO_ENV) && \
+			if [ -e .toaster ] ; then source toaster stop ; source toaster start ; /bin/true ; fi && \
+			LANG=$(LANG) bitbake $(YOCTO_CMD)
 
 build: $(YOCTO_DIR)/setup-environment build/conf/local.conf build/conf/bblayers.conf sources/meta-ornl
 	@$(MAKE) --no-print-directory -B environment
