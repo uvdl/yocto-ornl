@@ -8,11 +8,19 @@ LICENSE = "MIT"
 
 inherit core-image
 
+IMAGE_INSTALL_append_var-som-mx6-ornl += " \
+    packagegroup-imx-tools-audio \
+    packagegroup-fsl-gstreamer1.0-full \
+    packagegroup-fsl-gstreamer1.0 \
+    packagegroup-fsl-tools-gpu \
+    packagegroup-fsl-tools-gpu-external \
+    imx-test \
+    ksz-initscripts \
+"
+
+
 IMAGE_INSTALL_append += " \
 	ornl-packagegroup-prod \
-	packagegroup-imx-tools-audio \
-	packagegroup-fsl-gstreamer1.0-full \
-	packagegroup-fsl-gstreamer1.0 \
 	git \
 	libsodium \
 	libsodium-dev \
@@ -26,5 +34,4 @@ IMAGE_INSTALL_append += " \
 	pkgconfig \
 	gstd \
 	gst-interpipe \
-	ksz-initscripts \
 "

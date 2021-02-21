@@ -18,6 +18,21 @@ IMAGE_FEATURES += " \
 	tools-debug \
 "
 
+IMAGE_INSTALL_append_var-som-mx6-ornl += " \
+	imx-test \
+	ksz-initscripts \ 
+	packagegroup-fsl-gstreamer1.0 \ 
+	packagegroup-fsl-gstreamer1.0-full \
+	packagegroup-fsl-tools-benchmark \
+	packagegroup-fsl-tools-gpu \
+	packagegroup-fsl-tools-gpu-external \
+	packagegroup-fsl-tools-testapps \
+	packagegroup-imx-tools-audio \ 
+	packagegroup-tools-bluetooth \
+	postinstall \
+	perf \
+"
+
 IMAGE_INSTALL_append += " \
 	bind-utils \
 	default-eth0 \
@@ -29,9 +44,7 @@ IMAGE_INSTALL_append += " \
 	gps-utils \
 	gstd \
 	gst-interpipe \
-	imx-test \
 	iperf3 \
-	ksz-initscripts \
 	libgps \
 	libsodium \
 	libsodium-dev \
@@ -49,16 +62,7 @@ IMAGE_INSTALL_append += " \
 	openssl \
 	openssl-bin \
 	packagegroup-core-full-cmdline \
-	packagegroup-fsl-gstreamer1.0 \
-	packagegroup-fsl-gstreamer1.0-full \
-	packagegroup-fsl-tools-benchmark \
-	packagegroup-fsl-tools-gpu \
-	packagegroup-fsl-tools-gpu-external \
-	packagegroup-fsl-tools-testapps \
-	packagegroup-imx-tools-audio \
-	packagegroup-tools-bluetooth \
 	pkgconfig \
-	postinstall \
 	python3 \
 	python3-dev \
 	python3-future \
@@ -87,7 +91,6 @@ IMAGE_INSTALL_append += " \
 	tcpdump \
 	htop \
 	iotop \
-	perf \
 	powertop \
 	cockpit \
 	cockpit-ws \

@@ -1,4 +1,4 @@
-SUMMARY = "This is the Variscite specific update image for Ground Robotics"
+SUMMARY = "This is the Variscite specific update image for just production dependencies"
 
 IMAGE_FEATURES += "ssh-server-dropbear splash "
 
@@ -18,3 +18,5 @@ IMAGE_INSTALL_append = " \
     kernel-devicetree \
     u-boot-variscite \
 "
+
+COMPATIBLE_MACHINE = "var-som-mx6-ornl"

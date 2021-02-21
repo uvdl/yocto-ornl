@@ -9,10 +9,13 @@ LICENSE = "MIT"
 
 inherit core-image
 
+IMAGE_INSTALL_append_var-som-mx6-ornl += " \
+	postinstall \
+"
+
+
 IMAGE_INSTALL_append = " \
 	ornl-packagegroup-prod \
-	python-compiler \
 	python3 \
 	python3-pip \
-	postinstall \
 "

@@ -15,3 +15,5 @@ IMAGE_INSTALL_append = " \
     kernel-devicetree \
     u-boot-variscite \
 "
+
+COMPATIBLE_MACHINE = "var-som-mx6-ornl"

@@ -1,4 +1,4 @@
-SUMMARY = "T-Star Variscite Update Image"
+SUMMARY = "Minimum Build Variscite Update Image"
 
 IMAGE_FEATURES += "ssh-server-dropbear splash "
 
@@ -18,3 +18,5 @@ IMAGE_INSTALL_append = " \
     kernel-devicetree \
     u-boot-variscite \
 "
+
+COMPATIBLE_MACHINE = "var-som-mx6-ornl"
