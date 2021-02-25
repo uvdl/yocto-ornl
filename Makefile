@@ -97,7 +97,7 @@ $(YOCTO_DIR)/$(YOCTO_ENV)/conf/templateconf.cfg: $(YOCTO_DIR)/$(YOCTO_ENV)/conf
 	cd $(YOCTO_DIR) && \
 		rm -rf $(YOCTO_DIR)/sources/meta-ornl && \
 		cp -r $(CURDIR)/sources/meta-ornl $(YOCTO_DIR)/sources && \
-		MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV) && \
+		MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV)
 
 $(YOCTO_DIR)/sources/meta-ornl/recipes-core/default-eth0/files/eth0.network: Makefile
 	@echo "[Match]" > $@ && \
