@@ -6,6 +6,7 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 inherit packagegroup
 
 RDEPENDS_${PN} = " \
+	default-eth0 \
 	dtc \
 	gpsd \
 	gps-utils \
