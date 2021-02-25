@@ -92,7 +92,7 @@ $(YOCTO_DIR)/setup-environment: $(REPO) $(YOCTO_DIR)
 $(YOCTO_DIR)/$(YOCTO_ENV)/conf:
 	mkdir -p $(YOCTO_DIR)/$(YOCTO_ENV)/conf
 
-$(YOCTO_DIR)/$(YOCTO_ENV)/conf/templateconf.cfg: $(YOCTO_DIR)/$(YOCTO_ENV)/conf
+$(YOCTO_DIR)/$(YOCTO_ENV)/conf/templateconf.cfg: $(YOCTO_DIR)/$(YOCTO_ENV)/conf $(YOCTO_DIR)/setup-environment
 	@echo "$(YOCTO_DIR)/sources/poky/bitbake/bin/../../meta-poky/conf" > $@
 	cd $(YOCTO_DIR) && \
 		rm -rf $(YOCTO_DIR)/sources/meta-ornl && \
