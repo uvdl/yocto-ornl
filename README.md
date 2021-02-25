@@ -17,6 +17,54 @@ to create the recover SD card with.  The files will be in the folder:
 
 With the time based on when the `make archive` command is called.
 
+### Quick Fully Automatic Method
+
+This option takes advantage of even more Makefile automation.  If you have already
+done the fully automatic method above **(at least the `make dependencies` part)**,
+then you can use the following steps to build images with the desired IP address
+for the `eth0` port that will be needed for future software updates.
+
+<pre>
+make HOST=w.x.y.z NETMASK=n swu
+</pre>
+
+The above will build an SD card image as well as a .swu update file and archive
+them into a folder that can be taken to another machine or used to program a
+micro SD card as in the [flash sd to emmc](#flash-sd-to-emmc) section below.
+
+The files will be stored in `/opt/yocto-ornl-yyyy-mm-dd_hhmm` **(or wherever the `ARCHIVE` variable points to)**.
+Important environment variables are:
+
+  * `ARCHIVE := /opt` - controls the folder where the output files are written
+  * `EPHEMERAL := $(HOME)` - controls the folder where the yocto builds are made
+  * `HOST := 10.223.0.1` - controls the eth0 address of the processor
+  * `NETMASK := 16` - controls the netmask to be used.
+
+These can be overriden in the make command, for example:
+
+<pre>
+make ARCHIVE=/tmp HOST=192.168.1.10 NETMASK=24 smu
+</pre>
+
+Would build a micro SD/.swu full os image for a system
+whose eth0 port will be defined as 192.168.1.10/24.
+
+### `EPHEMERAL`
+
+The EPHEMERAL variable controls where the yocto build directory will be placed.  This is an
+important folder because:
+
+  a) it cannot be moved because all the yocto files reference it by full pathname
+  b) it holds alot of cached files that if present will speed up future builds
+  c) it is strictly tied to the yocto base system **(sumo, thud, dunfell, etc.)**
+  d) it rises to about 76GB after a build completes
+
+So, where this goes on your system makes a big difference.  The Makefile uses `/tmp` as the
+default, but you may want this to exist on something else (such as `/dev/shm` if your system
+has alot of memory, or a mount point to a fast storage drive).  If you wish to be able to
+restart your system and keep the build state you have, then ensure EPHEMERAL points to a
+persistent storage volume.
+
 ## Manual Step-by-Step Method
 
 This method describes the various steps needed in all the gory details.  These instructions
@@ -240,6 +288,20 @@ Where:
 
 ## Flash SD To eMMC
 
+### Boot up the board
+
+Boot up the board with the micro SD card that was prepared above.  If your system has not been flashed before, you may experience a 90sec delay.
+Then, the system will go into 'emergency mode':
+```
+You are in emergency mode. After logging in, type "journalctl -xb" to view
+system logs, "systemctl reboot" to reboot, "systemctl default" or "exit"
+to boot into default mode.
+Give root password for maintenance
+(or press Control-D to continue):
+```
+
+**Don't panic**.  Go ahead and give the root password for the image and you will get a shell prompt.
+
 Once the board has booted up run the install_yocto.sh script located in /usr/bin and follow the instructions below:
 
 **NOTES**
@@ -267,6 +329,18 @@ In this scheme, the eMMC is split into two rootfs partitions and the bootloader 
 <pre>
 /usr/bin/install_yocto.sh -b dart -u
 </pre>
+
+You should see the following:
+```
+*** Variscite MX6 Yocto eMMC/NAND Recovery ***
+
+Carrier board: DART-MX6
+Creating two rootfs partitions
+<<< bunch of stuff about partitions >>>
+Setting U-Boot enviroment variables
+
+Yocto installed successfully
+```
 
 ## OS Updates
 
