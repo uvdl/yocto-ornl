@@ -56,7 +56,7 @@ KERNEL_IMAGE=tmp/deploy/images/$(MACHINE)/uImage
 KERNEL_DTS=tmp/deploy/images/$(MACHINE)
 KERNEL_TEMP=$(_KERNEL_RELATIVE_PATH)/temp
 
-.PHONY: all archive build clean dependencies docker-deploy docker-image environment-update
+.PHONY: all archive build clean dependencies docker-deploy docker-image environment environment-update
 .PHONY: id kernel kernel-config kernel-pull locale mrproper sdk see swu
 .PHONY: toaster toaster-start toaster-stop
 
@@ -88,16 +88,15 @@ $(YOCTO_DIR)/setup-environment: $(REPO) $(YOCTO_DIR)
 	cd $(YOCTO_DIR) && \
 		$(REPO) init -u $(PLATFORM_GIT) -b $(YOCTO_VERSION) && \
 		$(REPO) sync -j$(CPUS)
+	@if [ ! -x $@ ] ; then false ; fi
 
-$(YOCTO_DIR)/$(YOCTO_ENV)/conf:
-	mkdir -p $(YOCTO_DIR)/$(YOCTO_ENV)/conf
-
-$(YOCTO_DIR)/$(YOCTO_ENV)/conf/templateconf.cfg: $(YOCTO_DIR)/$(YOCTO_ENV)/conf $(YOCTO_DIR)/setup-environment
-	@echo "$(YOCTO_DIR)/sources/poky/bitbake/bin/../../meta-poky/conf" > $@
+environment: $(YOCTO_DIR)/setup-environment
 	cd $(YOCTO_DIR) && \
 		rm -rf $(YOCTO_DIR)/sources/meta-ornl && \
 		cp -r $(CURDIR)/sources/meta-ornl $(YOCTO_DIR)/sources && \
-		MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV)
+		MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV) && \
+		mkdir -p $(YOCTO_DIR)/$(YOCTO_ENV)/conf
+		@echo "$(YOCTO_DIR)/sources/poky/bitbake/bin/../../meta-poky/conf" > $(YOCTO_DIR)/$(YOCTO_ENV)/conf/templateconf.cfg
 
 $(YOCTO_DIR)/sources/meta-ornl/recipes-core/default-eth0/files/eth0.network: Makefile
 	@echo "[Match]" > $@ && \
@@ -106,7 +105,7 @@ $(YOCTO_DIR)/sources/meta-ornl/recipes-core/default-eth0/files/eth0.network: Mak
 		echo "[Network]" >> $@ && \
 		echo "Address=$(HOST)/$(NETMASK)" >> $@
 
-environment-update: $(YOCTO_DIR)/$(YOCTO_ENV)/conf $(YOCTO_DIR)/$(YOCTO_ENV)/conf/templateconf.cfg
+environment-update: $(YOCTO_DIR)/setup-environment
 	@$(MAKE) --no-print-directory -B $(YOCTO_DIR)/sources/meta-ornl/recipes-core/default-eth0/files/eth0.network
 	cd $(YOCTO_DIR) && \
 		rm -rf $(YOCTO_DIR)/sources/meta-ornl && \
@@ -125,6 +124,7 @@ sd.img$(DOT_GZ): $(YOCTO_DIR)/$(YOCTO_ENV)/tmp/deploy/images/$(MACHINE)/$(YOCTO_
 
 all:
 	@$(MAKE) --no-print-directory -B dependencies
+	@$(MAKE) --no-print-directory -B environment
 	@$(MAKE) --no-print-directory -B environment-update
 	@$(MAKE) --no-print-directory -B toaster
 	@$(MAKE) --no-print-directory -B toaster-start
