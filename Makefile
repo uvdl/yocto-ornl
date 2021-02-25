@@ -134,22 +134,22 @@ all:
 
 archive:
 	@mkdir -p $(ARCHIVE)/$(PROJECT)-$(DATE)/dts
-	( for f in `find $(YOCTO_DIR)/$(YOCTO_ENV)/$(KERNEL_DTS) -name "*.dtb" -print` ; do n=$$(basename $$f) ; nb=$${n%.*} ; dtc -I dtb -O dts -o $(ARCHIVE)/$(PROJECT)-$(DATE)/dts/$${nb}.dts $$f ; cp $$f $(ARCHIVE)/$(PROJECT)-$(DATE)/dts/$${nb}.dtb ; done )
+	@( for f in `find $(YOCTO_DIR)/$(YOCTO_ENV)/$(KERNEL_DTS) -name "*.dtb" -print` ; do n=$$(basename $$f) ; nb=$${n%.*} ; dtc -I dtb -O dts -o $(ARCHIVE)/$(PROJECT)-$(DATE)/dts/$${nb}.dts $$f ; ( set -x && cp $$f $(ARCHIVE)/$(PROJECT)-$(DATE)/dts/$${nb}.dtb ) ; done )
 	@mkdir -p $(ARCHIVE)/$(PROJECT)-$(DATE)/$(YOCTO_ENV)/tmp/deploy/images
 	@rsync --links -rtp --exclude={*.wic.gz,*.manifest,*testdata*,*.ubi*,*.cfg} $(YOCTO_DIR)/$(YOCTO_ENV)/tmp/deploy/images/$(MACHINE) $(ARCHIVE)/$(PROJECT)-$(DATE)/$(YOCTO_ENV)/tmp/deploy/images/
 	@mkdir -p $(ARCHIVE)/$(PROJECT)-$(DATE)/$(YOCTO_ENV)/sources/meta-variscite-fslc/scripts
-	@cp -r $(YOCTO_DIR)/sources/meta-variscite-fslc/scripts/var_mk_yocto_sdcard/variscite_scripts $(ARCHIVE)/$(PROJECT)-$(DATE)/$(YOCTO_ENV)/sources/meta-variscite-fslc/scripts
-	@cp BuildScripts/var-create-yocto-sdcard.sh $(ARCHIVE)/$(PROJECT)-$(DATE)/$(YOCTO_ENV)/sources/meta-variscite-fslc/scripts
+	cp -r $(YOCTO_DIR)/sources/meta-variscite-fslc/scripts/var_mk_yocto_sdcard/variscite_scripts $(ARCHIVE)/$(PROJECT)-$(DATE)/$(YOCTO_ENV)/sources/meta-variscite-fslc/scripts
+	cp BuildScripts/var-create-yocto-sdcard.sh $(ARCHIVE)/$(PROJECT)-$(DATE)/$(YOCTO_ENV)/sources/meta-variscite-fslc/scripts
 	cp $(YOCTO_DIR)/$(YOCTO_ENV)/$(KERNEL_IMAGE) $(ARCHIVE)/$(PROJECT)-$(DATE)
 	tar czf $(ARCHIVE)/$(PROJECT)-$(DATE)/kernel-source.tgz -C $(YOCTO_DIR)/$(YOCTO_ENV)/tmp/work-shared/$(MACHINE) kernel-source
 	@( cd $(YOCTO_DIR)/$(YOCTO_ENV)/$(KERNEL_GIT) && commit=$$(git log | head -1 | tr -s ' ' | cut -f2 | tr -s ' ' | cut -f2 -d' ') ; touch $(ARCHIVE)/$(PROJECT)-$(DATE)/$$commit )
-	-@cp $(YOCTO_DIR)/$(YOCTO_ENV)/tmp/deploy/images/$(MACHINE)/var-$(YOCTO_PROD)-image-swu-$(MACHINE).swu $(ARCHIVE)/$(PROJECT)-$(DATE)
-	-@cp -r $(YOCTO_DIR)/$(YOCTO_ENV)/tmp/deploy/sdk $(ARCHIVE)/$(PROJECT)-$(DATE)
+	@if [ -e $(YOCTO_DIR)/$(YOCTO_ENV)/tmp/deploy/images/$(MACHINE)/var-$(YOCTO_PROD)-image-swu-$(MACHINE).swu ] ; then set -x ; cp $(YOCTO_DIR)/$(YOCTO_ENV)/tmp/deploy/images/$(MACHINE)/var-$(YOCTO_PROD)-image-swu-$(MACHINE).swu $(ARCHIVE)/$(PROJECT)-$(DATE) ; fi
+	@if [ -d $(YOCTO_DIR)/$(YOCTO_ENV)/tmp/deploy/sdk ] ; then set -x ; cp -r $(YOCTO_DIR)/$(YOCTO_ENV)/tmp/deploy/sdk $(ARCHIVE)/$(PROJECT)-$(DATE) ; fi
 	@echo "# To write image to MMC, do:" > $(ARCHIVE)/$(PROJECT)-$(DATE)/readme.txt
 	@echo "DEV=/dev/sdx" >> $(ARCHIVE)/$(PROJECT)-$(DATE)/readme.txt
 	@echo "$(SUDO) MACHINE=$(MACHINE) $(YOCTO_ENV)/sources/meta-variscite-fslc/scripts/var-create-yocto-sdcard.sh -a -r $(YOCTO_ENV)/tmp/deploy/images/$(MACHINE)/$(YOCTO_IMG)-$(MACHINE) \$${DEV}" >> $(ARCHIVE)/$(PROJECT)-$(DATE)/readme.txt
 	@if [ -e $(ARCHIVE)/$(PROJECT)-$(DATE)/var-$(YOCTO_PROD)-image-swu-$(MACHINE).swu ] ; then echo "# load var-$(YOCTO_PROD)-image-swu-$(MACHINE).swu to port :9080" >> $(ARCHIVE)/$(PROJECT)-$(DATE)/readme.txt ; fi
-	@if [ -e $(ARCHIVE)/$(PROJECT)-$(DATE)/sdk ] ; then echo "# A Cross-platform SDK is available in ./sdk" >> $(ARCHIVE)/$(PROJECT)-$(DATE)/readme.txt ; fi
+	@if [ -d $(ARCHIVE)/$(PROJECT)-$(DATE)/sdk ] ; then echo "# A Cross-platform SDK is available in ./sdk" >> $(ARCHIVE)/$(PROJECT)-$(DATE)/readme.txt ; fi
 
 build: $(YOCTO_DIR)/setup-environment build/conf/local.conf build/conf/bblayers.conf sources/meta-ornl
 	cd $(YOCTO_DIR) && \
