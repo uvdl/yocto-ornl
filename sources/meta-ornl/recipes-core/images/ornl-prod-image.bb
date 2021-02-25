@@ -14,21 +14,53 @@ IMAGE_FEATURES += " ssh-server-openssh "
 IMAGE_INSTALL_append += " \
 	bind-utils \
 	default-eth0 \
+	dtc \
+	flex \
 	git \
+	gpsd \
+	gps-utils \
 	gstd \
 	gst-interpipe \
+	imx-test \
+	iperf3 \
 	ksz-initscripts \
+	libgps \
 	libsodium \
 	libsodium-dev \
 	libtool \
 	libxml2-dev \
 	libxslt-dev \
+	m4 \
+	make \
+	minicom \
+	networkmanager \
+	nodejs \
+	ntp \
+	ntp-bin \
+	openssl \
+	packagegroup-core-full-cmdline \
+	packagegroup-fsl-tools-gpu \
+	packagegroup-fsl-tools-gpu-external \
 	packagegroup-imx-tools-audio \
 	packagegroup-fsl-gstreamer1.0-full \
 	packagegroup-fsl-gstreamer1.0 \
-	packagegroup-prod \
 	pkgconfig \
-	python3-pyyaml \
+	python-compiler \
+	python3 \
+	python3-future \
+	python3-lxml \
+	python3-mavproxy \
 	python3-netifaces \
+	python3-pexpect \
+	python3-pip \
+	python3-protobuf \
+	python3-pymavlink \
+	python3-pynmea2 \
+	python3-pyserial \
+	python3-pytz \
+	python3-pyyaml \
+	python3-requests \
+	python3-urllib3 \
+	v4l-utils \
 	webcam-tools \
 "
