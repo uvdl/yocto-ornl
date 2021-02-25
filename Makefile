@@ -128,9 +128,10 @@ all:
 	@$(MAKE) --no-print-directory -B environment-update
 	@$(MAKE) --no-print-directory -B toaster
 	@$(MAKE) --no-print-directory -B toaster-start
-	@$(MAKE) --no-print-directory -B build
+	@$(MAKE) --no-print-directory -B YOCTO_IMG=var-$(YOCTO_PROD)-update-full-image build
 	@$(MAKE) --no-print-directory -B YOCTO_IMG=var-$(YOCTO_PROD)-image-swu build
-	@$(MAKE) --no-print-directory -B archive
+	@$(MAKE) --no-print-directory -B YOCTO_IMG=var-$(YOCTO_PROD)-update-full-image YOCTO_CMD="-c populate_sdk var-$(YOCTO_PROD)-update-full-image" build
+	@$(MAKE) --no-print-directory -B YOCTO_PROD=$(YOCTO_PROD) archive
 
 archive:
 	@mkdir -p $(ARCHIVE)/$(PROJECT)-$(DATE)/dts
@@ -239,7 +240,7 @@ sdk:
 	@$(MAKE) --no-print-directory -B environment-update
 	@$(MAKE) --no-print-directory -B build
 	@$(MAKE) --no-print-directory -B YOCTO_IMG=var-$(YOCTO_PROD)-update-full-image YOCTO_CMD="-c populate_sdk var-$(YOCTO_PROD)-update-full-image" build
-	@$(MAKE) --no-print-directory -B archive
+	@$(MAKE) --no-print-directory -B YOCTO_PROD=$(YOCTO_PROD) archive
 
 see:
 	@echo "CPUS=$(CPUS)"
@@ -263,7 +264,7 @@ swu:
 	@$(MAKE) --no-print-directory -B environment-update
 	@$(MAKE) --no-print-directory -B build
 	@$(MAKE) --no-print-directory -B YOCTO_IMG=var-$(YOCTO_PROD)-image-swu build
-	@$(MAKE) --no-print-directory -B archive
+	@$(MAKE) --no-print-directory -B YOCTO_PROD=$(YOCTO_PROD) archive
 
 toaster: $(YOCTO_DIR)/setup-environment
 	# https://www.yoctoproject.org/docs/latest/toaster-manual/toaster-manual.html#toaster-manual-start
