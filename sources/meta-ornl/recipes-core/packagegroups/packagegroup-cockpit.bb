@@ -1,5 +1,5 @@
-DESCRIPTION = "Cockpit packagegroup"
-SUMMARY = "Cockpit packagegroup - needs to run cockpit on a device"
+DESCRIPTION = "Cockpit Packages"
+SUMMARY = "Provide the needed packages to run Cockpit on a device"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
