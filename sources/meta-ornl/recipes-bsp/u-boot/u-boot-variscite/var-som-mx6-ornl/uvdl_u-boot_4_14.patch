@@ -139,42 +139,42 @@ index f98a397248..96ef7bac8b 100644
 +		if (ident == PIXC3) 
 +		{
 +			/*SETUP_IOMUX_PADS(gpio_pixc3_dis);*/
-+			setenv("board_name", "iris2");    /* NB: coupled with kernel dtb */
++			env_set("board_name", "iris2");    /* NB: coupled with kernel dtb */
 +		} 
 +		else if (ident == PIXC4) 
 +		{
 +			SETUP_IOMUX_PADS(gpio_pixc4_dis);
-+			setenv("board_name", "nightcrawler"); /* NB: coupled with kernel dtb */
++			env_set("board_name", "nightcrawler"); /* NB: coupled with kernel dtb */
 +		} 
 +		else 
 +		{
-+			setenv("board_name", "DT6CUSTOM");
++			env_set("board_name", "DT6CUSTOM");
 +		}   	
 +		if(revision == R0)
-+			setenv("board_rev", "R0");
++			env_set("board_rev", "R0");
 +		else if(revision == R1)
-+			setenv("board_rev", "R1");
++			env_set("board_rev", "R1");
 +		else if(revision == R2)
-+			setenv("board_rev", "R2");
++			env_set("board_rev", "R2");
 +		else if(revision == R3)
-+			setenv("board_rev", "R3");
++			env_set("board_rev", "R3");
 +		else
-+			setenv("board_rev", "MX6Q");
++			env_set("board_rev", "MX6Q");
 +	}
 +	else 
 +	{
 +		if (is_dart_board())
-+			setenv("board_name", "DT6CUSTOM");
++			env_set("board_name", "DT6CUSTOM");
 +		else if (is_solo_custom_board())
-+			setenv("board_name", "SOLOCUSTOM");
++			env_set("board_name", "SOLOCUSTOM");
 +		else
-+			setenv("board_name", "MX6CUSTOM");   	
++			env_set("board_name", "MX6CUSTOM");   	
 +		if (is_mx6dqp())
-+			setenv("board_rev", "MX6QP");
++			env_set("board_rev", "MX6QP");
 +		else if (is_mx6dq())
-+			setenv("board_rev", "MX6Q");
++			env_set("board_rev", "MX6Q");
 +		else if (is_mx6sdl())
-+			setenv("board_rev", "MX6DL");
++			env_set("board_rev", "MX6DL");
 +	}
 +
  	if (is_som_solo())
