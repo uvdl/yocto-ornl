@@ -62,7 +62,6 @@ IMAGE_INSTALL_append = " \
 
 BBMASK_prepend = "fsl-image-mfgtool-initramfs "
 
-WKS_FILE = "imx-uboot-spl-bootpart.wks"
 IMAGE_FSTYPES += "tar.gz multiubi"
 
 # do multiubi last

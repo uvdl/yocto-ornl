@@ -7,13 +7,13 @@ SUDO := $(shell test $${EUID} -ne 0 && echo "sudo")
 LANG := en_US.UTF-8
 DATE := $(shell date +%Y-%m-%d_%H%M)
 ARCHIVE := $(HOME)/archive_yocto/
-EPHEMERAL := /tmp
+EPHEMERAL := $(HOME)
 .EXPORT_ALL_VARIABLES:
 
 DEV=
 DOT_GZ=.gz
 EULA=1	# https://patchwork.openembedded.org/patch/100815/
-MACHINE=jetson-xavier-nx-devkit-emmc
+MACHINE=var-som-mx6-ornl
 PKGDEPS1=gawk wget git-core diffstat unzip texinfo gcc-multilib \
 build-essential chrpath socat cpio python python3 python3-pip python3-pexpect \
 xz-utils debianutils iputils-ping libsdl1.2-dev xterm
@@ -36,7 +36,7 @@ TOASTER_PORT := 8000
 # Known variations
 # FIXME: requires mod to BuildScripts/ornl-setup-yocto.sh
 YOCTO_VERSION=dunfell
-YOCTO_DIR := $(EPHEMERAL)/$(PROJECT)-$(YOCTO_VERSION)
+YOCTO_DIR := $(EPHEMERAL)/$(PROJECT)-$(YOCTO_VERSION)-$(MACHINE)
 YOCTO_DISTRO=fslc-framebuffer
 YOCTO_ENV=build_ornl
 YOCTO_IMG=ornl-dev-image
@@ -81,8 +81,8 @@ environment: $(YOCTO_DIR)/setup-environment $(YOCTO_DIR)/$(YOCTO_ENV)/conf
 		rm -rf $(YOCTO_DIR)/sources/meta-ornl && \
 		cp -r $(CURDIR)/sources/meta-ornl $(YOCTO_DIR)/sources && \
 		MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV) && \
-		cp $(CURDIR)/build/conf/local.conf $(YOCTO_DIR)/$(YOCTO_ENV)/conf/ && \
-		cp $(CURDIR)/build/conf/bblayers.conf $(YOCTO_DIR)/$(YOCTO_ENV)/conf/ && \
+		cp $(CURDIR)/build/conf/$(MACHINE)/local.conf $(YOCTO_DIR)/$(YOCTO_ENV)/conf/ && \
+		cp $(CURDIR)/build/conf/$(MACHINE)/bblayers.conf $(YOCTO_DIR)/$(YOCTO_ENV)/conf/ && \
 		cp $(CURDIR)/BuildScripts/mx6_install_yocto_emmc.sh $(YOCTO_DIR)/sources/meta-variscite-fslc/scripts/var_mk_yocto_sdcard/variscite_scripts/ && \
 		echo "*** ENVIRONMENT SETUP ***" && \
 		echo "Please execute the following in your shell before giving bitbake commands:" && \
@@ -93,8 +93,8 @@ environment-update: $(YOCTO_DIR)/$(YOCTO_ENV)/conf
 		rm -rf $(YOCTO_DIR)/sources/meta-ornl && \
 		cp -r $(CURDIR)/sources/meta-ornl $(YOCTO_DIR)/sources && \
 		MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV) && \
-		cp $(CURDIR)/build/conf/local.conf $(YOCTO_DIR)/$(YOCTO_ENV)/conf/ && \
-		cp $(CURDIR)/build/conf/bblayers.conf $(YOCTO_DIR)/$(YOCTO_ENV)/conf/ && \
+		cp $(CURDIR)/build/conf/$(MACHINE)/local.conf $(YOCTO_DIR)/$(YOCTO_ENV)/conf/ && \
+		cp $(CURDIR)/build/conf/$(MACHINE)/bblayers.conf $(YOCTO_DIR)/$(YOCTO_ENV)/conf/ && \
 		cp $(CURDIR)/BuildScripts/mx6_install_yocto_emmc.sh $(YOCTO_DIR)/sources/meta-variscite-fslc/scripts/var_mk_yocto_sdcard/variscite_scripts/ && \
 		bitbake-layers add-layer $(YOCTO_DIR)/sources/meta-ornl && \
 		echo "*** ENVIRONMENT SETUP ***" && \
@@ -131,21 +131,22 @@ else
 	@tar -xf $(YOCTO_DIR)/$(YOCTO_ENV)/tmp/deploy/images/$(MACHINE)/$(YOCTO_IMG)-$(MACHINE).tegraflash.tar.gz -C $(ARCHIVE)/$(PROJECT)-$(DATE)
 endif
 
-build-tegra:
-	BuildScripts/ornl-setup-yocto.sh -m $(MACHINE) $(YOCTO_DIR)
-	cd $(YOCTO_DIR) && \
-		. $(YOCTO_DIR)/ornl-yocto-tegra/setup-env --machine $(MACHINE) --distro ornl-tegra $(YOCTO_ENV) && \
-		cd $(YOCTO_DIR)/$(YOCTO_ENV) && \
-			if [ -e .toaster ] ; then source toaster stop ; source toaster start ; /bin/true ; fi && \
-			LANG=$(LANG) bitbake $(YOCTO_CMD)
-
-build: $(YOCTO_DIR)/setup-environment build/conf/local.conf build/conf/bblayers.conf sources/meta-ornl
-	@$(MAKE) --no-print-directory -B environment
+build: 
+	BuildScripts/ornl-setup-yocto.sh -m $(MACHINE) -v $(YOCTO_VERSION) $(YOCTO_DIR)
+ifeq ($(MACHINE), var-som-mx6-ornl)
 	cd $(YOCTO_DIR) && \
 		MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV) && \
 		cd $(YOCTO_DIR)/$(YOCTO_ENV) && \
 			if [ -e .toaster ] ; then source toaster stop ; source toaster start ; /bin/true ; fi && \
 			LANG=$(LANG) bitbake $(YOCTO_CMD)
+else
+	cd $(YOCTO_DIR) && \
+		. $(YOCTO_DIR)/ornl-yocto-tegra/setup-env --machine $(MACHINE) --distro ornl-tegra $(YOCTO_ENV) && \
+		cd $(YOCTO_DIR)/$(YOCTO_ENV) && \
+			if [ -e .toaster ] ; then source toaster stop ; source toaster start ; /bin/true ; fi && \
+			LANG=$(LANG) bitbake $(YOCTO_CMD)
+endif
+
 
 clean:
 	-rm -rf $(YOCTO_DIR)/sources

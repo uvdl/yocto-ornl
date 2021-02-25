@@ -179,6 +179,19 @@ function sync_variscite_platform()
             echo "==============================================="
             exit 1
     fi
+    if [ ! -d "sources/meta-python2" ]
+        then
+        git clone -b dunfell https://git.openembedded.org/meta-python2/
+        if [ $? -ne 0 ]
+            then
+                echo
+                echo "==============================================="
+                echo "${BOLD}Failed to clone python2${NORMAL}"
+                echo "==============================================="
+                exit 1
+        fi
+        mv meta-python2/ sources/
+    fi
     eval cd $OLD_LOCATION
 }
 
@@ -339,6 +352,7 @@ function make_build_dir()
                 echo "======================================================"
                 exit 1
         fi
+        eval cd ${OLD_LOCATION}
         # Variscite kind of forces us to overwrite the originial config files
         copy_config_files
         ;;
@@ -357,12 +371,11 @@ function make_build_dir()
                 echo "======================================================"
                 exit 1
         fi
-        eval cd ..
+        eval cd ${OLD_DIR}
         ;;
     
     esac
 
-    eval cd ${OLD_DIR}
 }
 
 # =================================================================================
@@ -413,7 +426,7 @@ function copy_config_files()
             echo "Copying the ORNL Variscite Build Script file over... "
             echo
                 # Copy the Variscite script over
-            cp -f BuildScripts/var-create-yocto-sdcard.sh $YOCTO_DIR_LOCATION/sources/meta-variscite-fslc/scripts/var_mk_yocto_sdcard/var-create-yocto-sdcard.sh
+            cp -f BuildScripts/mx6_install_yocto_emmc.sh $YOCTO_DIR_LOCATION/sources/meta-variscite-fslc/scripts/var_mk_yocto_sdcard/variscite_scripts/
             if [ $? -ne 0 ]
                 then
                     echo
@@ -467,12 +480,13 @@ function help_menu()
     echo "options : "
     echo "-m : target machine: var-mx6-som-ornl or jetson-xavier-nx-devkit-emmc"
     echo "-h : A friendly reminder of how this script works"
+    echo "-v : Yocto version, sumo, thud, dunfell"
     echo "--------------------------------------------------------------------------------"
     echo
     echo "${BOLD}Before running this script please set git config user.name and user.email${NORMAL}"
     echo
     echo
-    exit 0
+    exit 1
 }
 
 # =================================================================================
@@ -482,6 +496,7 @@ function help_menu()
 # TODO :: change this to not be so clunky
 if [ $# -eq 3 ]
     then
+        echo "Butt"
         help_menu
 fi
 
@@ -496,7 +511,7 @@ if [ "$EUID" -eq 0 ]
             Y|y)
                 ;;
             *)
-                exit 0
+                exit 1
                 ;;
         esac
 fi
@@ -514,7 +529,7 @@ if [[ ("$ubuntu_release" != "16.04") && ("$ubuntu_release" != "18.04") ]]
 fi
 
 # Parse any / all options that were passed in to the script
-while getopts "h?m:" opt; do
+while getopts "h?m:v:" opt; do
     case "$opt" in
     h|\?)
         help_menu
@@ -522,18 +537,11 @@ while getopts "h?m:" opt; do
     m)
         TARGET_MACHINE=${OPTARG}
         ;;
+    v)
+        YOCTO_VERSION=${OPTARG}
     esac
 done
 shift $((OPTIND-1))
-
-if [ "$TARGET_MACHINE" == "var-mx6-som-ornl" ]
-    then
-        YOCTO_VERSION="sumo"
-fi
-if [ "$TARGET_MACHINE" == "jetson-xavier-nx-devkit-emmc" ]
-    then
-        YOCTO_VERSION="dunfell"
-fi
 
 # Give user a review of what has been entered
 echo 
