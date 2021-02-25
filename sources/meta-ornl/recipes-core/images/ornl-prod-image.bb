@@ -1,7 +1,7 @@
 # Copyright (C) 2015 Freescale Semiconductor
 # Released under the MIT license (see COPYING.MIT for the terms)
 
-DESCRIPTION = "Core networking and Python support"
+DESCRIPTION = "Core Networking, Python and Video Compositing support"
 LICENSE = "MIT"
 
 # https://wiki.yoctoproject.org/wiki/FAQ:How_do_I_set_or_change_the_root_password
@@ -9,7 +9,10 @@ EXTRA_USERS_PARAMS = "usermod -P root root;"
 
 inherit core-image distro_features_check extrausers
 
-IMAGE_FEATURES += " ssh-server-openssh "
+IMAGE_FEATURES += " \
+	hwcodecs \
+	ssh-server-openssh \
+"
 
 IMAGE_INSTALL_append += " \
 	bind-utils \
@@ -38,15 +41,18 @@ IMAGE_INSTALL_append += " \
 	ntp \
 	ntp-bin \
 	openssl \
+	openssl-bin \
 	packagegroup-core-full-cmdline \
+	packagegroup-fsl-gstreamer1.0 \
+	packagegroup-fsl-gstreamer1.0-full \
 	packagegroup-fsl-tools-gpu \
 	packagegroup-fsl-tools-gpu-external \
 	packagegroup-imx-tools-audio \
-	packagegroup-fsl-gstreamer1.0-full \
-	packagegroup-fsl-gstreamer1.0 \
 	pkgconfig \
+	postinstall \
 	python-compiler \
 	python3 \
+	python3-bottle \
 	python3-future \
 	python3-lxml \
 	python3-mavproxy \
@@ -60,7 +66,10 @@ IMAGE_INSTALL_append += " \
 	python3-pytz \
 	python3-pyyaml \
 	python3-requests \
+	python3-uptime \
 	python3-urllib3 \
 	v4l-utils \
 	webcam-tools \
+	x264 \
+	x265 \
 "
