@@ -1,7 +1,7 @@
 # Copyright (C) 2015 Freescale Semiconductor
 # Released under the MIT license (see COPYING.MIT for the terms)
 
-DESCRIPTION = "Mavlink telemetry and video compositing support"
+DESCRIPTION = "Development Support - Everything but the kitchen sink"
 LICENSE = "MIT"
 
 # https://wiki.yoctoproject.org/wiki/FAQ:How_do_I_set_or_change_the_root_password
@@ -74,18 +74,19 @@ IMAGE_INSTALL_append += " \
 	python3-dev \
 	python3-future \
 	python3-lxml \
+	python3-mavproxy \
 	python3-netifaces \
 	python3-pexpect \
 	python3-pip \
 	python3-protobuf \
+	python3-pymavlink \
 	python3-pynmea2 \
 	python3-pyserial \
 	python3-pytz \
 	python3-pyyaml \
 	python3-requests \
+	python3-uptime \
 	python3-urllib3 \
-	python3-pymavlink \
-	python3-mavproxy \
 	screen \
 	strace \
 	sudo \
@@ -96,4 +97,3 @@ IMAGE_INSTALL_append += " \
 	x264 \
 	x265 \
 "
-
