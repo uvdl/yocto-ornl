@@ -1,12 +1,11 @@
 SUMMARY = "DART Dev Update Recipe"
+LICENSE = "MIT"
 
 IMAGE_FEATURES += "ssh-server-dropbear splash "
 
-LICENSE = "MIT"
-
 require ornl-dev-image.bb
 
-# Do to how the DART boot is organized for SWUpdate to work we have to have
+# DART boot is organized for SWUpdate with two rootfs (ping/pong).
 # the kernel, dtb, uboot in a /boot/ folder on both rootfs
 IMAGE_INSTALL_append = " \
     swupdate \
