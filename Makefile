@@ -276,14 +276,12 @@ toaster: $(YOCTO_DIR)/setup-environment
 			pip3 install --user -r bitbake/toaster-requirements.txt && \
 			touch $(YOCTO_DIR)/$(YOCTO_ENV)/.toaster
 
-toaster-start: $(YOCTO_DIR)/setup-environment build/conf/local.conf build/conf/bblayers.conf sources/meta-ornl
-	cd $(YOCTO_DIR) && \
+toaster-start: $(YOCTO_DIR)/setup-environment
+	@if [ -e $(YOCTO_DIR)/$(YOCTO_ENV)/.toaster ] ; then cd $(YOCTO_DIR) && \
 		MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV) && \
-		cd $(YOCTO_DIR)/$(YOCTO_ENV) && \
-			if [ -e .toaster ] ; then source toaster stop ; source toaster start ; true ; fi
+		( cd $(YOCTO_DIR)/$(YOCTO_ENV) ; source toaster stop ; sleep 5 ; source toaster webport=0.0.0.0:$(TOASTER_PORT) start ) ; true ; fi
 
 toaster-stop:
-	-cd $(YOCTO_DIR) && \
+	@if [ -e $(YOCTO_DIR)/$(YOCTO_ENV)/.toaster ] ; then cd $(YOCTO_DIR) && \
 		MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV) && \
-		cd $(YOCTO_DIR)/$(YOCTO_ENV) && \
-			source toaster stop ; ( rm .toaster ; true )
+		( cd $(YOCTO_DIR)/$(YOCTO_ENV) ; source toaster stop ) ; true ; fi
