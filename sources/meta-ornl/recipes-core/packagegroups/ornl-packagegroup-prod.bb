@@ -6,16 +6,26 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 inherit packagegroup
 
 RDEPENDS_${PN} = " \
-    packagegroup-core-full-cmdline \
-    packagegroup-fsl-tools-gpu \
-	packagegroup-fsl-tools-gpu-external \
-    nodejs \
+	dtc \
+	gpsd \
+	gps-utils \
 	flex \
-    m4 \
+	m4 \
 	make \
-    iperf3 \
+	imx-test \
+	iperf3 \
+	libgps \
 	libtool \
-    python-compiler \
+	minicom \
+	networkmanager \
+	nodejs \
+	ntp \
+	ntp-bin \
+	openssl \
+	packagegroup-core-full-cmdline \
+	packagegroup-fsl-tools-gpu \
+	packagegroup-fsl-tools-gpu-external \
+	python-compiler \
 	python3 \
 	python3-lxml \
 	python3-pip \
@@ -29,15 +39,5 @@ RDEPENDS_${PN} = " \
 	python3-pymavlink \
 	python3-future \
 	python3-mavproxy \
-    minicom \
-	openssl \
-    imx-test \
-	networkmanager \
-    v4l-utils \
-    dtc \
-	gpsd \
-	gps-utils \
-	libgps \
-    ntp \
-	ntp-bin \
+	v4l-utils \
 "

@@ -1,4 +1,4 @@
-SUMMARY = "DART Dev Update Recipe"
+SUMMARY = "DART Development Base OS w/Update Recipe"
 LICENSE = "MIT"
 
 IMAGE_FEATURES += "ssh-server-dropbear splash "

@@ -1,7 +1,7 @@
 # Copyright (C) 2015 Freescale Semiconductor
 # Released under the MIT license (see COPYING.MIT for the terms)
 
-DESCRIPTION = "Basically everything but the kitchen sink build."
+DESCRIPTION = "Mavlink telemetry and video compositing support"
 LICENSE = "MIT"
 
 # https://wiki.yoctoproject.org/wiki/FAQ:How_do_I_set_or_change_the_root_password

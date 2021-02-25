@@ -1,4 +1,4 @@
-SUMMARY = "This is the Variscite specific update image for Ground Robotics"
+SUMMARY = "DART Production Base OS w/Update Recipe"
 LICENSE = "MIT"
 
 IMAGE_FEATURES += "ssh-server-dropbear splash "
