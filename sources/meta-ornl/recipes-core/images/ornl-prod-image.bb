@@ -19,10 +19,10 @@ IMAGE_INSTALL_append += " \
 	libtool \
 	libxml2-dev \
 	libxslt-dev \
-	ornl-packagegroup-prod \
 	packagegroup-imx-tools-audio \
 	packagegroup-fsl-gstreamer1.0-full \
 	packagegroup-fsl-gstreamer1.0 \
+	packagegroup-prod \
 	pkgconfig \
 	python3-pyyaml \
 	python3-netifaces \

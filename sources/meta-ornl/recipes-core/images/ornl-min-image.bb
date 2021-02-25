@@ -12,7 +12,7 @@ inherit core-image
 IMAGE_FEATURES += " read-only-rootfs"
 
 IMAGE_INSTALL_append = " \
-	ornl-packagegroup-prod \
+	packagegroup-prod \
 	postinstall \
 	python-compiler \
 	python3 \
