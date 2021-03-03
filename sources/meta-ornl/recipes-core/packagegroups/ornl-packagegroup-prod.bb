@@ -38,9 +38,3 @@ RDEPENDS_${PN} = " \
     ntp \
 	ntp-bin \
 "
-
-RDEPENDS_${PN}_append_var-som-mx6-ornl += " \
-    packagegroup-fsl-tools-gpu \
-	packagegroup-fsl-tools-gpu-external \
-    imx-test \
-"
