@@ -1,4 +1,4 @@
-SUMMARY = "Minimum Build Variscite Update Image"
+SUMMARY = "This is the Variscite specific update image for just production dependencies"
 
 IMAGE_FEATURES += "ssh-server-dropbear splash "
 
@@ -7,11 +7,18 @@ EXTRA_USERS_PARAMS = "usermod -P root root;"
 
 LICENSE = "MIT"
 
-require ornl-prod-min-image.bb
+require recipes-core/images/ornl-prod-image.bb
 
 # Do to how the DART boot is organized for SWUpdate to work we have to have
 # the kernel, dtb, uboot in a /boot/ folder on both rootfs
 IMAGE_INSTALL_append = " \
+    packagegroup-imx-tools-audio \
+    packagegroup-fsl-gstreamer1.0-full \
+    packagegroup-fsl-gstreamer1.0 \
+    packagegroup-fsl-tools-gpu \
+    packagegroup-fsl-tools-gpu-external \
+    imx-test \
+    ksz-initscripts \
     swupdate \
     swupdate-www \
     kernel-image \
