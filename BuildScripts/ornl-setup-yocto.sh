@@ -120,7 +120,7 @@ function run_build()
     var-som-mx6-ornl)
         sync_variscite_platform
         ;;
-    jetson-xavier-nx-devkit-emmc)
+    jetson-xavier-nx-devkit)
         sync_tegra_platform
         ;;
     *)
@@ -356,7 +356,7 @@ function make_build_dir()
         # Variscite kind of forces us to overwrite the originial config files
         copy_config_files
         ;;
-    jetson-xavier-nx-devkit-emmc)
+    jetson-xavier-nx-devkit)
         # copy the config files over so there isn't a need to overwrite them
         copy_config_files
         # From scope of script change into the directory.
@@ -478,7 +478,7 @@ function help_menu()
     echo "Usage : ./ornl-setup-yocto.sh [option [optarg1]] abs_build_directory"
     echo "--------------------------------------------------------------------------------"
     echo "options : "
-    echo "-m : target machine: var-mx6-som-ornl or jetson-xavier-nx-devkit-emmc"
+    echo "-m : target machine: var-mx6-som-ornl or jetson-xavier-nx-devkit"
     echo "-h : A friendly reminder of how this script works"
     echo "-v : Yocto version, sumo, thud, dunfell"
     echo "--------------------------------------------------------------------------------"

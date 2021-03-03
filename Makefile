@@ -13,7 +13,7 @@ EPHEMERAL := $(HOME)
 DEV=
 DOT_GZ=.gz
 EULA=1	# https://patchwork.openembedded.org/patch/100815/
-MACHINE=var-som-mx6-ornl
+MACHINE=jetson-xavier-nx-devkit
 PKGDEPS1=gawk wget git-core diffstat unzip texinfo gcc-multilib \
 build-essential chrpath socat cpio python python3 python3-pip python3-pexpect \
 xz-utils debianutils iputils-ping libsdl1.2-dev xterm
@@ -36,10 +36,10 @@ TOASTER_PORT := 8000
 # Known variations
 # FIXME: requires mod to BuildScripts/ornl-setup-yocto.sh
 YOCTO_VERSION=dunfell
-YOCTO_DIR := $(EPHEMERAL)/$(PROJECT)-$(YOCTO_VERSION)-$(MACHINE)
-YOCTO_DISTRO=fslc-framebuffer
+YOCTO_DIR := $(EPHEMERAL)/$(PROJECT)-$(YOCTO_VERSION)
+YOCTO_DISTRO=ornl-tegra
 YOCTO_ENV=build_ornl
-YOCTO_IMG=ornl-dev-image
+YOCTO_IMG=tegra-dev-full-image
 YOCTO_CMD := $(YOCTO_IMG)
 
 # Kernel rebuilding; paths relative to $(YOCTO_DIR)/$(YOCTO_ENV)
