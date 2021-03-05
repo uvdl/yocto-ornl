@@ -6,8 +6,8 @@ CPUS := $(shell nproc)
 SUDO := $(shell test $${EUID} -ne 0 && echo "sudo")
 LANG := en_US.UTF-8
 DATE := $(shell date +%Y-%m-%d_%H%M)
-ARCHIVE := /opt/
-EPHEMERAL := /tmp/
+ARCHIVE := /opt
+EPHEMERAL := /tmp
 .EXPORT_ALL_VARIABLES:
 
 DEV=
