@@ -123,6 +123,12 @@ function run_build()
     jetson-xavier-nx-devkit)
         sync_tegra_platform
         ;;
+    raspberrypi4-64)
+        echo "==============================================================================================="
+        echo "${BOLD}We only support the master branch for now, subject to changes until cm4 makes it to a version${NORMAL}"
+        echo "==============================================================================================="
+        sync_raspberries
+        ;;
     *)
         echo "${BOLD}No matching machine listed... ${NORMAL}"
         exit 1
@@ -251,6 +257,77 @@ function sync_tegra_platform()
 # =================================================================================
 #
 # =================================================================================
+function sync_raspberries()
+{
+    mkdir -p $YOCTO_DIR_LOCATION/
+    if [ $? -ne 0 ]
+        then
+            echo
+            echo "========================================================="
+            echo "${BOLD}Creating Yocto build directory failed...${NORMAL}"
+            echo "========================================================="
+            exit 1
+    fi
+
+    OLD_LOCATION=$PWD
+    eval cd $YOCTO_DIR_LOCATION/
+    if [ ! -d "ornl-yocto-rpi" ]
+        then
+            mkdir -p ornl-yocto-rpi/layers
+            eval cd ornl-yocto-rpi/layers/
+            git clone -b master git://git.yoctoproject.org/poky
+            if [ $? -ne 0 ]
+                then
+                    echo
+                    echo "==============================================="
+                    echo "${BOLD}Failed to clone Poky for RPi ${NORMAL}"
+                    echo "==============================================="
+                    exit 1
+            fi
+            git clone -b master git://git.openembedded.org/meta-openembedded
+            if [ $? -ne 0 ]
+                then
+                    echo
+                    echo "==============================================="
+                    echo "${BOLD}Failed to clone OE for RPi ${NORMAL}"
+                    echo "==============================================="
+                    exit 1
+            fi
+            git clone -b master https://github.com/agherzan/meta-raspberrypi.git
+            if [ $? -ne 0 ]
+                then
+                    echo
+                    echo "==============================================="
+                    echo "${BOLD}Failed to clone meta-raspberrypi ${NORMAL}"
+                    echo "==============================================="
+                    exit 1
+            fi
+            git clone -b master https://git.openembedded.org/meta-python2/
+            if [ $? -ne 0 ]
+                then
+                    echo
+                    echo "==============================================="
+                    echo "${BOLD}Failed to clone python2${NORMAL}"
+                    echo "==============================================="
+                    exit 1
+            fi
+            git clone -b master https://github.com/sbabic/meta-swupdate.git
+            if [ $? -ne 0 ]
+                then
+                    echo
+                    echo "==============================================="
+                    echo "${BOLD}Failed to clone swupdate${NORMAL}"
+                    echo "==============================================="
+                    exit 1
+            fi
+            eval cd ../..
+    fi
+    eval cd $OLD_LOCATION
+}
+
+# =================================================================================
+#
+# =================================================================================
 function check_for_bin_repo()
 {
     # Check for the bin directory in ~
@@ -289,10 +366,10 @@ function check_for_bin_repo()
 # =================================================================================
 function copying_ornl_layer()
 {
-    if [ $TARGET_MACHINE == "var-som-mx6-ornl" ]
-        then
+    case "$TARGET_MACHINE" in
+    var-som-mx6-ornl)
         # Ok now we know to some extent that the directories are available to us, move on.
-        cp -r sources/meta-ornl $YOCTO_DIR_LOCATION/sources
+        cp -rf sources/meta-ornl $YOCTO_DIR_LOCATION/sources
         if [ $? -ne 0 ]
             then
                 echo
@@ -301,8 +378,12 @@ function copying_ornl_layer()
                 echo "============================================"
                 exit 1
         fi
-    else
-        cp -r sources/meta-ornl $YOCTO_DIR_LOCATION/ornl-yocto-tegra/layers/
+        ;;
+    jetson-xavier-nx-devkit-emmc)
+        # Fallthrough Example
+        ;&
+    jetson-xavier-nx-devkit)
+        cp -rf sources/meta-ornl $YOCTO_DIR_LOCATION/ornl-yocto-tegra/layers/
         if [ $? -ne 0 ]
             then
                 echo
@@ -311,8 +392,19 @@ function copying_ornl_layer()
                 echo "============================================"
                 exit 1
         fi
-    fi
-
+        ;;
+    raspberrypi4-64)
+        cp -rf sources/meta-ornl $YOCTO_DIR_LOCATION/ornl-yocto-rpi/layers/
+        if [ $? -ne 0 ]
+            then
+                echo
+                echo "============================================"
+                echo "${BOLD}Copy of ORNL layer failed...${NORMAL}"
+                echo "============================================"
+                exit 1
+        fi
+        ;;
+    esac
 }
 
 # =================================================================================
@@ -352,7 +444,7 @@ function make_build_dir()
                 echo "======================================================"
                 exit 1
         fi
-        eval cd ${OLD_LOCATION}
+        eval cd ${OLD_DIR}
         # Variscite kind of forces us to overwrite the originial config files
         copy_config_files
         ;;
@@ -372,6 +464,21 @@ function make_build_dir()
                 exit 1
         fi
         eval cd ${OLD_DIR}
+        ;;
+    raspberrypi4-64)
+        eval cd $YOCTO_DIR_LOCATION/
+        # Run standard OE setup script
+        source ornl-yocto-rpi/layers/poky/oe-init-build-env build_ornl/
+        if [ $? -ne 0 ]
+            then
+                echo
+                echo "======================================================"
+                echo "${BOLD}OE setup script failed...${Normal}"
+                echo "======================================================"
+                exit 1
+        fi
+        eval cd ${OLD_DIR}
+        copy_config_files
         ;;
     
     esac
@@ -394,10 +501,27 @@ function copy_config_files()
     # Lets go ahead and make this directory if it doesn't exist
     mkdir -p $YOCTO_DIR_LOCATION/build_ornl/conf
 
+    #  Find the folder name based on the machine type
+    MACHINE_FOLDER=""
+    case "$TARGET_MACHINE" in
+    jetson-xavier-nx-devkit-emmc)
+        # Fallthrough example
+        ;&
+    jetson-xavier-nx-devkit)
+        MACHINE_FOLDER="jetson"
+        ;;
+    var-som-mx6-ornl)
+        MACHINE_FOLDER="variscite"
+        ;;
+    raspberrypi4-64)
+        MACHINE_FOLDER="raspberrypi"
+        ;;
+    esac
+
     echo
     echo "Copying the ORNL bblayers.conf file over... "
     echo
-    cp -f build/conf/$TARGET_MACHINE/bblayers.conf $YOCTO_DIR_LOCATION/build_ornl/conf/
+    cp -f build/conf/$MACHINE_FOLDER/bblayers.conf $YOCTO_DIR_LOCATION/build_ornl/conf/
     if [ $? -ne 0 ]
         then
             echo
@@ -410,7 +534,7 @@ function copy_config_files()
     echo
     echo "Copying the ORNL local.conf file over... "
     echo
-    cp -f build/conf/$TARGET_MACHINE/local.conf $YOCTO_DIR_LOCATION/build_ornl/conf/
+    cp -f build/conf/$MACHINE_FOLDER/local.conf $YOCTO_DIR_LOCATION/build_ornl/conf/
     if [ $? -ne 0 ]
         then
             echo
@@ -435,35 +559,6 @@ function copy_config_files()
                     echo "================================================="
                     exit 1
             fi
-    fi
-}
-
-# =================================================================================
-#
-# =================================================================================
-function copy_ornl_layer()
-{
-    # Make sure the build directory actually exists
-    if [ ! -d $YOCTO_DIR_LOCATION ]
-        then 
-            echo
-            echo "====================================================================="
-            echo "${BOLD}$YOCTO_DIR_LOCATION/$YOCTO_DIR_NAME does not exist...${NORMAL}"
-            echo "====================================================================="
-            exit 1
-    fi
-
-    echo
-    echo "Copying the ORNL source ... "
-    echo
-    cp -rf ../sources/meta-ornl $YOCTO_DIR_LOCATION/sources/meta-ornl
-    if [ $? -ne 0 ]
-        then
-            echo
-            echo "============================================"
-            echo "${BOLD}Copy of ornl layer source failed...${NORMAL}"
-            echo "============================================"
-            exit 1
     fi
 }
 
