@@ -45,8 +45,8 @@ tegra-dev-full-image (jetson boards only)
 
 ### Optional Makefile Variables
 
-1. You can change where you want the build directory created if you chage the variable **EPHEMERAL**.
-The default location is in `/tmp/` but can be anywere.
+1. You can change where you want the build directory created if you chage the variable **YOCTO_DIR**.
+The default location is in `/tmp/yocto-ornl-version/` (where `version` is the common name for the yocto version eg *sumo*) but can be anywere.
 
 2. You can change where you want your archive directory if you change the variable **ARCHIVE**.
 The default location is in `/opt/` but can be anywhere.
