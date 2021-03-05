@@ -11,6 +11,7 @@ DEPENDS = "gstreamer1.0 gstreamer1.0-plugins-base"
 PV = "v1.1.3"
 SRCBRANCH ?= "master"
 SRC_URI = "git://github.com/RidgeRun/gst-interpipe.git;protocol=https;tag=${PV}"
+# SRC_URI_append_raspberrypi4-64 += " file://0001-disable-gtk.patch"
 
 S = "${WORKDIR}/git"
 
@@ -18,8 +19,8 @@ FILES_${PN} += "${libdir}/gstreamer-1.0/libgstinterpipe.so "
 
 inherit autotools pkgconfig gettext
 
-do_configure() {
-${S}/autogen.sh --noconfigure
+# do_configure() {
+#     ${S}/autogen.sh --noconfigure
 
-oe_runconf
-}
+#     oe_runconf
+# }
