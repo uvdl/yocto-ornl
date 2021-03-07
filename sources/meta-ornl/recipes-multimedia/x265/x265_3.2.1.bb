@@ -17,7 +17,7 @@ SRC_URI[sha256sum] = "fb9badcf92364fd3567f8b5aa0e5e952aeea7a39a2b864387cec31e3b5
 
 inherit lib_package pkgconfig cmake
 
-EXTRA_OECMAKE += " -DENABLE_PIC=1" 
+EXTRA_OECMAKE += " -DENABLE_PIC=1"
 
 FILES_${PN} += "${prefix}/lib/*.a"
 FILES_${PN} += "${prefix}/lib/libx265.so.*"
@@ -37,7 +37,7 @@ do_install(){
     install -m 0755 ${WORKDIR}/build/x265.pc ${D}${prefix}/lib/pkgconfig
     install -m 0755 ${WORKDIR}/build/libx265.so.179 ${D}${prefix}/lib
 
-    ln -sr ${D}${prefix}/lib/libx265.so.179 ${D}${prefix}/lib/libx265.so  
+    ln -sr ${D}${prefix}/lib/libx265.so.179 ${D}${prefix}/lib/libx265.so
     install -m 0755 ${WORKDIR}/build/x265 ${D}${prefix}/bin
     chrpath -d ${D}${prefix}/bin/x265
 }
