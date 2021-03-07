@@ -34,7 +34,9 @@ IMAGE_INSTALL_append += " \
 	gpsd \
 	gps-utils \
 	gstd \
+	gstreamer1.0-plugins-ugly \
 	gst-interpipe \
+	gst-pylibgstc \
 	htop \
 	imx-test \
 	iotop \
