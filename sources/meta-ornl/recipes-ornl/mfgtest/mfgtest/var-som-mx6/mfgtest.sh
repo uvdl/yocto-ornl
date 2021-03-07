@@ -1,5 +1,8 @@
 #!/bin/bash
 
+TMPDIR=/tmp/$$
+mkdir -p $TMPDIR
+
 # determine serial number by reading FUSES
 sn1=`cat /sys/fsl_otp/HW_OCOTP_CFG0`
 sn2=`cat /sys/fsl_otp/HW_OCOTP_CFG1`
@@ -12,6 +15,16 @@ fi
 # declare tests to exectute on platform as command lines
 declare -A tests
 tests[eth0]="ping -c 4 192.168.0.2"
+tests[python3]="python3 --version"
+tests[h264]="gst-inspect-1.0 --exists imxvpuenc_h264"
+tests[h265]="gst-inspect-1.0 --exists x265enc"
+
+# run programs and inspect results of tests to ensure existence of devices
+declare -A inspections
+inspections[usb]="lsusb"
+
+declare -A comparisons
+comparisons[usb]="grep 1d6b:0002 $TMPDIR/usb"
 
 declare -A results
 
@@ -19,17 +32,24 @@ declare -A results
 # (mostly) BOILERPLATE from here on out...
 ##########################################
 
-function identifier() {
-	echo "$1" | cut -f1 -d,
-}
-function content() {
-	echo "$1" | cut -f2 -d,
-}
-
 # perform tests defined above
 for t in ${!tests[@]} ; do
 	results[$t]=false && echo "*** ${tests[$t]}"
 	if ${tests[$t]} ; then results[$t]=true ; fi
+done
+
+# run programs that produce output to be inspected by the comparisons[]
+set -e
+for t in ${!inspections[@]} ; do
+	${inspections[$t]} | tee -a $TMPDIR/$t
+done
+set +e
+
+# perform comparisons defined above
+for t in ${!comparisons[@]} ; do
+	results[$t]=false && echo "*** ${comparisons[$t]}"
+	${comparisons[$t]} | tee -a $TMPDIR/check-${t}
+	if [ -s $TMPDIR/check-${t} ] ; then results[$t]=true ; fi
 done
 
 # report on status of tests
