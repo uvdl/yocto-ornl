@@ -3,13 +3,15 @@ DESCRIPTION = "This is a script that can be run to verify hardware is working."
 SECTION = "misc"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/GPL-2.0;md5=801f80980d171dd6425610833a22dbe6"
-PR = "r1"
+PR = "r2"
 
 INHIBIT_DEFAULT_DEPS = "1"
 
 SRC_URI = " file://mfgtest.sh"
 
 S = "${WORKDIR}"
+
+RDEPENDS_${PN} += "bash"
 
 FILES_${PN}-home = "${localstatedir}/local"
 
