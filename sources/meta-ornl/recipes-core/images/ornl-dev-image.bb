@@ -50,6 +50,7 @@ IMAGE_INSTALL_append += " \
 	libxslt-dev \
 	m4 \
 	make \
+	mfgtest \
 	minicom \
 	networkmanager \
 	nodejs \
