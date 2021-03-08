@@ -16,8 +16,8 @@ fi
 declare -A tests
 tests[eth0]="ping -c 4 192.168.0.2"
 tests[python3]="python3 --version"
-tests[h264]="gst-inspect-1.0 --exists imxvpuenc_h264"
-tests[h265]="gst-inspect-1.0 --exists x265enc"
+tests[h264]="gst-launch-1.0 videotestsrc num-buffers=30 is-live=true ! imxvpuenc_h264 ! fakesink"
+tests[h265]="gst-launch-1.0 videotestsrc num-buffers=30 is-live=true ! x265enc ! fakesink"
 
 # run programs and inspect results of tests to ensure existence of devices
 declare -A inspections
