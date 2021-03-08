@@ -20,6 +20,7 @@ IMAGE_INSTALL_append += " \
 	libsodium \
 	libsodium-dev \
 	make \
+	mfgtest \
 	networkmanager \
 	ntp \
 	ntp-bin \
