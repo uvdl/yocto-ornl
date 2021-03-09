@@ -1,0 +1,20 @@
+[Unit]
+Description=Monitor System Temperature
+After=systemd-remount-fs.service
+RequiresMountsFor=/var
+
+[Service]
+Type=simple
+EnvironmentFile=/etc/systemd/temperature.conf
+ExecStart=/var/local/temperature.sh
+StandardOutput=journal
+StandardError=journal
+Restart=on-failure
+RestartSec=30
+StartLimitInterval=300
+StartLimitBurst=5
+TimeoutStartSec=0
+TimeoutStopSec=5
+
+[Install]
+WantedBy=multi-user.target

@@ -71,8 +71,14 @@ done
 
 # construct a .csv file and emit it
 echo -n "CPU," > $TMPDIR/${BRD}.csv
+if [ -s /tmp/temperature.csv ] ; then echo -n "uptime,temperature," >> $TMPDIR/${BRD}.csv ; fi
 for r in ${!results[@]} ; do echo -n "${r}," >> $TMPDIR/${BRD}.csv ; done ; echo "" >> $TMPDIR/${BRD}.csv
 echo -n "${sn}," >> $TMPDIR/${BRD}.csv
+if [ -s /tmp/temperature.csv ] ; then
+	x=$(tail -1 /tmp/temperature.csv)
+	t=$(echo $x | cut -f3 -d, | awk '{printf("%.3f",$1/1000)}')
+	echo -n "$(echo $x | cut -f2 -d,),$t," >> $TMPDIR/${BRD}.csv
+fi
 for r in ${!results[@]} ; do
 	if ${results[$r]} ; then
 		echo -n "OK," >> $TMPDIR/${BRD}.csv
