@@ -16,8 +16,8 @@ fi
 declare -A tests
 tests[eth0]="ping -c 4 192.168.0.2"
 tests[python3]="python3 --version"
-tests[h264]="gst-launch-1.0 videotestsrc num-buffers=30 is-live=true ! imxvpuenc_h264 ! fakesink"
-tests[h265]="gst-launch-1.0 videotestsrc num-buffers=30 is-live=true ! x265enc ! fakesink"
+tests[h264]="gst-launch-1.0 -f videotestsrc num-buffers=30 is-live=true ! imxvpuenc_h264 ! fakesink"
+tests[h265]="gst-launch-1.0 -f videotestsrc num-buffers=30 is-live=true ! x265enc ! fakesink"
 
 # run programs and inspect results of tests to ensure existence of devices
 declare -A inspections
@@ -58,7 +58,7 @@ echo "*** $sn ***"
 any=false
 for r in ${!results[@]} ; do
 	echo -n "$r: "
-	if ${results[$r]} ; then echo "OK" ; else echo "*** FAILED" ; any=true ; fi
+	if ${results[$r]} ; then echo "OK" ; else echo "FAILED ***" ; any=true ; fi
 done
 if $any ; then exit 1 ; fi
 exit 0
