@@ -29,8 +29,9 @@ do_install() {
 
     if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)}; then
         install -d ${D}${systemd_unitdir}/system
+        install -d ${D}${sysconfdir}/systemd
         install -d ${D}${sysconfdir}/systemd/system/multi-user.target.wants
-        install -m 0644 ${WORKDIR}/temperature.conf ${D}${sysconfdir}/system
+        install -m 0644 ${WORKDIR}/temperature.conf ${D}${sysconfdir}/systemd
         install -m 0644 ${WORKDIR}/temperature.service ${D}${systemd_unitdir}/system
         ln -sf ${systemd_unitdir}/system/temperature.service \
             ${D}${sysconfdir}/systemd/system/multi-user.target.wants/temperature.service
