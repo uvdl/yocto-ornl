@@ -37,7 +37,7 @@ TOASTER_PORT := 8000
 # FIXME: requires mod to BuildScripts/ornl-setup-yocto.sh
 YOCTO_VERSION=gatesgarth
 YOCTO_DIR := $(EPHEMERAL)/$(PROJECT)-$(YOCTO_VERSION)
-YOCTO_DISTRO=
+YOCTO_DISTRO=ornl-rpi
 YOCTO_ENV=build_ornl
 YOCTO_IMG=raspberrypi-dev-full-image
 YOCTO_CMD := $(YOCTO_IMG)
