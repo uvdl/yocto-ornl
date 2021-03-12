@@ -11,7 +11,6 @@ DEPENDS = "gstreamer1.0 gstreamer1.0-plugins-base"
 PV = "v1.1.3"
 SRCBRANCH ?= "master"
 SRC_URI = "git://github.com/RidgeRun/gst-interpipe.git;protocol=https;tag=${PV}"
-# SRC_URI_append_raspberrypi4-64 += " file://0001-disable-gtk.patch"
 
 S = "${WORKDIR}/git"
 
