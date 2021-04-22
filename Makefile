@@ -136,6 +136,7 @@ all:
 
 archive:
 	@mkdir -p $(ARCHIVE)/$(PROJECT)-$(DATE)/dts
+	@( commit=$$(git log | head -1 | tr -s ' ' | cut -f2 | tr -s ' ' | cut -f2 -d' ') ; echo "yocto-ornl: $$commit" > $(ARCHIVE)/$(PROJECT)-$(DATE)/hashes )
 	@( for f in `find $(YOCTO_DIR)/$(YOCTO_ENV)/$(KERNEL_DTS) -name "*.dtb" -print` ; do n=$$(basename $$f) ; nb=$${n%.*} ; dtc -I dtb -O dts -o $(ARCHIVE)/$(PROJECT)-$(DATE)/dts/$${nb}.dts $$f ; ( set -x && cp $$f $(ARCHIVE)/$(PROJECT)-$(DATE)/dts/$${nb}.dtb ) ; done )
 	@mkdir -p $(ARCHIVE)/$(PROJECT)-$(DATE)/$(YOCTO_ENV)/tmp/deploy/images
 	@rsync --links -rtp --exclude={*.wic.gz,*.manifest,*testdata*,*.ubi*,*.cfg} $(YOCTO_DIR)/$(YOCTO_ENV)/tmp/deploy/images/$(MACHINE) $(ARCHIVE)/$(PROJECT)-$(DATE)/$(YOCTO_ENV)/tmp/deploy/images/
@@ -143,7 +144,7 @@ archive:
 	cp -r $(YOCTO_DIR)/sources/meta-variscite-fslc/scripts/var_mk_yocto_sdcard/variscite_scripts $(ARCHIVE)/$(PROJECT)-$(DATE)/$(YOCTO_ENV)/sources/meta-variscite-fslc/scripts
 	cp $(YOCTO_DIR)/$(YOCTO_ENV)/$(KERNEL_IMAGE) $(ARCHIVE)/$(PROJECT)-$(DATE)
 	tar czf $(ARCHIVE)/$(PROJECT)-$(DATE)/kernel-source.tgz -C $(YOCTO_DIR)/$(YOCTO_ENV)/tmp/work-shared/$(MACHINE) kernel-source
-	@( cd $(YOCTO_DIR)/$(YOCTO_ENV)/$(KERNEL_GIT) && commit=$$(git log | head -1 | tr -s ' ' | cut -f2 | tr -s ' ' | cut -f2 -d' ') ; touch $(ARCHIVE)/$(PROJECT)-$(DATE)/$$commit )
+	@( cd $(YOCTO_DIR)/$(YOCTO_ENV)/$(KERNEL_GIT) && commit=$$(git log | head -1 | tr -s ' ' | cut -f2 | tr -s ' ' | cut -f2 -d' ') ; echo "kernel: $$commit" >> $(ARCHIVE)/$(PROJECT)-$(DATE)/hashes )
 	@if [ -e $(YOCTO_DIR)/$(YOCTO_ENV)/tmp/deploy/images/$(MACHINE)/var-$(YOCTO_PROD)-image-swu-$(MACHINE).swu ] ; then set -x ; cp $(YOCTO_DIR)/$(YOCTO_ENV)/tmp/deploy/images/$(MACHINE)/var-$(YOCTO_PROD)-image-swu-$(MACHINE).swu $(ARCHIVE)/$(PROJECT)-$(DATE)/var-$(YOCTO_PROD)-image-$(HOST)-$(NETMASK).swu ; fi
 	@if [ -d $(YOCTO_DIR)/$(YOCTO_ENV)/tmp/deploy/sdk ] ; then set -x ; cp -r $(YOCTO_DIR)/$(YOCTO_ENV)/tmp/deploy/sdk $(ARCHIVE)/$(PROJECT)-$(DATE) ; fi
 	@echo "# To write image to MMC, do:" > $(ARCHIVE)/$(PROJECT)-$(DATE)/readme.txt
