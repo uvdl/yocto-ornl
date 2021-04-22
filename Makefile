@@ -58,7 +58,7 @@ KERNEL_TEMP=$(_KERNEL_RELATIVE_PATH)/temp
 
 .PHONY: all archive build clean dependencies docker-deploy docker-image environment environment-update
 .PHONY: id kernel kernel-config kernel-pull locale mrproper sdk see swu
-.PHONY: toaster toaster-start toaster-stop
+.PHONY: toaster toaster-stop
 
 # https://stackoverflow.com/questions/10858261/how-to-abort-makefile-if-variable-not-set
 # NB: EPHEMERAL is the parent folder of the yocto build and is extremely important.
@@ -128,7 +128,6 @@ all:
 	@$(MAKE) --no-print-directory -B environment
 	@$(MAKE) --no-print-directory -B environment-update
 	@$(MAKE) --no-print-directory -B toaster
-	@$(MAKE) --no-print-directory -B toaster-start
 	@$(MAKE) --no-print-directory -B YOCTO_IMG=var-$(YOCTO_PROD)-update-full-image build
 	@$(MAKE) --no-print-directory -B YOCTO_IMG=var-$(YOCTO_PROD)-image-swu build
 	@$(MAKE) --no-print-directory -B YOCTO_IMG=var-$(YOCTO_PROD)-update-full-image YOCTO_CMD="-c populate_sdk var-$(YOCTO_PROD)-update-full-image" build
@@ -156,6 +155,9 @@ archive:
 build: $(YOCTO_DIR)/setup-environment build/conf/local.conf build/conf/bblayers.conf sources/meta-ornl
 	cd $(YOCTO_DIR) && \
 		MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV) && \
+		if [ -e $(YOCTO_DIR)/$(YOCTO_ENV)/.toaster ] ; then cd $(YOCTO_DIR) && \
+			source toaster stop && sleep 5 && \
+			source toaster webport=0.0.0.0:$(TOASTER_PORT) start ; fi && \
 		cd $(YOCTO_DIR)/$(YOCTO_ENV) && \
 			LANG=$(LANG) bitbake $(YOCTO_CMD)
 
@@ -276,11 +278,6 @@ toaster: $(YOCTO_DIR)/setup-environment
 		cd $(YOCTO_DIR)/sources/poky && \
 			pip3 install --user -r bitbake/toaster-requirements.txt && \
 			touch $(YOCTO_DIR)/$(YOCTO_ENV)/.toaster
-
-toaster-start: $(YOCTO_DIR)/setup-environment
-	@if [ -e $(YOCTO_DIR)/$(YOCTO_ENV)/.toaster ] ; then cd $(YOCTO_DIR) && \
-		MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV) && \
-		( cd $(YOCTO_DIR)/$(YOCTO_ENV) ; source toaster stop ; sleep 5 ; source toaster webport=0.0.0.0:$(TOASTER_PORT) start ) ; true ; fi
 
 toaster-stop:
 	@if [ -e $(YOCTO_DIR)/$(YOCTO_ENV)/.toaster ] ; then cd $(YOCTO_DIR) && \
