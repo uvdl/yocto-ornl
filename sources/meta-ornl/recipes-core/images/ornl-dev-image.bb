@@ -41,6 +41,7 @@ IMAGE_INSTALL_append += " \
 	make \
 	minicom \
 	networkmanager \
+	networkmanager-nmcli \
 	nodejs \
 	ntp \
 	ntp-bin \

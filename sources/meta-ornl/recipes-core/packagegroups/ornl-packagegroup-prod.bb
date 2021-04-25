@@ -30,6 +30,7 @@ RDEPENDS_${PN} = " \
     minicom \
 	openssl \
 	networkmanager \
+	networkmanager-nmcli \
     v4l-utils \
     dtc \
 	gpsd \
