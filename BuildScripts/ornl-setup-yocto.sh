@@ -125,7 +125,7 @@ function run_build()
         ;;
     raspberrypi4-64)
         echo "==============================================================================================="
-        echo "${BOLD}We only support the master branch for now, subject to changes until cm4 makes it to a version${NORMAL}"
+        echo "${BOLD}We only support Gatesgarth for now, subject to changes until cm4 makes it to a version${NORMAL}"
         echo "==============================================================================================="
         sync_raspberries
         ;;
@@ -275,7 +275,7 @@ function sync_raspberries()
         then
             mkdir -p ornl-yocto-rpi/layers
             eval cd ornl-yocto-rpi/layers/
-            git clone -b master git://git.yoctoproject.org/poky
+            git clone -b gatesgarth git://git.yoctoproject.org/poky
             if [ $? -ne 0 ]
                 then
                     echo
@@ -284,7 +284,7 @@ function sync_raspberries()
                     echo "==============================================="
                     exit 1
             fi
-            git clone -b master git://git.openembedded.org/meta-openembedded
+            git clone -b gatesgarth git://git.openembedded.org/meta-openembedded
             if [ $? -ne 0 ]
                 then
                     echo
@@ -293,7 +293,7 @@ function sync_raspberries()
                     echo "==============================================="
                     exit 1
             fi
-            git clone -b master https://github.com/agherzan/meta-raspberrypi.git
+            git clone -b gatesgarth https://github.com/agherzan/meta-raspberrypi.git
             if [ $? -ne 0 ]
                 then
                     echo
@@ -302,7 +302,7 @@ function sync_raspberries()
                     echo "==============================================="
                     exit 1
             fi
-            git clone -b master https://git.openembedded.org/meta-python2/
+            git clone -b gatesgarth https://git.openembedded.org/meta-python2/
             if [ $? -ne 0 ]
                 then
                     echo
@@ -311,7 +311,7 @@ function sync_raspberries()
                     echo "==============================================="
                     exit 1
             fi
-            git clone -b master https://github.com/sbabic/meta-swupdate.git
+            git clone -b gatesgarth https://github.com/sbabic/meta-swupdate.git
             if [ $? -ne 0 ]
                 then
                     echo
