@@ -43,7 +43,6 @@ IMAGE_INSTALL_append += " \
 	mfgtest \
 	minicom \
 	networkmanager \
-	networkmanager-nmcli \
 	nodejs \
 	ntp \
 	ntp-bin \

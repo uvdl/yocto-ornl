@@ -5,6 +5,9 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 inherit packagegroup
 
+PACKAGES = "\
+	ornl-packagegroup-prod \
+"
 
 RDEPENDS_${PN} = " \
     packagegroup-core-full-cmdline \
@@ -30,7 +33,6 @@ RDEPENDS_${PN} = " \
     minicom \
 	openssl \
 	networkmanager \
-	networkmanager-nmcli \
     v4l-utils \
     dtc \
 	gpsd \
