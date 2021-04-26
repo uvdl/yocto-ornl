@@ -45,9 +45,9 @@ function check_device()
 {
 	# Check that parameter is a valid block device
 	if [ ! -b "$1" ]; then
-          echo "$1 is not a valid block device, exiting"
-	  exit 1
-        fi
+        echo "$1 is not a valid block device, exiting"
+	  	exit 1
+    fi
 
 	local dev=$(basename $1)
 
@@ -340,9 +340,7 @@ function copy_scripts
 	fi
 
 }
-
 umount ${node}${part}*  2> /dev/null || true
-
 delete_device
 create_parts
 format_parts
