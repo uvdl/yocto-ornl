@@ -59,5 +59,5 @@ Next, follow the instructions from the README file and use Option 2 with the add
 bitbake var-dev-image-swu
 </pre>
 
-Once that has completed, just connect to the embedded web server using the static IP address:8080 and drag and drop the .swu file into the box.  From there the SWUpdate daemon will handle the rest!
+Once that has completed, just connect to the embedded web server using the static IP address:9080 and drag and drop the .swu file into the box.  From there the SWUpdate daemon will handle the rest!
 

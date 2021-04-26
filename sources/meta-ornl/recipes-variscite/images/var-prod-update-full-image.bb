@@ -9,7 +9,7 @@ LICENSE = "MIT"
 
 require recipes-core/images/ornl-prod-image.bb
 
-# Do to how the DART boot is organized for SWUpdate to work we have to have
+# DART boot is organized for SWUpdate with two rootfs (ping/pong).
 # the kernel, dtb, uboot in a /boot/ folder on both rootfs
 IMAGE_INSTALL_append = " \
     packagegroup-imx-tools-audio \

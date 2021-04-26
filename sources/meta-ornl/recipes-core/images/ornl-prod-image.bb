@@ -1,12 +1,18 @@
 # Copyright (C) 2015 Freescale Semiconductor
 # Released under the MIT license (see COPYING.MIT for the terms)
-DESCRIPTION = "Just the needed packages for the Ground Robotics build"
 
-IMAGE_FEATURES += " ssh-server-openssh "
-
+DESCRIPTION = "Core Networking, Python and Video Compositing support"
 LICENSE = "MIT"
 
-inherit core-image
+# https://wiki.yoctoproject.org/wiki/FAQ:How_do_I_set_or_change_the_root_password
+EXTRA_USERS_PARAMS = "usermod -P root root;"
+
+inherit core-image extrausers
+
+IMAGE_FEATURES += " \
+	hwcodecs \
+	ssh-server-openssh \
+"
 
 IMAGE_INSTALL_append += " \
 	ornl-packagegroup-prod \

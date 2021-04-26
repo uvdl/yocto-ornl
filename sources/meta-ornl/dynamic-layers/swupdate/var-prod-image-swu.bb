@@ -1,4 +1,4 @@
-DESCRIPTION = "Artifact recipe for a Ground Robotics image"
+DESCRIPTION = "Artifact recipe for a Core Networking+Python Support Image"
 SECTION = ""
 
 inherit swupdate

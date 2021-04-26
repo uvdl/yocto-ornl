@@ -13,6 +13,8 @@ require recipes-core/images/ornl-prod-min-image.bb
 # the kernel, dtb, uboot in a /boot/ folder on both rootfs
 IMAGE_INSTALL_append = " \
 	postinstall \
+    imx-test \
+    ksz-initscripts \
     swupdate \
     swupdate-www \
     kernel-image \

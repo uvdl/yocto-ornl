@@ -1,4 +1,4 @@
-DESCRIPTION = "Example compound image for Variscite boards"
+DESCRIPTION = "Artifact recipe for Mavlink+Video Support Image"
 SECTION = ""
 
 inherit swupdate
@@ -19,7 +19,7 @@ IMAGE_DEPENDS = "var-dev-update-full-image"
 # SWUPDATE_IMAGES: list of images that will be part of the compound image
 # the list can have any binaries - images must be in the DEPLOY directory
 SWUPDATE_IMAGES = " \
-    var-dev-update-full-image \
+	var-dev-update-full-image \
 "
 
 # Images can have multiple formats - define which image must be

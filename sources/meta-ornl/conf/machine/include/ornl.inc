@@ -1,4 +1,4 @@
-MACHINE_FEATURES += " pci bluetooth touchscreen wifi"
+MACHINE_FEATURES += " pci wifi"
 
 # UBIFS for Variscite 0.5GB NAND flash
 # erase block size of 128KiB
