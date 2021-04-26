@@ -17,7 +17,7 @@ NETMASK := 16
 DEV=
 DOT_GZ=.gz
 EULA=1	# https://patchwork.openembedded.org/patch/100815/
-MACHINE=raspberrypi4-64
+MACHINE=var-som-mx6-ornl
 PKGDEPS1=gawk wget git-core diffstat unzip texinfo gcc-multilib \
 build-essential chrpath socat cpio python python3 python3-pip python3-pexpect \
 xz-utils debianutils iputils-ping libsdl1.2-dev xterm
@@ -39,14 +39,22 @@ TOASTER_PORT := 8000
 
 # Known variations
 # FIXME: requires mod to BuildScripts/ornl-setup-yocto.sh
-YOCTO_VERSION=gatesgarth
+YOCTO_VERSION=dunfell
 YOCTO_DIR := $(EPHEMERAL)/$(PROJECT)-$(YOCTO_VERSION)
-YOCTO_DISTRO=ornl-rpi
+YOCTO_DISTRO=fslc-framebuffer
 YOCTO_ENV=build_ornl
-YOCTO_PROD=dev
-YOCTO_IMG=raspberrypi-$(YOCTO_PROD)-full-image
+YOCTO_PROD=prod
+YOCTO_IMG=var-$(YOCTO_PROD)-update-full-image
 YOCTO_CMD := $(YOCTO_IMG)
+ifeq ($(MACHINE), var-som-mx6-ornl)
 ETH0_NETWORK=$(YOCTO_DIR)/sources/meta-ornl/recipes-core/default-eth0/files/eth0.network
+endif
+ifeq ($(MACHINE), raspberrypi4-64)
+ETH0_NETWORK=$(YOCTO_DIR)/ornl-yocto-rpi/layers/meta-ornl/recipes-core/default-eth0/files/eth0.network
+endif
+ifeq ($(MACHINE), jetson-xavier-nx-devkit)
+ETH0_NETWORK=$(YOCTO_DIR)/ornl-yocto-tegra/layers/meta-ornl/recipes-core/default-eth0/files/eth0.network
+endif
 
 # Kernel rebuilding; paths relative to $(YOCTO_DIR)/$(YOCTO_ENV)
 _KERNEL_RELATIVE_PATH := tmp/work/var_som_mx6_ornl-fslc-linux-gnueabi/linux-variscite/4.9.88-r0
