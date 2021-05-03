@@ -11,6 +11,7 @@ require recipes-core/images/ornl-dev-image.bb
 IMAGE_INSTALL_append = " \
 	imx-test \
 	ksz-initscripts \ 
+	mfgtest \
 	packagegroup-fsl-gstreamer1.0 \ 
 	packagegroup-fsl-gstreamer1.0-full \
 	packagegroup-fsl-tools-benchmark \

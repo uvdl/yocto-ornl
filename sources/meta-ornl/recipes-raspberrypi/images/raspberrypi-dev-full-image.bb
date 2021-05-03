@@ -14,4 +14,6 @@ IMAGE_INSTALL_append = " \
 	packagegroup-core-full-cmdline \
 	networkmanager-nmcli \
 	perf \
+	swupdate \
+    swupdate-www \
 "

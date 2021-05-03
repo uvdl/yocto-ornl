@@ -19,6 +19,7 @@ IMAGE_INSTALL_append = " \
     packagegroup-fsl-tools-gpu-external \
     imx-test \
     ksz-initscripts \
+    mfgtest \
     swupdate \
     swupdate-www \
     kernel-image \
