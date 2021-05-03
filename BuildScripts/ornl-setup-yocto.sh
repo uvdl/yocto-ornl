@@ -320,6 +320,16 @@ function sync_raspberries()
                     echo "==============================================="
                     exit 1
             fi
+            git clone -b master https://github.com/sbabic/meta-swupdate-boards.git
+            if [ $? -ne 0 ]
+                then
+                    echo
+                    echo "==============================================="
+                    echo "${BOLD}Failed to clone swupdate boards${NORMAL}"
+                    echo "==============================================="
+                    exit 1
+            fi
+            rm -rf meta-swupdate-boards/recipes-extended/images/
             eval cd ../..
     fi
     eval cd $OLD_LOCATION
