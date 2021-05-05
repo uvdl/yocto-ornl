@@ -8,7 +8,7 @@ software =
 			copy1 : {
 				images: (
 					{
-						filename = "rpi-dev-image-swu.ext4.gz";
+						filename = "raspberrypi-dev-full-image-raspberrypi4-64.ext4.gz";
 						type = "raw";
 						compressed = true;
 						device = "/dev/mmcblk0p2";
@@ -30,7 +30,7 @@ software =
 			copy2 : {
 				images: (
 					{
-						filename = "rpi-dev-image-swu.ext4.gz";
+						filename = "raspberrypi-dev-full-image-raspberrypi4-64.ext4.gz";
 						type = "raw";
 						compressed = true;
 						device = "/dev/mmcblk0p3";
