@@ -16,4 +16,5 @@ IMAGE_INSTALL_append = " \
 	perf \
 	swupdate \
     swupdate-www \
+	u-boot \
 "

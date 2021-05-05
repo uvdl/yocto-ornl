@@ -330,6 +330,7 @@ function sync_raspberries()
                     exit 1
             fi
             rm -rf meta-swupdate-boards/recipes-extended/images/
+            rm -rf meta-swupdate-boards/recipes-bsp/libubootenv/
             eval cd ../..
     fi
     eval cd $OLD_LOCATION
