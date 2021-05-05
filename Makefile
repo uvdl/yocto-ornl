@@ -17,7 +17,7 @@ NETMASK := 16
 DEV=
 DOT_GZ=.gz
 EULA=1	# https://patchwork.openembedded.org/patch/100815/
-MACHINE=var-som-mx6-ornl
+MACHINE=raspberrypi4-64
 PKGDEPS1=gawk wget git-core diffstat unzip texinfo gcc-multilib \
 build-essential chrpath socat cpio python python3 python3-pip python3-pexpect \
 xz-utils debianutils iputils-ping libsdl1.2-dev xterm
@@ -39,12 +39,12 @@ TOASTER_PORT := 8000
 
 # Known variations
 # FIXME: requires mod to BuildScripts/ornl-setup-yocto.sh
-YOCTO_VERSION=dunfell
+YOCTO_VERSION=gatesgarth
 YOCTO_DIR := $(EPHEMERAL)/$(PROJECT)-$(YOCTO_VERSION)
-YOCTO_DISTRO=fslc-framebuffer
+YOCTO_DISTRO=ornl-rpi
 YOCTO_ENV=build_ornl
-YOCTO_PROD=prod
-YOCTO_IMG=var-$(YOCTO_PROD)-update-full-image
+YOCTO_PROD=dev
+YOCTO_IMG=raspberrypi-$(YOCTO_PROD)-full-image
 YOCTO_CMD := $(YOCTO_IMG)
 ifeq ($(MACHINE), var-som-mx6-ornl)
 ETH0_NETWORK=$(YOCTO_DIR)/sources/meta-ornl/recipes-core/default-eth0/files/eth0.network
@@ -167,6 +167,8 @@ ifeq ($(MACHINE), jetson-xavier-nx-devkit)
 endif
 ifeq ($(MACHINE), raspberrypi4-64)
 	cp -f $(YOCTO_DIR)/$(YOCTO_ENV)/tmp-glibc/deploy/images/$(MACHINE)/$(YOCTO_IMG)-$(MACHINE).wic.bz2 $(ARCHIVE)/$(PROJECT)-$(DATE)
+	@cd $(ARCHIVE)/$(PROJECT)-$(DATE) && \
+		bzip2 -d $(YOCTO_IMG)-$(MACHINE).wic.bz2
 endif
 
 build: 

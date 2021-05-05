@@ -10,7 +10,8 @@ require recipes-core/images/ornl-dev-image.bb
 # the kernel, dtb, uboot in a /boot/ folder on both rootfs
 IMAGE_INSTALL_append = " \
 	imx-test \
-	ksz-initscripts \ 
+	ksz-initscripts \
+	mfgtest \ 
 	packagegroup-fsl-gstreamer1.0 \ 
 	packagegroup-fsl-gstreamer1.0-full \
 	packagegroup-fsl-tools-benchmark \
