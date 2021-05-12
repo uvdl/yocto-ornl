@@ -39,7 +39,7 @@ TOASTER_PORT := 8000
 
 # Known variations
 # FIXME: requires mod to BuildScripts/ornl-setup-yocto.sh
-YOCTO_VERSION=thud
+YOCTO_VERSION=dunfell
 YOCTO_DIR := $(EPHEMERAL)/$(PROJECT)-$(YOCTO_VERSION)
 YOCTO_DISTRO=fslc-framebuffer
 YOCTO_ENV=build_ornl
