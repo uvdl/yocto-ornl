@@ -1,7 +1,7 @@
 #!/bin/bash
-if [ -z "$LOG" ] ; then LOG=/tmp/temperature.csv ; fi
-if [ -z "$PERIOD" ] ; then PERIOD=10 ; fi
-if [ -z "$THERMAL" ] ; then THERMAL=/sys/class/thermal/ ; fi
+LOG=/tmp/temperature.csv
+PERIOD=10
+THERMAL=/sys/class/thermal/
 n=0
 echo "Logging to $LOG, $PERIOD sec period"
 echo -n "date/time,uptime," >> $LOG

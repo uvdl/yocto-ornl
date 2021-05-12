@@ -28,7 +28,6 @@ IMAGE_INSTALL_append += " \
 	cockpit-systemd \
 	default-eth0 \
 	dtc \
-	elp-h264 \
 	flex \
 	gcc \
 	git \

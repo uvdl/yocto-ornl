@@ -18,7 +18,6 @@ IMAGE_INSTALL_append += " \
 	bind-utils \
 	default-eth0 \
 	dtc \
-	elp-h264 \
 	flex \
 	git \
 	gpsd \
