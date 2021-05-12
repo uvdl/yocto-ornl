@@ -7,7 +7,8 @@
 # =================================================================================
 # GLOBAL VARIABLES
 # =================================================================================
-YOCTO_DIR_LOCATION="$HOME"
+ORNL_YOCTO_BRANCH="develop"
+YOCTO_DIR_LOCATION=${PWD}
 YOCTO_VERSION=dunfell
 TARGET_MACHINE=""
 

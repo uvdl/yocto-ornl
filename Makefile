@@ -5,8 +5,8 @@ CPUS := $(shell nproc)
 SUDO := $(shell test $${EUID} -ne 0 && echo "sudo")
 LANG := en_US.UTF-8
 DATE := $(shell date +%Y-%m-%d_%H%M)
-ARCHIVE := $(HOME)/archive_yocto/
-EPHEMERAL := $(HOME)
+ARCHIVE := /opt
+EPHEMERAL := /tmp
 
 # allow for generation of working eth0
 HOST := 10.223.0.1
@@ -17,7 +17,7 @@ NETMASK := 16
 DEV=
 DOT_GZ=.gz
 EULA=1	# https://patchwork.openembedded.org/patch/100815/
-MACHINE=raspberrypi4-64
+MACHINE=var-som-mx6-ornl	# var-som-mx6-ornl, raspberrypi4-64, jetson-xavier-nx-devkit
 PKGDEPS1=gawk wget git-core diffstat unzip texinfo gcc-multilib \
 build-essential chrpath socat cpio python python3 python3-pip python3-pexpect \
 xz-utils debianutils iputils-ping libsdl1.2-dev xterm
@@ -39,22 +39,28 @@ TOASTER_PORT := 8000
 
 # Known variations
 # FIXME: requires mod to BuildScripts/ornl-setup-yocto.sh
-YOCTO_VERSION=gatesgarth
 YOCTO_DIR := $(EPHEMERAL)/$(PROJECT)-$(YOCTO_VERSION)
-YOCTO_DISTRO=ornl-rpi
 YOCTO_ENV=build_ornl
 YOCTO_PROD=dev
-YOCTO_IMG=raspberrypi-$(YOCTO_PROD)-full-image
-YOCTO_CMD := $(YOCTO_IMG)
 ifeq ($(MACHINE), var-som-mx6-ornl)
+YOCTO_VERSION=dunfell
+YOCTO_DISTRO=fslc-framebuffer
+YOCTO_IMG=var-$(YOCTO_PROD)-update-full-image
 ETH0_NETWORK=$(YOCTO_DIR)/sources/meta-ornl/recipes-core/default-eth0/files/eth0.network
 endif
 ifeq ($(MACHINE), raspberrypi4-64)
+YOCTO_VERSION=gatesgarth
+YOCTO_DISTRO=ornl-rpi
+YOCTO_IMG=raspberrypi-$(YOCTO_PROD)-full-image
 ETH0_NETWORK=$(YOCTO_DIR)/ornl-yocto-rpi/layers/meta-ornl/recipes-core/default-eth0/files/eth0.network
 endif
 ifeq ($(MACHINE), jetson-xavier-nx-devkit)
+YOCTO_VERSION=FIXME
+YOCTO_DISTRO=FIXME
+YOCTO_IMG=FIXME-$(YOCTO_PROD)-full-image
 ETH0_NETWORK=$(YOCTO_DIR)/ornl-yocto-tegra/layers/meta-ornl/recipes-core/default-eth0/files/eth0.network
 endif
+YOCTO_CMD := $(YOCTO_IMG)
 
 # Kernel rebuilding; paths relative to $(YOCTO_DIR)/$(YOCTO_ENV)
 _KERNEL_RELATIVE_PATH := tmp/work/var_som_mx6_ornl-fslc-linux-gnueabi/linux-variscite/4.9.88-r0
@@ -158,7 +164,7 @@ ifeq ($(MACHINE), var-som-mx6-ornl)
 	@if [ -d $(YOCTO_DIR)/$(YOCTO_ENV)/tmp/deploy/sdk ] ; then set -x ; cp -r $(YOCTO_DIR)/$(YOCTO_ENV)/tmp/deploy/sdk $(ARCHIVE)/$(PROJECT)-$(DATE) ; fi
 	@echo "# To write image to MMC, do:" > $(ARCHIVE)/$(PROJECT)-$(DATE)/readme.txt
 	@echo "DEV=/dev/sdx" >> $(ARCHIVE)/$(PROJECT)-$(DATE)/readme.txt
-	@echo "$(SUDO) MACHINE=$(MACHINE) $(YOCTO_ENV)/sources/meta-variscite-fslc/scripts/var-create-yocto-sdcard.sh -a -r $(YOCTO_ENV)/tmp/deploy/images/$(MACHINE)/$(YOCTO_CMD)-$(MACHINE) \$${DEV}" >> $(ARCHIVE)/$(PROJECT)-$(DATE)/readme.txt
+	@echo "$(SUDO) MACHINE=$(MACHINE) $(YOCTO_ENV)/sources/meta-variscite-fslc/scripts/var-create-yocto-sdcard.sh -a -r $(YOCTO_ENV)/tmp/deploy/images/$(MACHINE)/$(YOCTO_IMG)-$(MACHINE) \$${DEV}" >> $(ARCHIVE)/$(PROJECT)-$(DATE)/readme.txt
 	@if [ -e $(ARCHIVE)/$(PROJECT)-$(DATE)/var-$(YOCTO_PROD)-image-$(HOST)-$(NETMASK).swu ] ; then echo "# load var-$(YOCTO_PROD)-image-$(HOST)-$(NETMASK).swu to port :9080" >> $(ARCHIVE)/$(PROJECT)-$(DATE)/readme.txt ; fi
 	@if [ -d $(ARCHIVE)/$(PROJECT)-$(DATE)/sdk ] ; then echo "# A Cross-platform SDK is available in ./sdk" >> $(ARCHIVE)/$(PROJECT)-$(DATE)/readme.txt ; fi
 endif
@@ -185,18 +191,22 @@ endif
 ifeq ($(MACHINE), jetson-xavier-nx-devkit)
 	cd $(YOCTO_DIR) && \
 		. $(YOCTO_DIR)/ornl-yocto-tegra/setup-env --machine $(MACHINE) --distro ornl-tegra $(YOCTO_ENV) && \
+		if [ -e $(YOCTO_DIR)/$(YOCTO_ENV)/.toaster ] ; then cd $(YOCTO_DIR) && \
+			source toaster stop && sleep 5 && \
+			source toaster webport=0.0.0.0:$(TOASTER_PORT) start ; fi && \
 		cd $(YOCTO_DIR)/$(YOCTO_ENV) && \
-			if [ -e .toaster ] ; then source toaster stop ; source toaster start ; /bin/true ; fi && \
 			LANG=$(LANG) bitbake $(YOCTO_CMD)
 endif
 ifeq ($(MACHINE), raspberrypi4-64)
 	cd $(YOCTO_DIR) && \
 		. $(YOCTO_DIR)/ornl-yocto-rpi/layers/poky/oe-init-build-env $(YOCTO_ENV) && \
+		if [ -e $(YOCTO_DIR)/$(YOCTO_ENV)/.toaster ] ; then cd $(YOCTO_DIR) && \
+			source toaster stop && sleep 5 && \
+			source toaster webport=0.0.0.0:$(TOASTER_PORT) start ; fi && \
 		cd $(YOCTO_DIR)/$(YOCTO_ENV) && \
 			if [ -e .toaster ] ; then source toaster stop ; source toaster start ; /bin/true ; fi && \
 			LANG=$(LANG) bitbake $(YOCTO_CMD)
 endif
-
 
 clean:
 	-rm -rf $(YOCTO_DIR)/sources
