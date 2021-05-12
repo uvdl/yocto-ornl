@@ -17,7 +17,8 @@ NETMASK := 16
 DEV=
 DOT_GZ=.gz
 EULA=1	# https://patchwork.openembedded.org/patch/100815/
-MACHINE=var-som-mx6-ornl	# var-som-mx6-ornl, raspberrypi4-64, jetson-xavier-nx-devkit
+# var-som-mx6-ornl, raspberrypi4-64, jetson-xavier-nx-devkit
+MACHINE=var-som-mx6-ornl
 PKGDEPS1=gawk wget git-core diffstat unzip texinfo gcc-multilib \
 build-essential chrpath socat cpio python python3 python3-pip python3-pexpect \
 xz-utils debianutils iputils-ping libsdl1.2-dev xterm
@@ -39,25 +40,30 @@ TOASTER_PORT := 8000
 
 # Known variations
 # FIXME: requires mod to BuildScripts/ornl-setup-yocto.sh
-YOCTO_DIR := $(EPHEMERAL)/$(PROJECT)-$(YOCTO_VERSION)
 YOCTO_ENV=build_ornl
 YOCTO_PROD=dev
 ifeq ($(MACHINE), var-som-mx6-ornl)
+MACHINE_CONFDIR=variscite
 YOCTO_VERSION=dunfell
 YOCTO_DISTRO=fslc-framebuffer
 YOCTO_IMG=var-$(YOCTO_PROD)-update-full-image
+YOCTO_DIR := $(EPHEMERAL)/$(PROJECT)-$(YOCTO_VERSION)
 ETH0_NETWORK=$(YOCTO_DIR)/sources/meta-ornl/recipes-core/default-eth0/files/eth0.network
 endif
 ifeq ($(MACHINE), raspberrypi4-64)
+MACHINE_CONFDIR=raspberrypi
 YOCTO_VERSION=gatesgarth
 YOCTO_DISTRO=ornl-rpi
 YOCTO_IMG=raspberrypi-$(YOCTO_PROD)-full-image
+YOCTO_DIR := $(EPHEMERAL)/$(PROJECT)-$(YOCTO_VERSION)
 ETH0_NETWORK=$(YOCTO_DIR)/ornl-yocto-rpi/layers/meta-ornl/recipes-core/default-eth0/files/eth0.network
 endif
 ifeq ($(MACHINE), jetson-xavier-nx-devkit)
+MACHINE_CONFDIR=jetson
 YOCTO_VERSION=FIXME
 YOCTO_DISTRO=FIXME
 YOCTO_IMG=FIXME-$(YOCTO_PROD)-full-image
+YOCTO_DIR := $(EPHEMERAL)/$(PROJECT)-$(YOCTO_VERSION)
 ETH0_NETWORK=$(YOCTO_DIR)/ornl-yocto-tegra/layers/meta-ornl/recipes-core/default-eth0/files/eth0.network
 endif
 YOCTO_CMD := $(YOCTO_IMG)
@@ -125,8 +131,8 @@ environment-update: $(YOCTO_DIR)/setup-environment
 	@$(MAKE) --no-print-directory -B $(YOCTO_DIR)/sources/meta-ornl/recipes-core/default-eth0/files/eth0.network
 	cd $(YOCTO_DIR) && \
 		MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV) && \
-		cp $(CURDIR)/build/conf/$(MACHINE)/local.conf $(YOCTO_DIR)/$(YOCTO_ENV)/conf/ && \
-		cp $(CURDIR)/build/conf/$(MACHINE)/bblayers.conf $(YOCTO_DIR)/$(YOCTO_ENV)/conf/ && \
+		cp $(CURDIR)/build/conf/$(MACHINE_CONFDIR)/local.conf $(YOCTO_DIR)/$(YOCTO_ENV)/conf/ && \
+		cp $(CURDIR)/build/conf/$(MACHINE_CONFDIR)/bblayers.conf $(YOCTO_DIR)/$(YOCTO_ENV)/conf/ && \
 		cp $(CURDIR)/BuildScripts/mx6_install_yocto_emmc.sh $(YOCTO_DIR)/sources/meta-variscite-fslc/scripts/var_mk_yocto_sdcard/variscite_scripts/ && \
 		cp $(CURDIR)/BuildScripts/var-create-yocto-sdcard.sh $(YOCTO_DIR)/sources/meta-variscite-fslc/scripts/var_mk_yocto_sdcard/ && \
 		bitbake-layers add-layer $(YOCTO_DIR)/sources/meta-ornl && \
@@ -300,8 +306,8 @@ see:
 	@echo "ETH0_NETWORK=$(shell grep Address $(ETH0_NETWORK))"
 	@echo -n "KERNEL=$(YOCTO_DIR)/$(YOCTO_ENV)/tmp/work-shared/$(MACHINE)/kernel-source: "
 	@( cd $(YOCTO_DIR)/$(YOCTO_ENV)/$(KERNEL_GIT) && commit=$$(git log | head -1 | tr -s ' ' | cut -f2 | tr -s ' ' | cut -f2 -d' ') ; echo $$commit ) 
-	-@echo "*** local.conf ***" && diff build/conf/local.conf $(YOCTO_DIR)/$(YOCTO_ENV)/conf/local.conf
-	-@echo "*** bblayers.conf ***" && diff build/conf/bblayers.conf $(YOCTO_DIR)/$(YOCTO_ENV)/conf/bblayers.conf
+	-@echo "*** local.conf ***" && diff build/conf/$(MACHINE_CONFDIR)/local.conf $(YOCTO_DIR)/$(YOCTO_ENV)/conf/local.conf
+	-@echo "*** bblayers.conf ***" && diff build/conf/$(MACHINE_CONFDIR)/bblayers.conf $(YOCTO_DIR)/$(YOCTO_ENV)/conf/bblayers.conf
 	@echo "*** Build Commands ***"
 	@echo "cd $(YOCTO_DIR)"
 	@echo "MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV)"
