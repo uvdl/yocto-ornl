@@ -31,6 +31,8 @@ IMAGE_INSTALL_append += " \
 	gstd \
 	gstreamer1.0-plugins-ugly \
 	gst-interpipe \
+	htop \
+	iotop \
 	iperf3 \
 	libgps \
 	libsodium \
@@ -47,7 +49,9 @@ IMAGE_INSTALL_append += " \
 	ntp-bin \
 	openssl \
 	openssl-bin \
+	packagegroup-cockpit \
 	pkgconfig \
+	powertop \
 	python3 \
 	python3-bottle \
 	python3-dev \
@@ -75,9 +79,4 @@ IMAGE_INSTALL_append += " \
 	webcam-tools \
 	x264 \
 	x265 \
-	tcpdump \
-	htop \
-	iotop \
-	powertop \
-	packagegroup-cockpit \
 "

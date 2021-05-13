@@ -12,18 +12,22 @@ require recipes-core/images/ornl-prod-image.bb
 # DART boot is organized for SWUpdate with two rootfs (ping/pong).
 # the kernel, dtb, uboot in a /boot/ folder on both rootfs
 IMAGE_INSTALL_append = " \
-    packagegroup-imx-tools-audio \
-    packagegroup-fsl-gstreamer1.0-full \
-    packagegroup-fsl-gstreamer1.0 \
-    packagegroup-fsl-tools-gpu \
-    packagegroup-fsl-tools-gpu-external \
-    imx-test \
-    ksz-initscripts \
-    swupdate \
-    swupdate-www \
-    kernel-image \
-    kernel-devicetree \
-    u-boot-variscite \
+	dhcp-server \
+	imx-test \
+	kernel-devicetree \
+	kernel-image \
+	ksz-initscripts \
+	packagegroup-core-full-cmdline \
+	packagegroup-fsl-gstreamer1.0 \
+	packagegroup-fsl-gstreamer1.0-full \
+	packagegroup-fsl-tools-gpu \
+	packagegroup-fsl-tools-gpu-external \
+	packagegroup-imx-tools-audio \
+	packagegroup-tools-bluetooth \
+	postinstall \
+	swupdate \
+	swupdate-www \
+	u-boot-variscite \
 "
 
 COMPATIBLE_MACHINE = "var-som-mx6-ornl"

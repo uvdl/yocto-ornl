@@ -10,7 +10,17 @@ LICENSE = "MIT"
 inherit core-image
 
 IMAGE_INSTALL_append = " \
-	ornl-packagegroup-prod \
+	bind-utils \
+	default-eth0 \
+	libsodium \
+	libsodium-dev \
+	make \
+	networkmanager \
+	ntp \
+	ntp-bin \
+	openssl \
+	openssl-bin \
+	packagegroup-cockpit \
+	pkgconfig \
 	python3 \
-	python3-pip \
 "

@@ -7,19 +7,20 @@ EXTRA_USERS_PARAMS = "usermod -P root root;"
 
 LICENSE = "MIT"
 
-require recipes-core/images/ornl-prod-min-image.bb
+require recipes-core/images/ornl-min-image.bb
 
 # Do to how the DART boot is organized for SWUpdate to work we have to have
 # the kernel, dtb, uboot in a /boot/ folder on both rootfs
 IMAGE_INSTALL_append = " \
+	imx-test \
+	kernel-devicetree \
+	kernel-image \
+	ksz-initscripts \
+	packagegroup-core-full-cmdline \
 	postinstall \
-    imx-test \
-    ksz-initscripts \
-    swupdate \
-    swupdate-www \
-    kernel-image \
-    kernel-devicetree \
-    u-boot-variscite \
+	swupdate \
+	swupdate-www \
+	u-boot-variscite \
 "
 
 COMPATIBLE_MACHINE = "var-som-mx6-ornl"
