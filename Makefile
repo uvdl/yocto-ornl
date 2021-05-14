@@ -74,6 +74,9 @@ KERNEL_SOURCE=$(YOCTO_DIR)/$(YOCTO_ENV)/tmp/work-shared/$(MACHINE)/kernel-source
 KERNEL_IMAGE=tmp/deploy/images/$(MACHINE)/uImage
 KERNEL_DTS=tmp/deploy/images/$(MACHINE)
 
+# mfgtest.sh needs adjustment to default pinghost
+MFGTEST_SH=sources/meta-ornl/recipes-ornl/mfgtest/mfgtest/$(MACHINE)/mfgtest.sh
+
 .PHONY: all archive build clean dependencies docker-deploy docker-image environment environment-update
 .PHONY: id kernel kernel-config kernel-pull locale mrproper sdk see swu
 .PHONY: toaster toaster-stop
@@ -123,10 +126,18 @@ environment: $(YOCTO_DIR)/setup-environment
 		echo "[Network]" >> $@ && \
 		echo "Address=$(HOST)/$(NETMASK)" >> $@
 
+# https://unix.stackexchange.com/questions/329083/how-to-replace-the-last-octet-of-a-valid-network-address-with-the-number-2
+%/mfgtest.sh:
+	@( GW=$(shell awk -F"." '{print $1"."$2"."$3".2"}'<<<$(HOST)) && sed -e 's/10.223.0.2/$${GW}/g' < $(CURDIR)/$(MFGTEST_SH) > $@
+	@chmod a+x $@
+
 environment-update: $(YOCTO_DIR)/setup-environment
 	@rm -rf $(YOCTO_DIR)/sources/meta-ornl
 	@cp -r $(CURDIR)/sources/meta-ornl $(YOCTO_DIR)/sources
 	@$(MAKE) --no-print-directory -B $(YOCTO_DIR)/sources/meta-ornl/recipes-core/default-eth0/files/eth0.network
+ifeq ($(MACHINE), var-som-mx6-ornl)
+	@$(MAKE) --no-print-directory -B $(YOCTO_DIR)/$(MFGTEST_SH)
+endif
 	cd $(YOCTO_DIR) && \
 		MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV) && \
 		cp $(CURDIR)/build/conf/$(MACHINE_FOLDER)/local.conf $(YOCTO_DIR)/$(YOCTO_ENV)/conf/ && \
