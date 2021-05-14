@@ -68,13 +68,10 @@ ETH0_NETWORK=$(YOCTO_DIR)/ornl-yocto-tegra/layers/meta-ornl/recipes-core/default
 endif
 YOCTO_CMD := $(YOCTO_IMG)
 
-# Kernel rebuilding; paths relative to $(YOCTO_DIR)/$(YOCTO_ENV)
-_KERNEL_RELATIVE_PATH := tmp/work/var_som_mx6_ornl-fslc-linux-gnueabi/linux-variscite/4.9.88-r0
-KERNEL_BUILD=$(_KERNEL_RELATIVE_PATH)/build
-KERNEL_GIT=$(_KERNEL_RELATIVE_PATH)/git
+# Kernel rebuilding; depends on kernel version, a path in $(YOCTO_DIR)/$(YOCTO_ENV) with dynamic folder names (see find calls below)
+KERNEL_VER=5.4.85
 KERNEL_IMAGE=tmp/deploy/images/$(MACHINE)/uImage
 KERNEL_DTS=tmp/deploy/images/$(MACHINE)
-KERNEL_TEMP=$(_KERNEL_RELATIVE_PATH)/temp
 
 .PHONY: all archive build clean dependencies docker-deploy docker-image environment environment-update
 .PHONY: id kernel kernel-config kernel-pull locale mrproper sdk see swu
@@ -165,7 +162,8 @@ ifeq ($(MACHINE), var-som-mx6-ornl)
 	cp -r $(YOCTO_DIR)/sources/meta-variscite-fslc/scripts/var_mk_yocto_sdcard/variscite_scripts $(ARCHIVE)/$(PROJECT)-$(DATE)/$(YOCTO_ENV)/sources/meta-variscite-fslc/scripts
 	cp $(YOCTO_DIR)/$(YOCTO_ENV)/$(KERNEL_IMAGE) $(ARCHIVE)/$(PROJECT)-$(DATE)
 	tar czf $(ARCHIVE)/$(PROJECT)-$(DATE)/kernel-source.tgz -C $(YOCTO_DIR)/$(YOCTO_ENV)/tmp/work-shared/$(MACHINE) kernel-source
-	@( cd $(YOCTO_DIR)/$(YOCTO_ENV)/$(KERNEL_GIT) && commit=$$(git log | head -1 | tr -s ' ' | cut -f2 | tr -s ' ' | cut -f2 -d' ') ; echo "kernel: $$commit" >> $(ARCHIVE)/$(PROJECT)-$(DATE)/hashes )
+	@( kernel=$(shell find $(YOCTO_DIR)/$(YOCTO_ENV) -type d -name "$(KERNEL_VER)*-r0" -print | head -1) && \
+        cd $${kernel}/git && commit=$$(git log | head -1 | tr -s ' ' | cut -f2 | tr -s ' ' | cut -f2 -d' ') ; echo "kernel: $$commit" >> $(ARCHIVE)/$(PROJECT)-$(DATE)/hashes )
 	@if [ -e $(YOCTO_DIR)/$(YOCTO_ENV)/tmp/deploy/images/$(MACHINE)/var-$(YOCTO_PROD)-image-swu-$(MACHINE).swu ] ; then set -x ; cp $(YOCTO_DIR)/$(YOCTO_ENV)/tmp/deploy/images/$(MACHINE)/var-$(YOCTO_PROD)-image-swu-$(MACHINE).swu $(ARCHIVE)/$(PROJECT)-$(DATE)/var-$(YOCTO_PROD)-image-$(HOST)-$(NETMASK).swu ; fi
 	@if [ -d $(YOCTO_DIR)/$(YOCTO_ENV)/tmp/deploy/sdk ] ; then set -x ; cp -r $(YOCTO_DIR)/$(YOCTO_ENV)/tmp/deploy/sdk $(ARCHIVE)/$(PROJECT)-$(DATE) ; fi
 	@echo "# To write image to MMC, do:" > $(ARCHIVE)/$(PROJECT)-$(DATE)/readme.txt
@@ -260,7 +258,8 @@ kernel:
 	-rm sd.img$(DOT_GZ)
 	cd $(YOCTO_DIR) && \
 		MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV) && \
-		cd $(YOCTO_DIR)/$(YOCTO_ENV)/$(KERNEL_TEMP) && \
+		kernel=$(shell find $(YOCTO_DIR)/$(YOCTO_ENV) -type d -name "$(KERNEL_VER)*-r0" -print | head -1) && \
+		cd $${kernel}/temp && \
 		./run.do_compile && \
 		./run.do_compile_kernelmodules && \
 		echo "kernel built in $(YOCTO_DIR)/$(YOCTO_ENV)/$(KERNEL_IMAGE)"
@@ -268,11 +267,13 @@ kernel:
 kernel-config:
 	cd $(YOCTO_DIR) && \
 		MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV) && \
-		cd $(YOCTO_DIR)/$(YOCTO_ENV)/$(KERNEL_TEMP) && \
+		kernel=$(shell find $(YOCTO_DIR)/$(YOCTO_ENV) -type d -name "$(KERNEL_VER)*-r0" -print | head -1) && \
+		cd $${kernel}/temp && \
 		LANG=$(LANG) bitbake linux-variscite -c menuconfig
 
 kernel-pull:
-	cd $(YOCTO_DIR)/$(YOCTO_ENV)/$(KERNEL_GIT) && git pull
+	@( kernel=$(shell find $(YOCTO_DIR)/$(YOCTO_ENV) -type d -name "$(KERNEL_VER)*-r0" -print | head -1) && \
+		cd $${kernel}/git && git pull )
 
 locale:
 	# https://wiki.yoctoproject.org/wiki/TipsAndTricks/ResolvingLocaleIssues
@@ -305,7 +306,8 @@ see:
 	@echo "ARCHIVE-TO=$(ARCHIVE)/$(PROJECT)-$(DATE)"
 	@echo "ETH0_NETWORK=$(shell grep Address $(ETH0_NETWORK))"
 	@echo -n "KERNEL=$(YOCTO_DIR)/$(YOCTO_ENV)/tmp/work-shared/$(MACHINE)/kernel-source: "
-	@( cd $(YOCTO_DIR)/$(YOCTO_ENV)/$(KERNEL_GIT) && commit=$$(git log | head -1 | tr -s ' ' | cut -f2 | tr -s ' ' | cut -f2 -d' ') ; echo $$commit ) 
+	@( kernel=$(shell find $(YOCTO_DIR)/$(YOCTO_ENV) -type d -name "$(KERNEL_VER)*-r0" -print | head -1) && \
+		cd $${kernel}/git && commit=$$(git log | head -1 | tr -s ' ' | cut -f2 | tr -s ' ' | cut -f2 -d' ') ; echo $$commit )
 	-@echo "*** local.conf ***" && diff build/conf/$(MACHINE_FOLDER)/local.conf $(YOCTO_DIR)/$(YOCTO_ENV)/conf/local.conf
 	-@echo "*** bblayers.conf ***" && diff build/conf/$(MACHINE_FOLDER)/bblayers.conf $(YOCTO_DIR)/$(YOCTO_ENV)/conf/bblayers.conf
 	@echo "*** Build Commands ***"
