@@ -48,7 +48,6 @@ YOCTO_VERSION=dunfell
 YOCTO_DISTRO=fslc-framebuffer
 YOCTO_IMG=var-$(YOCTO_PROD)-update-full-image
 YOCTO_DIR := $(EPHEMERAL)/$(PROJECT)-$(YOCTO_VERSION)
-             $(YOCTO_DIR)/sources/meta-ornl/recipes-core/default-eth0/files/eth0.network
 ETH0_NETWORK=$(YOCTO_DIR)/sources/meta-ornl/recipes-core/default-eth0/files/eth0.network
 endif
 ifeq ($(MACHINE), raspberrypi4-64)
