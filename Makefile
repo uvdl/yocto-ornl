@@ -76,6 +76,7 @@ KERNEL_DTS=tmp/deploy/images/$(MACHINE)
 
 # mfgtest.sh needs adjustment to default pinghost
 MFGTEST_SH=sources/meta-ornl/recipes-ornl/mfgtest/mfgtest/$(MACHINE)/mfgtest.sh
+PINGHOST := $(shell echo $(HOST) | awk 'BEGIN{FS=OFS="."}{$$4=2}1')
 
 .PHONY: all archive build clean dependencies docker-deploy docker-image environment environment-update
 .PHONY: id kernel kernel-config kernel-pull locale mrproper sdk see swu
@@ -127,8 +128,10 @@ environment: $(YOCTO_DIR)/setup-environment
 		echo "Address=$(HOST)/$(NETMASK)" >> $@
 
 # https://unix.stackexchange.com/questions/329083/how-to-replace-the-last-octet-of-a-valid-network-address-with-the-number-2
+# but this works better: https://stackoverflow.com/a/40125775
 %/mfgtest.sh:
-	@( GW=$(shell awk -F"." '{print $1"."$2"."$3".2"}'<<<$(HOST)) && sed -e 's/10.223.0.2/$${GW}/g' < $(CURDIR)/$(MFGTEST_SH) > $@
+	@mkdir -p $(shell dirname $@)
+	cat $(CURDIR)/$(MFGTEST_SH) | sed -e 's/10.223.0.2/$(PINGHOST)/g' > $@
 	@chmod a+x $@
 
 environment-update: $(YOCTO_DIR)/setup-environment

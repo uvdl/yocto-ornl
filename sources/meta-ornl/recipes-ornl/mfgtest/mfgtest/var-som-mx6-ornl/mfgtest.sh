@@ -4,9 +4,9 @@ BRD=${1}
 if [ -z "$BRD" ] ; then
 	read -p "Board Identity? " BRD
 fi
-HOST=${2-10.223.0.2}
-if [ -z "$HOST" ] ; then
-	read -p "Ping Host? " HOST
+PINGHOST=${2-10.223.0.2}
+if [ -z "$PINGHOST" ] ; then
+	read -p "Ping Host? " PINGHOST
 fi
 TMPDIR=/tmp/$$
 mkdir -p $TMPDIR
@@ -22,7 +22,7 @@ fi
 
 # declare tests to exectute on platform as command lines
 declare -A tests
-tests[eth0]="ping -c 4 $HOST"
+tests[eth0]="ping -c 4 $PINGHOST"
 tests[python3]="python3 --version"
 tests[h264]="gst-launch-1.0 -f videotestsrc num-buffers=30 is-live=true ! imxvpuenc_h264 ! fakesink"
 tests[h265]="gst-launch-1.0 -f videotestsrc num-buffers=30 is-live=true ! x265enc ! fakesink"
