@@ -155,13 +155,15 @@ endif
 sd.img$(DOT_GZ): $(YOCTO_DIR)/$(YOCTO_ENV)/tmp/deploy/images/$(MACHINE)/$(YOCTO_IMG)-$(MACHINE).wic$(DOT_GZ)
 	ln -sf $(YOCTO_DIR)/$(YOCTO_ENV)/tmp/deploy/images/$(MACHINE)/$(YOCTO_IMG)-$(MACHINE).wic$(DOT_GZ) $@
 
+# var-$(YOCTO_PROD)-update-full-image has a bug in some post-build stage that gives a fault exit code
+# var-$(YOCTO_PROD)-image-swu doesn't exist anymore, only var-image-swu (?)
 all:
 	@$(MAKE) --no-print-directory -B dependencies
 	@$(MAKE) --no-print-directory -B environment
 	@$(MAKE) --no-print-directory -B environment-update
 	@$(MAKE) --no-print-directory -B toaster
-	@$(MAKE) --no-print-directory -B YOCTO_IMG=var-$(YOCTO_PROD)-update-full-image build
-	@$(MAKE) --no-print-directory -B YOCTO_IMG=var-$(YOCTO_PROD)-image-swu build
+	-@$(MAKE) --no-print-directory -B YOCTO_IMG=var-$(YOCTO_PROD)-update-full-image build
+	@$(MAKE) --no-print-directory -B YOCTO_IMG=var-image-swu build
 	@$(MAKE) --no-print-directory -B YOCTO_IMG=var-$(YOCTO_PROD)-update-full-image YOCTO_CMD="-c populate_sdk var-$(YOCTO_PROD)-update-full-image" build
 	@$(MAKE) --no-print-directory -B YOCTO_PROD=$(YOCTO_PROD) archive
 
