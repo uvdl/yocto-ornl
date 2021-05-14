@@ -181,7 +181,7 @@ ifeq ($(MACHINE), var-som-mx6-ornl)
 	cp $(YOCTO_DIR)/$(YOCTO_ENV)/$(KERNEL_IMAGE) $(ARCHIVE)/$(PROJECT)-$(DATE)
 	tar czf $(ARCHIVE)/$(PROJECT)-$(DATE)/kernel-source.tgz -C $(shell dirname $(KERNEL_SOURCE)) $(shell basename $(KERNEL_SOURCE))
 	@( cd $(KERNEL_SOURCE) && commit=$$(git log | head -1 | tr -s ' ' | cut -f2 | tr -s ' ' | cut -f2 -d' ') ; echo "kernel: $$commit" >> $(ARCHIVE)/$(PROJECT)-$(DATE)/hashes )
-	( set -x ; swu=$$(find $(YOCTO_DIR)/$(YOCTO_ENV) -name "var-image-swu-$(MACHINE).swu | head -1) ; set +x ; \
+	( set -x ; swu=$$(find $(YOCTO_DIR)/$(YOCTO_ENV) -name "var-image-swu-$(MACHINE).swu" | head -1) ; set +x ; \
 		if [ ! -z $${swu} ] ; then set -x ; cp $${swu} $(ARCHIVE)/$(PROJECT)-$(DATE)/var-$(YOCTO_PROD)-image-$(HOST)-$(NETMASK).swu ; fi )
 	@if [ -d $(YOCTO_DIR)/$(YOCTO_ENV)/tmp/deploy/sdk ] ; then set -x ; cp -r $(YOCTO_DIR)/$(YOCTO_ENV)/tmp/deploy/sdk $(ARCHIVE)/$(PROJECT)-$(DATE) ; fi
 	@echo "# To write image to MMC, do:" > $(ARCHIVE)/$(PROJECT)-$(DATE)/readme.txt
@@ -337,7 +337,7 @@ see:
 # var-$(YOCTO_PROD)-image-swu doesn't exist anymore, only var-image-swu (?)
 swu:
 	@$(MAKE) --no-print-directory -B environment-update
-	@$(MAKE) --no-print-directory -B build
+	-@$(MAKE) --no-print-directory -B YOCTO_IMG=var-$(YOCTO_PROD)-update-full-image build
 	@$(MAKE) --no-print-directory -B YOCTO_IMG=var-image-swu build
 	@$(MAKE) --no-print-directory -B YOCTO_PROD=$(YOCTO_PROD) archive
 
