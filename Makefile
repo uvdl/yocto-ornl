@@ -48,6 +48,7 @@ YOCTO_VERSION=dunfell
 YOCTO_DISTRO=fslc-framebuffer
 YOCTO_IMG=var-$(YOCTO_PROD)-update-full-image
 YOCTO_DIR := $(EPHEMERAL)/$(PROJECT)-$(YOCTO_VERSION)
+             $(YOCTO_DIR)/sources/meta-ornl/recipes-core/default-eth0/files/eth0.network
 ETH0_NETWORK=$(YOCTO_DIR)/sources/meta-ornl/recipes-core/default-eth0/files/eth0.network
 endif
 ifeq ($(MACHINE), raspberrypi4-64)
@@ -135,22 +136,16 @@ environment: $(YOCTO_DIR)/setup-environment
 	@chmod a+x $@
 
 environment-update: $(YOCTO_DIR)/setup-environment
-	@rm -rf $(YOCTO_DIR)/sources/meta-ornl
-	@cp -r $(CURDIR)/sources/meta-ornl $(YOCTO_DIR)/sources
-	@$(MAKE) --no-print-directory -B $(YOCTO_DIR)/sources/meta-ornl/recipes-core/default-eth0/files/eth0.network
+	BuildScripts/ornl-setup-yocto.sh -m $(MACHINE) -v $(YOCTO_VERSION) $(YOCTO_DIR)
+	#@rm -rf $(YOCTO_DIR)/sources/meta-ornl
+	#@cp -r $(CURDIR)/sources/meta-ornl $(YOCTO_DIR)/sources
+	@$(MAKE) --no-print-directory -B $(ETH0_NETWORK)
 ifeq ($(MACHINE), var-som-mx6-ornl)
 	@$(MAKE) --no-print-directory -B $(YOCTO_DIR)/$(MFGTEST_SH)
 endif
-	cd $(YOCTO_DIR) && \
-		MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV) && \
-		cp $(CURDIR)/build/conf/$(MACHINE_FOLDER)/local.conf $(YOCTO_DIR)/$(YOCTO_ENV)/conf/ && \
-		cp $(CURDIR)/build/conf/$(MACHINE_FOLDER)/bblayers.conf $(YOCTO_DIR)/$(YOCTO_ENV)/conf/ && \
-		cp $(CURDIR)/BuildScripts/mx6_install_yocto_emmc.sh $(YOCTO_DIR)/sources/meta-variscite-fslc/scripts/var_mk_yocto_sdcard/variscite_scripts/ && \
-		cp $(CURDIR)/BuildScripts/var-create-yocto-sdcard.sh $(YOCTO_DIR)/sources/meta-variscite-fslc/scripts/var_mk_yocto_sdcard/ && \
-		bitbake-layers add-layer $(YOCTO_DIR)/sources/meta-ornl && \
-		echo "*** ENVIRONMENT SETUP ***" && \
-		echo "Please execute the following in your shell before giving bitbake commands:" && \
-		echo "cd $(YOCTO_DIR) && MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV)"
+	@echo "*** ENVIRONMENT SETUP ***"
+	@echo "Please execute the following in your shell before giving bitbake commands:"
+	@echo "cd $(YOCTO_DIR) && MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV)"
 
 sd.img$(DOT_GZ): $(YOCTO_DIR)/$(YOCTO_ENV)/tmp/deploy/images/$(MACHINE)/$(YOCTO_IMG)-$(MACHINE).wic$(DOT_GZ)
 	ln -sf $(YOCTO_DIR)/$(YOCTO_ENV)/tmp/deploy/images/$(MACHINE)/$(YOCTO_IMG)-$(MACHINE).wic$(DOT_GZ) $@
@@ -200,7 +195,6 @@ ifeq ($(MACHINE), raspberrypi4-64)
 endif
 
 build: 
-	BuildScripts/ornl-setup-yocto.sh -m $(MACHINE) -v $(YOCTO_VERSION) $(YOCTO_DIR)
 ifeq ($(MACHINE), var-som-mx6-ornl)
 	cd $(YOCTO_DIR) && \
 		MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV) && \
