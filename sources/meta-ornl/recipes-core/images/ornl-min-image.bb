@@ -16,18 +16,14 @@ IMAGE_FEATURES += " \
 IMAGE_INSTALL_append += " \
 	bind-utils \
 	default-eth0 \
-	ksz-initscripts \
 	libsodium \
 	libsodium-dev \
 	make \
-	mfgtest \
 	networkmanager \
 	ntp \
 	ntp-bin \
 	openssl \
 	openssl-bin \
-	packagegroup-core-full-cmdline \
 	pkgconfig \
-	postinstall \
 	python3 \
 "

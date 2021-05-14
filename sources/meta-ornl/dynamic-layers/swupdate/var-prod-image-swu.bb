@@ -25,3 +25,5 @@ SWUPDATE_IMAGES = " \
 # Images can have multiple formats - define which image must be
 # taken to be put in the compound image
 SWUPDATE_IMAGES_FSTYPES[var-prod-update-full-image] = ".tar.gz"
+
+COMPATIBLE_MACHINE = "var-som-mx6-ornl"

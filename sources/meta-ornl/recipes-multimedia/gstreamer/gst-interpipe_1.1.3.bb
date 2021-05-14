@@ -19,7 +19,7 @@ FILES_${PN} += "${libdir}/gstreamer-1.0/libgstinterpipe.so "
 inherit autotools pkgconfig gettext
 
 do_configure() {
-${S}/autogen.sh --noconfigure
+    ${S}/autogen.sh --noconfigure
 
-oe_runconf
+    oe_runconf
 }

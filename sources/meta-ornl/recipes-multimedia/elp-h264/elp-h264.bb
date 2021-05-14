@@ -9,7 +9,7 @@ SRC_URI = "git://github.com/yokeap/ELP_H264_UVC.git;protocol=https;branch=${SRCB
     file://UvcChanges.patch \
 "
 
-S = "${WORKDIR}/git/Linux_UVC_TestAP/"
+S = "${WORKDIR}/git/Linux_UVC_TestAP"
 INSANE_SKIP_${PN} = "ldflags"
 
 FILES_${PN} += "/usr/bin/H264_UVC_TestAP"
@@ -22,5 +22,5 @@ do_install() {
     mkdir -p ${D}/usr/bin/
     install -d ${D}/usr/bin/
 
-    install -m 0755 ${S}H264_UVC_TestAP ${D}/usr/bin/
+    install -m 0755 ${S}/H264_UVC_TestAP ${D}/usr/bin/
 }

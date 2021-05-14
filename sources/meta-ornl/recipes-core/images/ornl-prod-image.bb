@@ -25,9 +25,6 @@ IMAGE_INSTALL_append += " \
 	gps-utils \
 	gstd \
 	gst-interpipe \
-	imx-test \
-	iperf3 \
-	ksz-initscripts \
 	libgps \
 	libsodium \
 	libsodium-dev \
@@ -36,7 +33,6 @@ IMAGE_INSTALL_append += " \
 	libxslt-dev \
 	m4 \
 	make \
-	mfgtest \
 	minicom \
 	networkmanager \
 	nodejs \
@@ -44,14 +40,8 @@ IMAGE_INSTALL_append += " \
 	ntp-bin \
 	openssl \
 	openssl-bin \
-	packagegroup-core-full-cmdline \
-	packagegroup-fsl-gstreamer1.0 \
-	packagegroup-fsl-gstreamer1.0-full \
-	packagegroup-fsl-tools-gpu \
-	packagegroup-fsl-tools-gpu-external \
-	packagegroup-imx-tools-audio \
+	packagegroup-cockpit \
 	pkgconfig \
-	postinstall \
 	python-compiler \
 	python3 \
 	python3-bottle \

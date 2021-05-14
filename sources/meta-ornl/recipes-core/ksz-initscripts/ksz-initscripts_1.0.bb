@@ -35,3 +35,5 @@ do_install() {
           ${D}${sysconfdir}/systemd/system/multi-user.target.wants/init-ksz9897.service
     fi
 }
+
+COMPATIBLE_MACHINE = "var-som-mx6-ornl"
