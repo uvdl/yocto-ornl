@@ -47,7 +47,7 @@ ifeq ($(MACHINE), var-som-mx6-ornl)
 MACHINE_FOLDER=variscite
 YOCTO_VERSION=dunfell
 YOCTO_DISTRO=fslc-framebuffer
-YOCTO_IMG=var-$(YOCTO_PROD)-update-full-image
+YOCTO_IMG=var-$(YOCTO_PROD)-image-swu
 YOCTO_DIR := $(EPHEMERAL)/$(PROJECT)-$(YOCTO_VERSION)
 ETH0_NETWORK=$(YOCTO_DIR)/sources/meta-ornl/recipes-core/default-eth0/files/$(DEFAULT_NETWORK_FILE)
 endif
@@ -113,7 +113,7 @@ $(YOCTO_DIR)/setup-environment: $(REPO) $(YOCTO_DIR)
 		$(REPO) sync -j$(CPUS)
 	@if [ ! -x $@ ] ; then false ; fi
 
-environment: $(YOCTO_DIR)/setup-environment
+environment:
 	cd $(YOCTO_DIR) && \
 		rm -rf $(YOCTO_DIR)/sources/meta-ornl && \
 		cp -r $(CURDIR)/sources/meta-ornl $(YOCTO_DIR)/sources && \
@@ -196,6 +196,7 @@ endif
 
 build: 
 ifeq ($(MACHINE), var-som-mx6-ornl)
+	cp -rf build/conf/variscite/* $(YOCTO_DIR)/build_ornl/conf/
 	cd $(YOCTO_DIR) && \
 		MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV) && \
 		if [ -e $(YOCTO_DIR)/$(YOCTO_ENV)/.toaster ] ; then cd $(YOCTO_DIR) && \
@@ -205,6 +206,7 @@ ifeq ($(MACHINE), var-som-mx6-ornl)
 			LANG=$(LANG) bitbake $(YOCTO_CMD)
 endif
 ifeq ($(MACHINE), jetson-xavier-nx-devkit)
+	cp -rf build/conf/jetson/* $(YOCTO_DIR)/build_ornl/conf/	
 	cd $(YOCTO_DIR) && \
 		. $(YOCTO_DIR)/ornl-yocto-tegra/setup-env --machine $(MACHINE) --distro ornl-tegra $(YOCTO_ENV) && \
 		if [ -e $(YOCTO_DIR)/$(YOCTO_ENV)/.toaster ] ; then cd $(YOCTO_DIR) && \
@@ -214,6 +216,7 @@ ifeq ($(MACHINE), jetson-xavier-nx-devkit)
 			LANG=$(LANG) bitbake $(YOCTO_CMD)
 endif
 ifeq ($(MACHINE), raspberrypi4-64)
+	cp -rf build/conf/raspberrypi/* $(YOCTO_DIR)/build_ornl/conf/
 	cd $(YOCTO_DIR) && \
 		. $(YOCTO_DIR)/ornl-yocto-rpi/layers/poky/oe-init-build-env $(YOCTO_ENV) && \
 		if [ -e $(YOCTO_DIR)/$(YOCTO_ENV)/.toaster ] ; then cd $(YOCTO_DIR) && \
