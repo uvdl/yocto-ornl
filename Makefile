@@ -11,6 +11,7 @@ EPHEMERAL := /tmp
 # allow for generation of working eth0
 HOST := 10.223.0.1
 NETMASK := 16
+DEFAULT_NETWORK_FILE := 10-eth0.network
 
 .EXPORT_ALL_VARIABLES:
 
@@ -48,7 +49,7 @@ YOCTO_VERSION=dunfell
 YOCTO_DISTRO=fslc-framebuffer
 YOCTO_IMG=var-$(YOCTO_PROD)-update-full-image
 YOCTO_DIR := $(EPHEMERAL)/$(PROJECT)-$(YOCTO_VERSION)
-ETH0_NETWORK=$(YOCTO_DIR)/sources/meta-ornl/recipes-core/default-eth0/files/eth0.network
+ETH0_NETWORK=$(YOCTO_DIR)/sources/meta-ornl/recipes-core/default-eth0/files/$(DEFAULT_NETWORK_FILE)
 endif
 ifeq ($(MACHINE), raspberrypi4-64)
 MACHINE_FOLDER=raspberrypi
@@ -56,7 +57,7 @@ YOCTO_VERSION=gatesgarth
 YOCTO_DISTRO=ornl-rpi
 YOCTO_IMG=raspberrypi-$(YOCTO_PROD)-full-image
 YOCTO_DIR := $(EPHEMERAL)/$(PROJECT)-$(YOCTO_VERSION)
-ETH0_NETWORK=$(YOCTO_DIR)/ornl-yocto-rpi/layers/meta-ornl/recipes-core/default-eth0/files/eth0.network
+ETH0_NETWORK=$(YOCTO_DIR)/ornl-yocto-rpi/layers/meta-ornl/recipes-core/default-eth0/files/$(DEFAULT_NETWORK_FILE)
 endif
 ifeq ($(MACHINE), jetson-xavier-nx-devkit)
 MACHINE_FOLDER=jetson
@@ -64,7 +65,7 @@ YOCTO_VERSION=FIXME
 YOCTO_DISTRO=FIXME
 YOCTO_IMG=FIXME-$(YOCTO_PROD)-full-image
 YOCTO_DIR := $(EPHEMERAL)/$(PROJECT)-$(YOCTO_VERSION)
-ETH0_NETWORK=$(YOCTO_DIR)/ornl-yocto-tegra/layers/meta-ornl/recipes-core/default-eth0/files/eth0.network
+ETH0_NETWORK=$(YOCTO_DIR)/ornl-yocto-tegra/layers/meta-ornl/recipes-core/default-eth0/files/$(DEFAULT_NETWORK_FILE)
 endif
 YOCTO_CMD := $(YOCTO_IMG)
 
@@ -120,7 +121,7 @@ environment: $(YOCTO_DIR)/setup-environment
 		mkdir -p $(YOCTO_DIR)/$(YOCTO_ENV)/conf
 		@echo "$(YOCTO_DIR)/sources/poky/bitbake/bin/../../meta-poky/conf" > $(YOCTO_DIR)/$(YOCTO_ENV)/conf/templateconf.cfg
 
-%/eth0.network:
+%/$(DEFAULT_NETWORK_FILE):
 	@echo "[Match]" > $@ && \
 		echo "Name=eth0" >> $@ && \
 		echo "" >> $@ && \
