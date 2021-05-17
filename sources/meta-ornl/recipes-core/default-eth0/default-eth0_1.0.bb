@@ -1,6 +1,6 @@
 DESCRIPTION = "Default static IP for eth0"
 
-SRC_URI = "file://eth0.network \
+SRC_URI = "file://10-eth0.network \
 "
 
 LICENSE = "MIT"
@@ -18,6 +18,6 @@ do_install() {
 	install -d ${D}/etc/systemd/network
 
 	if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)}; then
-		install -m 0644 ${WORKDIR}/eth0.network ${D}/etc/systemd/network
+		install -m 0644 ${WORKDIR}/10-eth0.network ${D}/etc/systemd/network
 	fi
 }
