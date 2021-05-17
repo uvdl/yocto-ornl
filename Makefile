@@ -113,7 +113,7 @@ $(YOCTO_DIR)/setup-environment: $(REPO) $(YOCTO_DIR)
 		$(REPO) sync -j$(CPUS)
 	@if [ ! -x $@ ] ; then false ; fi
 
-environment:
+environment: $(YOCTO_DIR)/setup-environment
 	cd $(YOCTO_DIR) && \
 		rm -rf $(YOCTO_DIR)/sources/meta-ornl && \
 		cp -r $(CURDIR)/sources/meta-ornl $(YOCTO_DIR)/sources && \
