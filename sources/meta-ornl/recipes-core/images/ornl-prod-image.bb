@@ -15,18 +15,58 @@ IMAGE_FEATURES += " \
 "
 
 IMAGE_INSTALL_append += " \
-	ornl-packagegroup-prod \
+	bind-utils \
+	default-eth0 \
+	dtc \
+	elp-h264 \
+	flex \
 	git \
+	gpsd \
+	gps-utils \
+	gstd \
+	gstreamer1.0-plugins-ugly \
+	gst-interpipe \
+	libgps \
 	libsodium \
 	libsodium-dev \
-	python3-pyyaml \
-	python3-netifaces \
+	libtool \
 	libxml2-dev \
 	libxslt-dev \
-	webcam-tools \
-	bind-utils \
-	libtool \
+	m4 \
+	make \
+	minicom \
+	networkmanager \
+	nodejs \
+	ntp \
+	ntp-bin \
+	openssl \
+	openssl-bin \
+	packagegroup-cockpit \
 	pkgconfig \
-	gstd \
-	gst-interpipe \
+	python3 \
+	python3-bottle \
+	python3-dev \
+	python3-future \
+	python3-lxml \
+	python3-mavproxy \
+	python3-netifaces \
+	python3-pexpect \
+	python3-pip \
+	python3-protobuf \
+	python3-pymavlink \
+	python3-pynmea2 \
+	python3-pyserial \
+	python3-pytz \
+	python3-pyyaml \
+	python3-requests \
+	python3-uptime \
+	python3-urllib3 \
+	screen \
+	sudo \
+	systemd-analyze \
+	tcpdump \
+	v4l-utils \
+	webcam-tools \
+	x264 \
+	x265 \
 "
