@@ -163,6 +163,9 @@ all:
 	@$(MAKE) --no-print-directory -B YOCTO_PROD=$(YOCTO_PROD) archive
 
 archive:
+	BuildScripts/ornl-create-archive.sh -p $(YOCTO_PROD) -m $(MACHINE) -ip $(HOST) -nm $(NETMASK) $(YOCTO_DIR)
+
+archive-old:
 	@mkdir -p $(ARCHIVE)/$(PROJECT)-$(DATE)
 ifeq ($(MACHINE), var-som-mx6-ornl)
 	@mkdir -p $(ARCHIVE)/$(PROJECT)-$(DATE)/dts
