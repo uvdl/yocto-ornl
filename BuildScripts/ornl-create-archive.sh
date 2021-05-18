@@ -65,7 +65,7 @@ while [ "$moreoptions" = 1 -a $# -gt 0 ]; do
                 #MACHINE_FOLDER=jetson
                 YOCTO_VERSION=FIXME
                 #YOCTO_DISTRO=FIXME
-            endif
+	    fi
         ;;
 	    -nm) shift ; NETMASK=${1} ;;
 	    -o) shift ; _OUT=${1} ;;
@@ -108,7 +108,7 @@ if [[ ($MACHINE == var-som-mx6 || $MACHINE == var-som-mx6-ornl) ]] ; then
 	tar czf ${_OUT}/kernel-source.tgz -C $(dirname ${KERNEL_SOURCE}) $(basename ${KERNEL_SOURCE})
 
     # .swu files for this MACHINE
-	( set -x ; swu=$(find ${YOCTO_DIR}/${YOCTO_ENV} -name "var-image-swu-$(MACHINE).swu" | head -1) ; set +x ;
+	( set -x ; swu=$(find ${YOCTO_DIR}/${YOCTO_ENV} -name "var-image-swu-${MACHINE}.swu" | head -1) ; set +x ;
 		if [ ! -z ${swu} ] ; then set -x ; cp ${swu} ${_OUT}/var-${YOCTO_PROD}-image-${HOST}-${NETMASK}.swu ; fi )
 
     # the SDK for this MACHINE
@@ -119,7 +119,7 @@ if [[ ($MACHINE == var-som-mx6 || $MACHINE == var-som-mx6-ornl) ]] ; then
     # calculate hashes for various files
 	commit=$(git log | head -1 | tr -s ' ' | cut -f2 | tr -s ' ' | cut -f2 -d' ') ;
         echo "yocto-ornl: $$commit" > ${_OUT}/hashes
-	( cd $(KERNEL_SOURCE) && commit=$(git log | head -1 | tr -s ' ' | cut -f2 | tr -s ' ' | cut -f2 -d' ') ;
+	( cd ${KERNEL_SOURCE} && commit=$(git log | head -1 | tr -s ' ' | cut -f2 | tr -s ' ' | cut -f2 -d' ') ;
         echo "kernel: $$commit" >> ${_OUT}/hashes )
 
     # write instructions on use out
