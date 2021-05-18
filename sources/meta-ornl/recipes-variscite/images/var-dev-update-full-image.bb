@@ -31,8 +31,6 @@ IMAGE_INSTALL_append = " \
     kernel-image \
     kernel-devicetree \
     u-boot-variscite \
-	dhcp-server \
-	mosquitto \
 "
 
 COMPATIBLE_MACHINE = "var-som-mx6-ornl"
