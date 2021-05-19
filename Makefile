@@ -291,6 +291,9 @@ ifeq ($(MACHINE), var-som-mx6-ornl)
 	else \
 		echo "Please provide a DEV; make DEV=/dev/sdb sd" && false ; \
 	fi
+else
+	echo "SD card write for $(MACHINE) is not defined" && false
+endif
 
 sdk:
 	@$(MAKE) --no-print-directory -B environment
