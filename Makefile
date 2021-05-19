@@ -137,11 +137,9 @@ environment: $(YOCTO_DIR)/setup-environment
 
 environment-update: $(YOCTO_DIR)/setup-environment
 	BuildScripts/ornl-setup-yocto.sh -m $(MACHINE) -v $(YOCTO_VERSION) $(YOCTO_DIR)
-	#@rm -rf $(YOCTO_DIR)/sources/meta-ornl
-	#@cp -r $(CURDIR)/sources/meta-ornl $(YOCTO_DIR)/sources
-	@$(MAKE) --no-print-directory -B $(ETH0_NETWORK)
+	@$(MAKE) --no-print-directory -B HOST=$(HOST) NETMASK=$(NETMASK) $(ETH0_NETWORK)
 ifeq ($(MACHINE), var-som-mx6-ornl)
-	@$(MAKE) --no-print-directory -B $(YOCTO_DIR)/$(MFGTEST_SH)
+	@$(MAKE) --no-print-directory -B HOST=$(HOST) NETMASK=$(NETMASK) $(YOCTO_DIR)/$(MFGTEST_SH)
 endif
 	@echo "*** ENVIRONMENT SETUP ***"
 	@echo "Please execute the following in your shell before giving bitbake commands:"
@@ -164,38 +162,6 @@ all:
 
 archive:
 	BuildScripts/ornl-create-archive.sh -p $(YOCTO_PROD) -m $(MACHINE) -ip $(HOST) -nm $(NETMASK) $(YOCTO_DIR)
-
-archive-old:
-	@mkdir -p $(ARCHIVE)/$(PROJECT)-$(DATE)
-ifeq ($(MACHINE), var-som-mx6-ornl)
-	@mkdir -p $(ARCHIVE)/$(PROJECT)-$(DATE)/dts
-	@( commit=$$(git log | head -1 | tr -s ' ' | cut -f2 | tr -s ' ' | cut -f2 -d' ') ; echo "yocto-ornl: $$commit" > $(ARCHIVE)/$(PROJECT)-$(DATE)/hashes )
-	@( for f in `find $(YOCTO_DIR)/$(YOCTO_ENV)/$(KERNEL_DTS) -name "*.dtb" -print` ; do n=$$(basename $$f) ; nb=$${n%.*} ; dtc -I dtb -O dts -o $(ARCHIVE)/$(PROJECT)-$(DATE)/dts/$${nb}.dts $$f ; ( set -x && cp $$f $(ARCHIVE)/$(PROJECT)-$(DATE)/dts/$${nb}.dtb ) ; done )
-	@mkdir -p $(ARCHIVE)/$(PROJECT)-$(DATE)/$(YOCTO_ENV)/tmp/deploy/images
-	@rsync --links -rtp --exclude={*.wic.gz,*.manifest,*testdata*,*.ubi*,*.cfg} $(YOCTO_DIR)/$(YOCTO_ENV)/tmp/deploy/images/$(MACHINE) $(ARCHIVE)/$(PROJECT)-$(DATE)/$(YOCTO_ENV)/tmp/deploy/images/
-	@mkdir -p $(ARCHIVE)/$(PROJECT)-$(DATE)/$(YOCTO_ENV)/sources/meta-variscite-fslc/scripts
-	cp -r $(YOCTO_DIR)/sources/meta-variscite-fslc/scripts/var_mk_yocto_sdcard/var-create-yocto-sdcard.sh $(ARCHIVE)/$(PROJECT)-$(DATE)/$(YOCTO_ENV)/sources/meta-variscite-fslc/scripts
-	cp -r $(YOCTO_DIR)/sources/meta-variscite-fslc/scripts/var_mk_yocto_sdcard/variscite_scripts $(ARCHIVE)/$(PROJECT)-$(DATE)/$(YOCTO_ENV)/sources/meta-variscite-fslc/scripts
-	cp $(YOCTO_DIR)/$(YOCTO_ENV)/$(KERNEL_IMAGE) $(ARCHIVE)/$(PROJECT)-$(DATE)
-	tar czf $(ARCHIVE)/$(PROJECT)-$(DATE)/kernel-source.tgz -C $(shell dirname $(KERNEL_SOURCE)) $(shell basename $(KERNEL_SOURCE))
-	@( cd $(KERNEL_SOURCE) && commit=$$(git log | head -1 | tr -s ' ' | cut -f2 | tr -s ' ' | cut -f2 -d' ') ; echo "kernel: $$commit" >> $(ARCHIVE)/$(PROJECT)-$(DATE)/hashes )
-	( set -x ; swu=$$(find $(YOCTO_DIR)/$(YOCTO_ENV) -name "var-image-swu-$(MACHINE).swu" | head -1) ; set +x ; \
-		if [ ! -z $${swu} ] ; then set -x ; cp $${swu} $(ARCHIVE)/$(PROJECT)-$(DATE)/var-$(YOCTO_PROD)-image-$(HOST)-$(NETMASK).swu ; fi )
-	@if [ -d $(YOCTO_DIR)/$(YOCTO_ENV)/tmp/deploy/sdk ] ; then set -x ; cp -r $(YOCTO_DIR)/$(YOCTO_ENV)/tmp/deploy/sdk $(ARCHIVE)/$(PROJECT)-$(DATE) ; fi
-	@echo "# To write image to MMC, do:" > $(ARCHIVE)/$(PROJECT)-$(DATE)/readme.txt
-	@echo "DEV=/dev/sdx" >> $(ARCHIVE)/$(PROJECT)-$(DATE)/readme.txt
-	@echo "$(SUDO) MACHINE=$(MACHINE) $(YOCTO_ENV)/sources/meta-variscite-fslc/scripts/var-create-yocto-sdcard.sh -a -r $(YOCTO_ENV)/tmp/deploy/images/$(MACHINE)/$(YOCTO_IMG)-$(MACHINE) \$${DEV}" >> $(ARCHIVE)/$(PROJECT)-$(DATE)/readme.txt
-	@if [ -e $(ARCHIVE)/$(PROJECT)-$(DATE)/var-$(YOCTO_PROD)-image-$(HOST)-$(NETMASK).swu ] ; then echo "# load var-$(YOCTO_PROD)-image-$(HOST)-$(NETMASK).swu to port :9080" >> $(ARCHIVE)/$(PROJECT)-$(DATE)/readme.txt ; fi
-	@if [ -d $(ARCHIVE)/$(PROJECT)-$(DATE)/sdk ] ; then echo "# A Cross-platform SDK is available in ./sdk" >> $(ARCHIVE)/$(PROJECT)-$(DATE)/readme.txt ; fi
-endif
-ifeq ($(MACHINE), jetson-xavier-nx-devkit)
-	@tar -xf $(YOCTO_DIR)/$(YOCTO_ENV)/tmp/deploy/images/$(MACHINE)/$(YOCTO_IMG)-$(MACHINE).tegraflash.tar.gz -C $(ARCHIVE)/$(PROJECT)-$(DATE)
-endif
-ifeq ($(MACHINE), raspberrypi4-64)
-	cp -f $(YOCTO_DIR)/$(YOCTO_ENV)/tmp-glibc/deploy/images/$(MACHINE)/$(YOCTO_IMG)-$(MACHINE).wic.bz2 $(ARCHIVE)/$(PROJECT)-$(DATE)
-	@cd $(ARCHIVE)/$(PROJECT)-$(DATE) && \
-		bzip2 -d $(YOCTO_IMG)-$(MACHINE).wic.bz2
-endif
 
 build: 
 ifeq ($(MACHINE), var-som-mx6-ornl)
