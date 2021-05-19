@@ -72,9 +72,9 @@ esac
 
 # FIXME: *OR* we may have to do it still if we switch between variscite/jetson/raspberrypi builds...
 if [ "${YOCTO_CMD}" == "toaster install" ] ; then
-	cd $(YOCTO_DIR)/sources/poky
+	cd ${YOCTO_DIR}/sources/poky
 		pip3 install --user -r bitbake/toaster-requirements.txt
-		touch $(YOCTO_DIR)/$(YOCTO_ENV)/.toaster
+		touch ${YOCTO_DIR}/${YOCTO_ENV}/.toaster
 elif [ "${YOCTO_CMD}" == "toaster start" ] ; then
     if [ -e ${YOCTO_DIR}/${YOCTO_ENV}/.toaster ] ; then
 	    cd ${YOCTO_DIR}
