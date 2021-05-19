@@ -80,7 +80,7 @@ fi
 # The reason this script exists at all...
 if [ ! -z "${YOCTO_CMD}" ] ; then
 	cd ${YOCTO_DIR}/${YOCTO_ENV}
-    LANG=$(LANG) bitbake ${YOCTO_CMD}
+    LANG=${LANG} bitbake ${YOCTO_CMD}
 fi
 
 exit 0
