@@ -37,7 +37,6 @@ PROJECT_TAG := core
 REPO=$(EPHEMERAL)/repo
 REPO_LOC=https://storage.googleapis.com/git-repo-downloads/repo-1
 REPO_SUM=b5caa4be6496419057c5e1b1cdff1e4bdd3c1845eec87bd89ecb2e463a3ee62c
-TOASTER_PORT := 8000
 
 # Known variations
 # FIXME: requires mod to BuildScripts/ornl-setup-yocto.sh
@@ -114,6 +113,9 @@ $(YOCTO_DIR)/setup-environment: $(REPO) $(YOCTO_DIR)
 	@if [ ! -x $@ ] ; then false ; fi
 
 environment: $(YOCTO_DIR)/setup-environment
+	BuildScripts/ornl-setup-yocto.sh -m $(MACHINE) -v $(YOCTO_VERSION) $(YOCTO_DIR)
+
+old-environment: $(YOCTO_DIR)/setup-environment
 	cd $(YOCTO_DIR) && \
 		rm -rf $(YOCTO_DIR)/sources/meta-ornl && \
 		cp -r $(CURDIR)/sources/meta-ornl $(YOCTO_DIR)/sources && \
@@ -135,7 +137,7 @@ environment: $(YOCTO_DIR)/setup-environment
 	cat $(CURDIR)/$(MFGTEST_SH) | sed -e 's/10.223.0.2/$(PINGHOST)/g' > $@
 	@chmod a+x $@
 
-environment-update: $(YOCTO_DIR)/setup-environment
+old-environment-update: $(YOCTO_DIR)/setup-environment
 	BuildScripts/ornl-setup-yocto.sh -m $(MACHINE) -v $(YOCTO_VERSION) $(YOCTO_DIR)
 	@$(MAKE) --no-print-directory -B HOST=$(HOST) NETMASK=$(NETMASK) $(ETH0_NETWORK)
 ifeq ($(MACHINE), var-som-mx6-ornl)
@@ -145,25 +147,29 @@ endif
 	@echo "Please execute the following in your shell before giving bitbake commands:"
 	@echo "cd $(YOCTO_DIR) && MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV)"
 
-sd.img$(DOT_GZ): $(YOCTO_DIR)/$(YOCTO_ENV)/tmp/deploy/images/$(MACHINE)/$(YOCTO_IMG)-$(MACHINE).wic$(DOT_GZ)
-	ln -sf $(YOCTO_DIR)/$(YOCTO_ENV)/tmp/deploy/images/$(MACHINE)/$(YOCTO_IMG)-$(MACHINE).wic$(DOT_GZ) $@
+#sd.img$(DOT_GZ): $(YOCTO_DIR)/$(YOCTO_ENV)/tmp/deploy/images/$(MACHINE)/$(YOCTO_IMG)-$(MACHINE).wic$(DOT_GZ)
+#	ln -sf $(YOCTO_DIR)/$(YOCTO_ENV)/tmp/deploy/images/$(MACHINE)/$(YOCTO_IMG)-$(MACHINE).wic$(DOT_GZ) $@
 
 # var-$(YOCTO_PROD)-update-full-image has a bug in some post-build stage that gives a fault exit code
 # var-$(YOCTO_PROD)-image-swu doesn't exist anymore, only var-image-swu (?)
 all:
 	@$(MAKE) --no-print-directory -B dependencies
 	@$(MAKE) --no-print-directory -B environment
-	@$(MAKE) --no-print-directory -B environment-update
+	#@$(MAKE) --no-print-directory -B environment-update
 	@$(MAKE) --no-print-directory -B toaster
-	-@$(MAKE) --no-print-directory -B YOCTO_IMG=var-$(YOCTO_PROD)-update-full-image build
-	@$(MAKE) --no-print-directory -B YOCTO_IMG=var-image-swu build
-	@$(MAKE) --no-print-directory -B YOCTO_IMG=var-$(YOCTO_PROD)-update-full-image YOCTO_CMD="-c populate_sdk var-$(YOCTO_PROD)-update-full-image" build
+	-@$(MAKE) --no-print-directory -B YOCTO_CMD=var-$(YOCTO_PROD)-update-full-image build
+	@$(MAKE) --no-print-directory -B YOCTO_CMD=var-image-swu build
+	@$(MAKE) --no-print-directory -B YOCTO_CMD="-c populate_sdk var-$(YOCTO_PROD)-update-full-image" build
 	@$(MAKE) --no-print-directory -B YOCTO_PROD=$(YOCTO_PROD) archive
 
 archive:
 	BuildScripts/ornl-create-archive.sh -p $(YOCTO_PROD) -m $(MACHINE) -ip $(HOST) -nm $(NETMASK) $(YOCTO_DIR)
 
-build: 
+build:
+	BuildScripts/ornl-bitbake.sh -m $(MACHINE) -d $(YOCTO_DIR) -e $(YOCTO_ENV) $(YOCTO_CMD)
+
+TOASTER_PORT := 8000
+old-build:
 ifeq ($(MACHINE), var-som-mx6-ornl)
 	cp -rf build/conf/variscite/* $(YOCTO_DIR)/build_ornl/conf/
 	cd $(YOCTO_DIR) && \
@@ -239,7 +245,7 @@ id:
 # https://github.com/uvdl/yocto-ornl/issues/11#issuecomment-462969336
 # Edison's email from 2019-03-15 Re: FEC driver debugging
 kernel:
-	-rm sd.img$(DOT_GZ)
+ifeq ($(MACHINE), var-som-mx6-ornl)
 	cd $(YOCTO_DIR) && \
 		MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV) && \
 		kernel=$(shell find $(YOCTO_DIR)/$(YOCTO_ENV) -type d -name "$(KERNEL_VER)*-r0" -print | head -1) && \
@@ -247,13 +253,20 @@ kernel:
 		./run.do_compile && \
 		./run.do_compile_kernelmodules && \
 		echo "kernel built in $(YOCTO_DIR)/$(YOCTO_ENV)/$(KERNEL_IMAGE)"
+else
+	echo "kernel build for $(MACHINE) is not defined" && false
+endif
 
 kernel-config:
+ifeq ($(MACHINE), var-som-mx6-ornl)
 	cd $(YOCTO_DIR) && \
 		MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV) && \
 		kernel=$(shell find $(YOCTO_DIR)/$(YOCTO_ENV) -type d -name "$(KERNEL_VER)*-r0" -print | head -1) && \
 		cd $${kernel}/temp && \
 		LANG=$(LANG) bitbake linux-variscite -c menuconfig
+else
+	echo "kernel config for $(MACHINE) is not defined" && false
+endif
 
 kernel-pull:
 	@( cd $(KERNEL_SOURCE) && git pull )
@@ -268,8 +281,11 @@ locale:
 mrproper: clean toaster-stop
 	-rm -rf $(YOCTO_DIR)
 
-sd: $(YOCTO_DIR)/sources/meta-variscite-fslc/scripts/var_mk_yocto_sdcard/var-create-yocto-sdcard.sh $(YOCTO_DIR)/$(YOCTO_ENV)/tmp/deploy/images/$(MACHINE)/$(YOCTO_IMG)
-	@if ! [ -z "$(DEV)" ] ; then cd $(YOCTO_DIR) && \
+sd:
+ifeq ($(MACHINE), var-som-mx6-ornl)
+	@file $(YOCTO_DIR)/$(YOCTO_ENV)/tmp/deploy/images/$(MACHINE)/$(YOCTO_IMG)
+	@file $(YOCTO_DIR)/sources/meta-variscite-fslc/scripts/var_mk_yocto_sdcard/var-create-yocto-sdcard.sh
+	@if [ ! -z "$(DEV)" ] ; then cd $(YOCTO_DIR) && \
 		MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV) && \
 		$(SUDO) MACHINE=$(MACHINE) $(YOCTO_DIR)/sources/meta-variscite-fslc/scripts/var_mk_yocto_sdcard/var-create-yocto-sdcard.sh -a -r $(YOCTO_DIR)/$(YOCTO_ENV)/tmp/deploy/images/$(MACHINE)/$(YOCTO_IMG) $(DEV) ; \
 	else \
@@ -277,9 +293,9 @@ sd: $(YOCTO_DIR)/sources/meta-variscite-fslc/scripts/var_mk_yocto_sdcard/var-cre
 	fi
 
 sdk:
-	@$(MAKE) --no-print-directory -B environment-update
-	@$(MAKE) --no-print-directory -B build
-	@$(MAKE) --no-print-directory -B YOCTO_IMG=var-$(YOCTO_PROD)-update-full-image YOCTO_CMD="-c populate_sdk var-$(YOCTO_PROD)-update-full-image" build
+	@$(MAKE) --no-print-directory -B environment
+	@$(MAKE) --no-print-directory -B YOCTO_CMD=var-$(YOCTO_PROD)-update-full-image build
+	@$(MAKE) --no-print-directory -B YOCTO_CMD="-c populate_sdk var-$(YOCTO_PROD)-update-full-image" build
 	@$(MAKE) --no-print-directory -B YOCTO_PROD=$(YOCTO_PROD) archive
 
 see:
@@ -297,21 +313,20 @@ see:
 	@echo "MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV)"
 	@echo "cd $(YOCTO_DIR)/$(YOCTO_ENV) && LANG=$(LANG) bitbake $(YOCTO_CMD)"
 	@echo "**********************"
-	@echo "Use: \"make toaster\" to install it so it can track the build (port $(TOASTER_PORT))"
+	@echo "Use: \"make toaster\" to install it so it can track the build"
 	@echo "Use: \"make all\" to perform this build"
 
 # var-$(YOCTO_PROD)-image-swu doesn't exist anymore, only var-image-swu (?)
 swu:
-	@$(MAKE) --no-print-directory -B environment-update
-	-@$(MAKE) --no-print-directory -B YOCTO_IMG=var-$(YOCTO_PROD)-update-full-image build
-	@$(MAKE) --no-print-directory -B YOCTO_IMG=var-image-swu build
+	@$(MAKE) --no-print-directory -B environment
+	-@$(MAKE) --no-print-directory -B YOCTO_CMD=var-$(YOCTO_PROD)-update-full-image build
+	@$(MAKE) --no-print-directory -B YOCTO_CMD=var-image-swu build
 	@$(MAKE) --no-print-directory -B YOCTO_PROD=$(YOCTO_PROD) archive
 
-toaster: $(YOCTO_DIR)/setup-environment
+toaster:
+	@$(MAKE) --no-print-directory -B environment
 	# https://www.yoctoproject.org/docs/latest/toaster-manual/toaster-manual.html#toaster-manual-start
 	cd $(YOCTO_DIR) && \
-		rm -rf $(YOCTO_DIR)/sources/meta-ornl && \
-		cp -r $(CURDIR)/sources/meta-ornl $(YOCTO_DIR)/sources && \
 		MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV) && \
 		cd $(YOCTO_DIR)/sources/poky && \
 			pip3 install --user -r bitbake/toaster-requirements.txt && \
