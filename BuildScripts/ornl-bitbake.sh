@@ -41,7 +41,7 @@ while [ "$moreoptions" = 1 -a $# -gt 0 ]; do
 	    -h) help; exit 3 ;;
 	    -m) shift ; MACHINE=${1} ;;
 	    -tp) shift ; TOASTER_PORT=${1} ;;
-	    *)  moreoptions=0; YOCTO_CMD=$1 ;;
+	    *)  moreoptions=0; YOCTO_CMD=$* ; break ;;
 	esac
 	[ "$moreoptions" = 0 ] && [ $# -gt 1 ] && help && exit 1
 	[ "$moreoptions" = 1 ] && shift
