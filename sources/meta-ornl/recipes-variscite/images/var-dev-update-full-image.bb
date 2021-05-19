@@ -26,11 +26,11 @@ IMAGE_INSTALL_append = " \
 	packagegroup-tools-bluetooth \
 	perf \
 	postinstall \
-    swupdate \
-    swupdate-www \
-    kernel-image \
-    kernel-devicetree \
-    u-boot-variscite \
+	swupdate \
+	swupdate-www \
+	kernel-image \
+	kernel-devicetree \
+	u-boot-variscite \
 "
 
 COMPATIBLE_MACHINE = "var-som-mx6-ornl"
