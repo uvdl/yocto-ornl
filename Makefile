@@ -295,9 +295,10 @@ else
 	echo "SD card write for $(MACHINE) is not defined" && false
 endif
 
+# var-$(YOCTO_PROD)-update-full-image has a bug in some post-build stage that gives a fault exit code
 sdk:
 	@$(MAKE) --no-print-directory -B environment
-	@$(MAKE) --no-print-directory -B YOCTO_CMD=var-$(YOCTO_PROD)-update-full-image build
+	-@$(MAKE) --no-print-directory -B YOCTO_CMD=var-$(YOCTO_PROD)-update-full-image build
 	@$(MAKE) --no-print-directory -B YOCTO_CMD="-c populate_sdk var-$(YOCTO_PROD)-update-full-image" build
 	@$(MAKE) --no-print-directory -B YOCTO_PROD=$(YOCTO_PROD) archive
 
@@ -319,6 +320,7 @@ see:
 	@echo "Use: \"make toaster\" to install it so it can track the build"
 	@echo "Use: \"make all\" to perform this build"
 
+# var-$(YOCTO_PROD)-update-full-image has a bug in some post-build stage that gives a fault exit code
 # var-$(YOCTO_PROD)-image-swu doesn't exist anymore, only var-image-swu (?)
 swu:
 	@$(MAKE) --no-print-directory -B environment
