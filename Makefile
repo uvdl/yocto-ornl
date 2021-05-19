@@ -261,7 +261,7 @@ see:
 	@echo "MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV)"
 	@echo "cd $(YOCTO_DIR)/$(YOCTO_ENV) && LANG=$(LANG) bitbake $(YOCTO_CMD)"
 	@echo "**********************"
-	@echo "Use: \"make toaster\" to install it so it can track the build"
+	@echo "Use: \"make toaster\" to install/start it so it can track the build"
 	@echo "Use: \"make all\" to perform this build"
 
 # var-$(YOCTO_PROD)-update-full-image has a bug in some post-build stage that gives a fault exit code
@@ -273,6 +273,10 @@ swu:
 	@$(MAKE) --no-print-directory -B YOCTO_PROD=$(YOCTO_PROD) archive
 
 toaster:
+	BuildScripts/ornl-bitbake.sh -m $(MACHINE) -d $(YOCTO_DIR) -e $(YOCTO_ENV) toaster install
+	BuildScripts/ornl-bitbake.sh -m $(MACHINE) -d $(YOCTO_DIR) -e $(YOCTO_ENV) toaster start
+
+old-toaster:
 	@$(MAKE) --no-print-directory -B environment
 	# https://www.yoctoproject.org/docs/latest/toaster-manual/toaster-manual.html#toaster-manual-start
 	cd $(YOCTO_DIR) && \
@@ -282,6 +286,9 @@ toaster:
 			touch $(YOCTO_DIR)/$(YOCTO_ENV)/.toaster
 
 toaster-stop:
+	BuildScripts/ornl-bitbake.sh -m $(MACHINE) -d $(YOCTO_DIR) -e $(YOCTO_ENV) toaster stop
+
+old-toaster-stop:
 	@if [ -e $(YOCTO_DIR)/$(YOCTO_ENV)/.toaster ] ; then cd $(YOCTO_DIR) && \
 		MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV) && \
 		( cd $(YOCTO_DIR)/$(YOCTO_ENV) ; source toaster stop ) ; true ; fi

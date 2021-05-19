@@ -70,15 +70,22 @@ raspberrypi4-64)
     ;;
 esac
 
-# FIXME: now that we are not wiping the ${YOCTO_DIR}/sources, we may not need to restart toaster each time
 # FIXME: *OR* we may have to do it still if we switch between variscite/jetson/raspberrypi builds...
-if [ -e ${YOCTO_DIR}/${YOCTO_ENV}/.toaster ] ; then
-	cd ${YOCTO_DIR}
-	source toaster stop && sleep 5
-	source toaster webport=0.0.0.0:${TOASTER_PORT} start
-fi
-# The reason this script exists at all...
-if [ ! -z "${YOCTO_CMD}" ] ; then
+if [ "${YOCTO_CMD}" == "toaster install" ] ; then
+	cd $(YOCTO_DIR)/sources/poky
+		pip3 install --user -r bitbake/toaster-requirements.txt
+		touch $(YOCTO_DIR)/$(YOCTO_ENV)/.toaster
+elif [ "${YOCTO_CMD}" == "toaster start" ] ; then
+    if [ -e ${YOCTO_DIR}/${YOCTO_ENV}/.toaster ] ; then
+	    cd ${YOCTO_DIR}
+	    source toaster stop && sleep 5
+	    source toaster webport=0.0.0.0:${TOASTER_PORT} start
+    fi
+elif [ "${YOCTO_CMD}" == "toaster stop" ] ; then
+    cd ${YOCTO_DIR}
+    source toaster stop
+elif [ ! -z "${YOCTO_CMD}" ] ; then
+    # The reason this script exists at all...
 	cd ${YOCTO_DIR}/${YOCTO_ENV}
     LANG=${LANG} bitbake ${YOCTO_CMD}
 fi
