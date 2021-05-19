@@ -125,7 +125,7 @@ if [[ ($MACHINE == var-som-mx6 || $MACHINE == var-som-mx6-ornl) ]] ; then
     # write instructions on use out
 	echo "# To write image to MMC, do:" > ${_OUT}/readme.txt
 	echo "DEV=/dev/sdx" >> ${_OUT}/readme.txt
-	echo "sudo MACHINE=${MACHINE} ${YOCTO_ENV}/sources/meta-variscite-fslc/scripts/var-create-yocto-sdcard.sh -a -r ${YOCTO_ENV}/tmp/deploy/images/${MACHINE}/var-${YOCTO_PROD}-update-full-image-${MACHINE} \$\{DEV\}" >> ${_OUT}/readme.txt
+	echo "sudo MACHINE=${MACHINE} ${YOCTO_ENV}/sources/meta-variscite-fslc/scripts/var-create-yocto-sdcard.sh -a -r ${YOCTO_ENV}/tmp/deploy/images/${MACHINE}/var-${YOCTO_PROD}-update-full-image-${MACHINE} \${DEV}" >> ${_OUT}/readme.txt
 	if [ -e ${_OUT}/var-${YOCTO_PROD}-image-${HOST}-${NETMASK}.swu ] ; then
         echo "# load var-${YOCTO_PROD}-image-${HOST}-${NETMASK}.swu to port :9080" >> ${_OUT}/readme.txt
     fi
