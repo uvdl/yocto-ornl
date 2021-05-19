@@ -26,7 +26,7 @@ help() {
     echo "          raspberrypi4-64 - RPi Compute Module 4"
 	echo " -tp		override TOASTER_PORT (default ${TOASTER_PORT})"
 	echo
-	echo " Example: $bn ornl-bitbake.sh -p dev -m var-som-mx6-ornl -ip 172.18.0.1 -nm 16 -d /ephemeral/yoctl-ornl-dunfell var-dev-update-full-image"
+	echo " Example: $bn ornl-bitbake.sh -m var-som-mx6-ornl -d /ephemeral/yoctl-ornl-dunfell -e dunfell var-dev-update-full-image"
 	echo
 	echo " options:"
 	echo
