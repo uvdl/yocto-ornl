@@ -122,9 +122,9 @@ $(YOCTO_DIR)/setup-environment: $(REPO) $(YOCTO_DIR)
 
 # https://unix.stackexchange.com/questions/329083/how-to-replace-the-last-octet-of-a-valid-network-address-with-the-number-2
 # but this works better: https://stackoverflow.com/a/40125775
-%/mfgtest.sh:
+%/mfgtest.sh: sources/meta-ornl/recipes-ornl/mfgtest/mfgtest/$(MACHINE)/mfgtest.sh
 	@mkdir -p $(shell dirname $@)
-	cat $(CURDIR)/$(MFGTEST_SH) | sed -e 's/10.223.0.2/$(PINGHOST)/g' > $@
+	cat sources/meta-ornl/recipes-ornl/mfgtest/mfgtest/$(MACHINE)/mfgtest.sh | sed -e 's/10.223.0.2/$(PINGHOST)/g' > $@
 	@chmod a+x $@
 
 # var-$(YOCTO_PROD)-update-full-image has a bug in some post-build stage that gives a fault exit code
