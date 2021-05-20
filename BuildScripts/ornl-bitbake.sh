@@ -78,10 +78,12 @@ if [ "${YOCTO_CMD}" == "toaster enable" ] ; then
 	cd ${YOCTO_DIR}/sources/poky
 		pip3 install --user -r bitbake/toaster-requirements.txt
 		touch ${YOCTO_DIR}/${YOCTO_ENV}/.toaster
+	exit 0
 elif [ "${YOCTO_CMD}" == "toaster stop" ] ; then
     cd ${YOCTO_DIR}
     source toaster stop
     rm -f ${YOCTO_DIR}/${YOCTO_ENV}/.toaster
+	exit 0
 else
     if [ -e ${YOCTO_DIR}/${YOCTO_ENV}/.toaster ] ; then
 	    cd ${YOCTO_DIR}
