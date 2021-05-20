@@ -8,6 +8,7 @@ DATE := $(shell date +%Y-%m-%d_%H%M)
 ARCHIVE := /opt
 EPHEMERAL := /tmp
 
+
 # allow for generation of working eth0
 HOST := 10.223.0.1
 NETMASK := 16
@@ -35,8 +36,8 @@ PROJECT_REMOTE := $(USER)
 PROJECT_TAG := core
 # https://source.android.com/setup/develop#old-repo-python2
 REPO=$(EPHEMERAL)/repo
-REPO_LOC=https://storage.googleapis.com/git-repo-downloads/repo-1
-REPO_SUM=b5caa4be6496419057c5e1b1cdff1e4bdd3c1845eec87bd89ecb2e463a3ee62c
+REPO_LOC=https://storage.googleapis.com/git-repo-downloads/repo-2.14
+REPO_SUM=b74fda4aa5df31b88248a0c562691cb943a9c45cc9dd909d000f0e3cc265b685
 
 # Known variations
 # FIXME: requires mod to BuildScripts/ornl-setup-yocto.sh
@@ -48,7 +49,7 @@ YOCTO_VERSION=dunfell
 YOCTO_DISTRO=fslc-framebuffer
 YOCTO_IMG=var-$(YOCTO_PROD)-image-swu
 YOCTO_DIR := $(EPHEMERAL)/$(PROJECT)-$(YOCTO_VERSION)
-ETH0_NETWORK=$(YOCTO_DIR)/sources/meta-ornl/recipes-core/default-eth0/files/$(DEFAULT_NETWORK_FILE)
+ETH0_NETWORK=$(YOCTO_DIR)/ornl-layers/meta-ornl/recipes-core/default-eth0/files/$(DEFAULT_NETWORK_FILE)
 endif
 ifeq ($(MACHINE), raspberrypi4-64)
 MACHINE_FOLDER=raspberrypi
@@ -56,7 +57,7 @@ YOCTO_VERSION=gatesgarth
 YOCTO_DISTRO=ornl-rpi
 YOCTO_IMG=raspberrypi-$(YOCTO_PROD)-full-image
 YOCTO_DIR := $(EPHEMERAL)/$(PROJECT)-$(YOCTO_VERSION)
-ETH0_NETWORK=$(YOCTO_DIR)/ornl-yocto-rpi/layers/meta-ornl/recipes-core/default-eth0/files/$(DEFAULT_NETWORK_FILE)
+ETH0_NETWORK=$(YOCTO_DIR)/ornl-layers/meta-ornl/recipes-core/default-eth0/files/$(DEFAULT_NETWORK_FILE)
 endif
 ifeq ($(MACHINE), jetson-xavier-nx-devkit)
 MACHINE_FOLDER=jetson
@@ -64,7 +65,7 @@ YOCTO_VERSION=dunfell
 YOCTO_DISTRO=ornl-tegra
 YOCTO_IMG=FIXME-$(YOCTO_PROD)-full-image
 YOCTO_DIR := $(EPHEMERAL)/$(PROJECT)-$(YOCTO_VERSION)
-ETH0_NETWORK=$(YOCTO_DIR)/ornl-yocto-tegra/layers/meta-ornl/recipes-core/default-eth0/files/$(DEFAULT_NETWORK_FILE)
+ETH0_NETWORK=$(YOCTO_DIR)/ornl-layers/meta-ornl/recipes-core/default-eth0/files/$(DEFAULT_NETWORK_FILE)
 endif
 YOCTO_CMD := $(YOCTO_IMG)
 
@@ -75,7 +76,7 @@ KERNEL_IMAGE=tmp/deploy/images/$(MACHINE)/uImage
 KERNEL_DTS=tmp/deploy/images/$(MACHINE)
 
 # mfgtest.sh needs adjustment to default pinghost
-MFGTEST_SH=sources/meta-ornl/recipes-ornl/mfgtest/mfgtest/$(MACHINE)/mfgtest.sh
+MFGTEST_SH=ornl-layers/meta-ornl/recipes-ornl/mfgtest/mfgtest/$(MACHINE)/mfgtest.sh
 PINGHOST := $(shell echo $(HOST) | awk 'BEGIN{FS=OFS="."}{$$4=2}1')
 
 .PHONY: all archive build clean dependencies docker-deploy docker-image environment
