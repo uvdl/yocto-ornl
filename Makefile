@@ -8,6 +8,7 @@ DATE := $(shell date +%Y-%m-%d_%H%M)
 ARCHIVE := /opt
 EPHEMERAL := /tmp
 
+
 # allow for generation of working eth0
 HOST := 10.223.0.1
 NETMASK := 16
@@ -35,8 +36,8 @@ PROJECT_REMOTE := $(USER)
 PROJECT_TAG := core
 # https://source.android.com/setup/develop#old-repo-python2
 REPO=$(EPHEMERAL)/repo
-REPO_LOC=https://storage.googleapis.com/git-repo-downloads/repo-1
-REPO_SUM=b5caa4be6496419057c5e1b1cdff1e4bdd3c1845eec87bd89ecb2e463a3ee62c
+REPO_LOC=https://storage.googleapis.com/git-repo-downloads/repo-2.14
+REPO_SUM=b74fda4aa5df31b88248a0c562691cb943a9c45cc9dd909d000f0e3cc265b685
 
 # Known variations
 # FIXME: requires mod to BuildScripts/ornl-setup-yocto.sh
