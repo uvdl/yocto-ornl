@@ -135,7 +135,7 @@ all:
 	@$(MAKE) --no-print-directory -B toaster
 	-@$(MAKE) --no-print-directory -B YOCTO_CMD=var-$(YOCTO_PROD)-update-full-image build
 	@$(MAKE) --no-print-directory -B YOCTO_CMD=var-image-swu build
-	@$(MAKE) --no-print-directory -B YOCTO_CMD="-c populate_sdk var-$(YOCTO_PROD)-update-full-image" build
+	#@$(MAKE) --no-print-directory -B YOCTO_CMD="-c populate_sdk var-$(YOCTO_PROD)-update-full-image" build
 	@$(MAKE) --no-print-directory -B YOCTO_PROD=$(YOCTO_PROD) archive
 
 archive:
