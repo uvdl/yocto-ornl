@@ -457,7 +457,7 @@ function make_build_dir()
                 exit 1
         fi
         eval cd ${OLD_DIR}
-        # Variscite kind of forces us to overwrite the originial config files
+        # Variscite kind of forces us to overwrite the original config files
         copy_config_files
         ;;
     jetson-xavier-nx-devkit)
