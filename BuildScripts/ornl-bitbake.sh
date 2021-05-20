@@ -70,21 +70,26 @@ raspberrypi4-64)
     ;;
 esac
 
-# FIXME: *OR* we may have to do it still if we switch between variscite/jetson/raspberrypi builds...
-if [ "${YOCTO_CMD}" == "toaster install" ] ; then
+# NB: toaster has to be restarted *before* each bitbake command
+# it must be that something in setup-environment clears out toaster's database
+# and it only gets rebuilt upon start.  Bummer.  All this is because we continually
+# call setup-environment instead of working in a persistent shell.  Whatever.
+if [ "${YOCTO_CMD}" == "toaster enable" ] ; then
 	cd ${YOCTO_DIR}/sources/poky
 		pip3 install --user -r bitbake/toaster-requirements.txt
 		touch ${YOCTO_DIR}/${YOCTO_ENV}/.toaster
-elif [ "${YOCTO_CMD}" == "toaster start" ] ; then
+elif [ "${YOCTO_CMD}" == "toaster stop" ] ; then
+    cd ${YOCTO_DIR}
+    source toaster stop
+    rm -f ${YOCTO_DIR}/${YOCTO_ENV}/.toaster
+else
     if [ -e ${YOCTO_DIR}/${YOCTO_ENV}/.toaster ] ; then
 	    cd ${YOCTO_DIR}
 	    source toaster stop && sleep 5
 	    source toaster webport=0.0.0.0:${TOASTER_PORT} start
     fi
-elif [ "${YOCTO_CMD}" == "toaster stop" ] ; then
-    cd ${YOCTO_DIR}
-    source toaster stop
-elif [ ! -z "${YOCTO_CMD}" ] ; then
+fi
+if [ ! -z "${YOCTO_CMD}" ] ; then
     # The reason this script exists at all...
 	cd ${YOCTO_DIR}/${YOCTO_ENV}
     LANG=${LANG} bitbake ${YOCTO_CMD}
