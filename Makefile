@@ -179,7 +179,7 @@ docker-image: Dockerfile
 environment: $(YOCTO_DIR)/setup-environment
 	BuildScripts/ornl-setup-yocto.sh -m $(MACHINE) -v $(YOCTO_VERSION) $(YOCTO_DIR)
 	@$(MAKE) --no-print-directory -B HOST=$(HOST) NETMASK=$(NETMASK) $(ETH0_NETWORK)
-	@$(MAKE) --no-print-directory -B HOST=$(HOST) $(MFGTEST_SH)
+	@$(MAKE) --no-print-directory -B HOST=$(HOST) $(YOCTO_DIR)/$(MFGTEST_SH)
 
 id:
 	git config --global user.name "UVDL Developer"
