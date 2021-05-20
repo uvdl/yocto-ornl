@@ -378,45 +378,16 @@ function check_for_bin_repo()
 # =================================================================================
 function copying_ornl_layer()
 {
-    case "$TARGET_MACHINE" in
-    var-som-mx6-ornl)
-        # Ok now we know to some extent that the directories are available to us, move on.
-        cp -rf sources/meta-ornl $YOCTO_DIR_LOCATION/sources
-        if [ $? -ne 0 ]
-            then
-                echo
-                echo "============================================"
-                echo "${BOLD}Copy of ORNL layer failed...${NORMAL}"
-                echo "============================================"
-                exit 1
-        fi
-        ;;
-    jetson-xavier-nx-devkit-emmc)
-        # Fallthrough Example
-        ;&
-    jetson-xavier-nx-devkit)
-        cp -rf sources/meta-ornl $YOCTO_DIR_LOCATION/ornl-yocto-tegra/layers/
-        if [ $? -ne 0 ]
-            then
-                echo
-                echo "============================================"
-                echo "${BOLD}Copy of ORNL layer failed...${NORMAL}"
-                echo "============================================"
-                exit 1
-        fi
-        ;;
-    raspberrypi4-64)
-        cp -rf sources/meta-ornl $YOCTO_DIR_LOCATION/ornl-yocto-rpi/layers/
-        if [ $? -ne 0 ]
-            then
-                echo
-                echo "============================================"
-                echo "${BOLD}Copy of ORNL layer failed...${NORMAL}"
-                echo "============================================"
-                exit 1
-        fi
-        ;;
-    esac
+    mkdir -p $YOCTO_DIR_LOCATION/ornl-layers/
+    cp -rf sources/meta-ornl $YOCTO_DIR_LOCATION/ornl-layers/
+    if [ $? -ne 0 ]
+        then
+            echo
+            echo "============================================"
+            echo "${BOLD}Copy of ORNL layer failed...${NORMAL}"
+            echo "============================================"
+            exit 1
+    fi
 }
 
 # =================================================================================
