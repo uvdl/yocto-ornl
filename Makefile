@@ -78,8 +78,8 @@ KERNEL_DTS=tmp/deploy/images/$(MACHINE)
 MFGTEST_SH=sources/meta-ornl/recipes-ornl/mfgtest/mfgtest/$(MACHINE)/mfgtest.sh
 PINGHOST := $(shell echo $(HOST) | awk 'BEGIN{FS=OFS="."}{$$4=2}1')
 
-.PHONY: all archive build clean dependencies docker-deploy docker-image environment environment-update
-.PHONY: id kernel kernel-config kernel-pull locale mrproper sdk see swu
+.PHONY: all archive build clean dependencies docker-deploy docker-image environment
+.PHONY: id kernel kernel-config kernel-pull locale mrproper sd sdk see swu
 .PHONY: toaster toaster-stop
 
 # https://stackoverflow.com/questions/10858261/how-to-abort-makefile-if-variable-not-set
@@ -111,9 +111,6 @@ $(YOCTO_DIR)/setup-environment: $(REPO) $(YOCTO_DIR)
 		$(REPO) init -u $(PLATFORM_GIT) -b $(YOCTO_VERSION) && \
 		$(REPO) sync -j$(CPUS)
 	@if [ ! -x $@ ] ; then false ; fi
-
-environment: $(YOCTO_DIR)/setup-environment
-	BuildScripts/ornl-setup-yocto.sh -m $(MACHINE) -v $(YOCTO_VERSION) $(YOCTO_DIR)
 
 %/$(DEFAULT_NETWORK_FILE):
 	@echo "[Match]" > $@ && \
@@ -178,6 +175,11 @@ docker-deploy: docker-image
 
 docker-image: Dockerfile
 	docker build -t $(PROJECT):$(PROJECT_TAG) .
+
+environment: $(YOCTO_DIR)/setup-environment
+	BuildScripts/ornl-setup-yocto.sh -m $(MACHINE) -v $(YOCTO_VERSION) $(YOCTO_DIR)
+	@$(MAKE) --no-print-directory -B HOST=$(HOST) NETMASK=$(NETMASK) $(ETH0_NETWORK)
+	@$(MAKE) --no-print-directory -B HOST=$(HOST) $(MFGTEST_SH)
 
 id:
 	git config --global user.name "UVDL Developer"
