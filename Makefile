@@ -60,8 +60,8 @@ ETH0_NETWORK=$(YOCTO_DIR)/ornl-yocto-rpi/layers/meta-ornl/recipes-core/default-e
 endif
 ifeq ($(MACHINE), jetson-xavier-nx-devkit)
 MACHINE_FOLDER=jetson
-YOCTO_VERSION=FIXME
-YOCTO_DISTRO=FIXME
+YOCTO_VERSION=dunfell
+YOCTO_DISTRO=ornl-tegra
 YOCTO_IMG=FIXME-$(YOCTO_PROD)-full-image
 YOCTO_DIR := $(EPHEMERAL)/$(PROJECT)-$(YOCTO_VERSION)
 ETH0_NETWORK=$(YOCTO_DIR)/ornl-yocto-tegra/layers/meta-ornl/recipes-core/default-eth0/files/$(DEFAULT_NETWORK_FILE)
