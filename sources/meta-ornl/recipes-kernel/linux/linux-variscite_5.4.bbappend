@@ -5,6 +5,7 @@ LOCALVERSION_var-som-mx6-ornl = "-imx6ul"
 
 SRC_URI_append += " file://uvdl_kernel_5-4.patch \
     file://imx_v7_iris2_defconfig \
+    file://uvdl_kernel_otp.patch \
 "
 
 KBUILD_DEFCONFIG_var-som-mx6-ornl = "imx_v7_iris2_defconfig"
