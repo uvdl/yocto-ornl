@@ -50,21 +50,21 @@ done
 # NB: *EVERY* call to bitbake must have its environment prepared by setup-environment
 case ${MACHINE} in
 var-som-mx6-ornl)
-    cd ${YOCTO_DIR}
-        MACHINE=${MACHINE} DISTRO=${YOCTO_DISTRO} EULA=${EULA} . setup-environment ${YOCTO_ENV}
-    ;;
+	cd ${YOCTO_DIR}
+	MACHINE=${MACHINE} DISTRO=${YOCTO_DISTRO} EULA=${EULA} . setup-environment ${YOCTO_ENV}
+	;;
 jetson-xavier-nx-devkit)
 	cd ${YOCTO_DIR}
-		source ${YOCTO_DIR}/ornl-yocto-tegra/setup-env --machine ${MACHINE} --distro ornl-tegra ${YOCTO_ENV}
-    ;;
+	source ${YOCTO_DIR}/ornl-yocto-tegra/setup-env --machine ${MACHINE} --distro ornl-tegra ${YOCTO_ENV}
+	;;
 raspberrypi4-64)
 	cd ${YOCTO_DIR}
-		source ${YOCTO_DIR}/ornl-yocto-rpi/layers/poky/oe-init-build-env ${YOCTO_ENV}
-    ;;
+	source ${YOCTO_DIR}/ornl-yocto-rpi/layers/poky/oe-init-build-env ${YOCTO_ENV}
+	;;
 *)
 	help
 	exit 1
-    ;;
+	;;
 esac
 
 # NB: toaster has to be restarted *before* each bitbake command

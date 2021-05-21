@@ -124,7 +124,7 @@ $(YOCTO_DIR)/setup-environment: $(REPO) $(YOCTO_DIR)
 # but this works better: https://stackoverflow.com/a/40125775
 %/mfgtest.sh:
 	@mkdir -p $(shell dirname $@)
-	cat $(CURDIR)/$(MFGTEST_SH) | sed -e 's/10.223.0.2/$(PINGHOST)/g' > $@
+	cat sources/meta-ornl/recipes-ornl/mfgtest/mfgtest/$(MACHINE)/mfgtest.sh | sed -e 's/10.223.0.2/$(PINGHOST)/g' > $@
 	@chmod a+x $@
 
 # var-$(YOCTO_PROD)-update-full-image has a bug in some post-build stage that gives a fault exit code
@@ -135,7 +135,7 @@ all:
 	@$(MAKE) --no-print-directory -B toaster
 	-@$(MAKE) --no-print-directory -B YOCTO_CMD=var-$(YOCTO_PROD)-update-full-image build
 	@$(MAKE) --no-print-directory -B YOCTO_CMD=var-image-swu build
-	@$(MAKE) --no-print-directory -B YOCTO_CMD="-c populate_sdk var-$(YOCTO_PROD)-update-full-image" build
+	#@$(MAKE) --no-print-directory -B YOCTO_CMD="-c populate_sdk var-$(YOCTO_PROD)-update-full-image" build
 	@$(MAKE) --no-print-directory -B YOCTO_PROD=$(YOCTO_PROD) archive
 
 archive:
