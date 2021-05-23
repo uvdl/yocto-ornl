@@ -132,8 +132,10 @@ $(YOCTO_DIR)/setup-environment: $(REPO) $(YOCTO_DIR)
 all:
 	@$(MAKE) --no-print-directory -B dependencies
 	@$(MAKE) --no-print-directory -B environment
-	@$(MAKE) --no-print-directory -B toaster
+	@$(MAKE) --no-print-directory -B toaster-stop
+	@$(MAKE) --no-print-directory -B YOCTO_CMD="-c clean var-$(YOCTO_PROD)-update-full-image" build
 	-@$(MAKE) --no-print-directory -B YOCTO_CMD=var-$(YOCTO_PROD)-update-full-image build
+	@$(MAKE) --no-print-directory -B YOCTO_CMD="-c clean var-image-swu" build
 	@$(MAKE) --no-print-directory -B YOCTO_CMD=var-image-swu build
 	#@$(MAKE) --no-print-directory -B YOCTO_CMD="-c populate_sdk var-$(YOCTO_PROD)-update-full-image" build
 	@$(MAKE) --no-print-directory -B YOCTO_PROD=$(YOCTO_PROD) archive
