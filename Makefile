@@ -144,8 +144,14 @@ archive:
 build:
 	BuildScripts/ornl-bitbake.sh -m $(MACHINE) -d $(YOCTO_DIR) -e $(YOCTO_ENV) $(YOCTO_CMD)
 
+# NB: need to run toaster-stop before wiping folders
+# want to not fail if that is not setup/running, so have to use submake with
+# needed pass-thrus of variables.
 clean:
+	-@$(MAKE) --no-print-directory MACHINE=$(MACHINE) YOCTO_DIR=$(YOCTO_DIR) YOCTO_ENV=$(YOCTO_ENV) toaster-stop
 	-rm -rf $(YOCTO_DIR)/sources
+	-rm -rf $(YOCTO_DIR)/ornl-layers
+	-rm -rf $(YOCTO_DIR)/$(YOCTO_ENV)/tmp/deploy/images/$(MACHINE)
 	-rm $(YOCTO_DIR)/$(YOCTO_ENV)/conf/local.conf
 	-rm $(YOCTO_DIR)/$(YOCTO_ENV)/conf/bblayers.conf
 
