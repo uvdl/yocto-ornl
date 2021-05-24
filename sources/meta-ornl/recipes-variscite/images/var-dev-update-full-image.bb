@@ -28,8 +28,6 @@ IMAGE_INSTALL_append = " \
 	postinstall \
 	swupdate \
 	swupdate-www \
-	kernel-image \
-	kernel-devicetree \
 	u-boot-variscite \
 "
 
