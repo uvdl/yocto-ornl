@@ -1,9 +1,9 @@
 diff --git a/arch/arm/boot/dts/imx6q-iris2-R0.dts b/arch/arm/boot/dts/imx6q-iris2-R0.dts
 new file mode 100644
-index 000000000000..e103950c39bc
+index 000000000000..821b6d668a12
 --- /dev/null
 +++ b/arch/arm/boot/dts/imx6q-iris2-R0.dts
-@@ -0,0 +1,188 @@
+@@ -0,0 +1,189 @@
 +/*
 + * Copyright (C) 2015-2017 Variscite Ltd.
 + *
@@ -190,14 +190,15 @@ index 000000000000..e103950c39bc
 +&uart5 {
 +	pinctrl-names = "default";
 +	pinctrl-0 = <&pinctrl_uart5_1>;
++	dma-names = "", "";
 +	status = "okay";
 +};
 diff --git a/arch/arm/boot/dts/imx6q-iris2-R1.dts b/arch/arm/boot/dts/imx6q-iris2-R1.dts
 new file mode 100644
-index 000000000000..52f268a15069
+index 000000000000..578b3196b9ef
 --- /dev/null
 +++ b/arch/arm/boot/dts/imx6q-iris2-R1.dts
-@@ -0,0 +1,263 @@
+@@ -0,0 +1,264 @@
 +/*
 + * Copyright (C) 2015-2017 Variscite Ltd.
 + *
@@ -459,14 +460,15 @@ index 000000000000..52f268a15069
 +&uart5 {
 +	pinctrl-names = "default";
 +	pinctrl-0 = <&pinctrl_uart5_1>;
++	dma-names = "", "";
 +	status = "okay";
 +};
 diff --git a/arch/arm/boot/dts/imx6q-nightcrawler-R0.dts b/arch/arm/boot/dts/imx6q-nightcrawler-R0.dts
 new file mode 100644
-index 000000000000..5a906349c859
+index 000000000000..40cae1f40259
 --- /dev/null
 +++ b/arch/arm/boot/dts/imx6q-nightcrawler-R0.dts
-@@ -0,0 +1,255 @@
+@@ -0,0 +1,256 @@
 +/*
 + * Copyright (C) 2015-2017 Variscite Ltd.
 + *
@@ -721,6 +723,7 @@ index 000000000000..5a906349c859
 +	pinctrl-names = "default";
 +	pinctrl-0 = <&pinctrl_uart5_1>;
 +	status = "okay";
++	dma-names = "", "";
 +};
 diff --git a/arch/arm/boot/dts/imx6qdl-iris2.dtsi b/arch/arm/boot/dts/imx6qdl-iris2.dtsi
 new file mode 100644
