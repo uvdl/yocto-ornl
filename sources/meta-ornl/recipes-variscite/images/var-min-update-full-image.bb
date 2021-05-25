@@ -1,26 +1,16 @@
-SUMMARY = "Minimum Build Variscite Update Image"
+SUMMARY = "DART Minimal Base OS w/Update Recipe"
+LICENSE = "MIT"
 
 IMAGE_FEATURES += "ssh-server-dropbear splash "
 
-# https://wiki.yoctoproject.org/wiki/FAQ:How_do_I_set_or_change_the_root_password
-EXTRA_USERS_PARAMS = "usermod -P root root;"
+require ornl-min-image.bb
 
-LICENSE = "MIT"
-
-require recipes-core/images/ornl-min-image.bb
-
-# Do to how the DART boot is organized for SWUpdate to work we have to have
+# DART boot is organized for SWUpdate with two rootfs (ping/pong).
 # the kernel, dtb, uboot in a /boot/ folder on both rootfs
 IMAGE_INSTALL_append = " \
-	imx-test \
-	kernel-devicetree \
-	kernel-image \
-	ksz-initscripts \
-	packagegroup-core-full-cmdline \
-	postinstall \
-	swupdate \
-	swupdate-www \
-	u-boot-variscite \
+    swupdate \
+    swupdate-www \
+    kernel-image \
+    kernel-devicetree \
+    u-boot-variscite \
 "
-
-COMPATIBLE_MACHINE = "var-som-mx6-ornl"
