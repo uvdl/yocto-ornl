@@ -3,7 +3,7 @@ EXTRA_OECONF += "--enable-x265"
 
 DEPENDS += " x265"
 
-PACKAGECONFIG += " \
+PACKAGECONFIG_var-som-mx6-ornl += " \ 
     rtmp \
     voaacenc \
 "

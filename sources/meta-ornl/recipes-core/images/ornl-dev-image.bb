@@ -7,7 +7,7 @@ LICENSE = "MIT"
 # https://wiki.yoctoproject.org/wiki/FAQ:How_do_I_set_or_change_the_root_password
 EXTRA_USERS_PARAMS = "usermod -P root root;"
 
-inherit core-image distro_features_check extrausers
+inherit core-image features_check extrausers
 
 IMAGE_FEATURES += " \
 	debug-tweaks \
@@ -20,12 +20,6 @@ IMAGE_FEATURES += " \
 
 IMAGE_INSTALL_append += " \
 	bind-utils \
-	cockpit \
-	cockpit-ws \
-	cockpit-users \
-	cockpit-shell \
-	cockpit-networkmanager \
-	cockpit-systemd \
 	default-eth0 \
 	dtc \
 	elp-h264 \
@@ -37,12 +31,9 @@ IMAGE_INSTALL_append += " \
 	gstd \
 	gstreamer1.0-plugins-ugly \
 	gst-interpipe \
-	gst-pylibgstc \
 	htop \
-	imx-test \
 	iotop \
 	iperf3 \
-	ksz-initscripts \
 	libgps \
 	libsodium \
 	libsodium-dev \
@@ -51,7 +42,6 @@ IMAGE_INSTALL_append += " \
 	libxslt-dev \
 	m4 \
 	make \
-	mfgtest \
 	minicom \
 	networkmanager \
 	nodejs \
@@ -59,20 +49,9 @@ IMAGE_INSTALL_append += " \
 	ntp-bin \
 	openssl \
 	openssl-bin \
-	packagegroup-core-full-cmdline \
-	packagegroup-fsl-gstreamer1.0 \
-	packagegroup-fsl-gstreamer1.0-full \
-	packagegroup-fsl-tools-benchmark \
-	packagegroup-fsl-tools-gpu \
-	packagegroup-fsl-tools-gpu-external \
-	packagegroup-fsl-tools-testapps \
-	packagegroup-imx-tools-audio \
-	packagegroup-tools-bluetooth \
-	perf \
+	packagegroup-cockpit \
 	pkgconfig \
-	postinstall \
 	powertop \
-	python-compiler \
 	python3 \
 	python3-bottle \
 	python3-dev \

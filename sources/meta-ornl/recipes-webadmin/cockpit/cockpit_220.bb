@@ -13,7 +13,7 @@ SRC_URI += " \
 SRC_URI[md5sum] = "beb88d8e70ee1da6ebd917c956217803"
 SRC_URI[sha256sum] = "afc82acc8ef9d51e0f34265a07a2f059f5b71a1df721b299e657a40a098cbb7f"
 
-inherit gettext pkgconfig autotools systemd distro_features_check
+inherit gettext pkgconfig autotools systemd features_check
 
 DEPENDS += "glib-2.0-native intltool-native gnutls virtual/gettext json-glib krb5 libpam systemd"
 

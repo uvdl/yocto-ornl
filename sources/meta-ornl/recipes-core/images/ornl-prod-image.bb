@@ -7,7 +7,7 @@ LICENSE = "MIT"
 # https://wiki.yoctoproject.org/wiki/FAQ:How_do_I_set_or_change_the_root_password
 EXTRA_USERS_PARAMS = "usermod -P root root;"
 
-inherit core-image distro_features_check extrausers
+inherit core-image extrausers
 
 IMAGE_FEATURES += " \
 	hwcodecs \
@@ -24,10 +24,8 @@ IMAGE_INSTALL_append += " \
 	gpsd \
 	gps-utils \
 	gstd \
+	gstreamer1.0-plugins-ugly \
 	gst-interpipe \
-	imx-test \
-	iperf3 \
-	ksz-initscripts \
 	libgps \
 	libsodium \
 	libsodium-dev \
@@ -36,7 +34,6 @@ IMAGE_INSTALL_append += " \
 	libxslt-dev \
 	m4 \
 	make \
-	mfgtest \
 	minicom \
 	networkmanager \
 	nodejs \
@@ -44,17 +41,11 @@ IMAGE_INSTALL_append += " \
 	ntp-bin \
 	openssl \
 	openssl-bin \
-	packagegroup-core-full-cmdline \
-	packagegroup-fsl-gstreamer1.0 \
-	packagegroup-fsl-gstreamer1.0-full \
-	packagegroup-fsl-tools-gpu \
-	packagegroup-fsl-tools-gpu-external \
-	packagegroup-imx-tools-audio \
+	packagegroup-cockpit \
 	pkgconfig \
-	postinstall \
-	python-compiler \
 	python3 \
 	python3-bottle \
+	python3-dev \
 	python3-future \
 	python3-lxml \
 	python3-mavproxy \
@@ -70,6 +61,10 @@ IMAGE_INSTALL_append += " \
 	python3-requests \
 	python3-uptime \
 	python3-urllib3 \
+	screen \
+	sudo \
+	systemd-analyze \
+	tcpdump \
 	v4l-utils \
 	webcam-tools \
 	x264 \

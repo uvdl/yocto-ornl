@@ -1,33 +1,26 @@
-# Copyright (C) 2015 Freescale Semiconductor
-# Released under the MIT license (see COPYING.MIT for the terms)
+SUMMARY = "Minimal Base Production Image"
 
-DESCRIPTION = "Minimal Image w/SWUpdate (read-only filesystem)"
-LICENSE = "MIT"
+IMAGE_FEATURES += " read-only-rootfs"
 
 # https://wiki.yoctoproject.org/wiki/FAQ:How_do_I_set_or_change_the_root_password
 EXTRA_USERS_PARAMS = "usermod -P root root;"
 
-inherit core-image distro_features_check extrausers
+LICENSE = "MIT"
 
-IMAGE_FEATURES += " \
-	read-only-rootfs \
-"
+inherit core-image
 
-IMAGE_INSTALL_append += " \
+IMAGE_INSTALL_append = " \
 	bind-utils \
 	default-eth0 \
-	ksz-initscripts \
 	libsodium \
 	libsodium-dev \
 	make \
-	mfgtest \
 	networkmanager \
 	ntp \
 	ntp-bin \
 	openssl \
 	openssl-bin \
-	packagegroup-core-full-cmdline \
+	packagegroup-cockpit \
 	pkgconfig \
-	postinstall \
 	python3 \
 "

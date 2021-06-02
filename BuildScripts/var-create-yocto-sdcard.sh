@@ -342,7 +342,6 @@ function copy_scripts
 }
 
 umount ${node}${part}*  2> /dev/null || true
-
 delete_device
 create_parts
 format_parts
