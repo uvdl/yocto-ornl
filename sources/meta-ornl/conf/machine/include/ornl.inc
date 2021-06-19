@@ -24,6 +24,7 @@ UBI_VOLNAME  = "rootfs"
 
 # Variscite BSP default providers
 PREFERRED_PROVIDER_virtual/kernel ?= "linux-variscite"
+# FIXME: this breaks thud when it uses 4.9.88
 PREFERRED_VERSION_linux-variscite = "5.4_%"
 
 PREFERRED_PROVIDER_u-boot = "u-boot-variscite"
