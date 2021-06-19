@@ -8,8 +8,9 @@ require recipes-core/images/ornl-min-image.bb
 # DART boot is organized for SWUpdate with two rootfs (ping/pong).
 # the kernel, dtb, uboot in a /boot/ folder on both rootfs
 IMAGE_INSTALL_append = " \
-	kernel-image \
+	imx-test \
 	kernel-devicetree \
+	kernel-image \
 	ksz-initscripts \
 	mfgtest \
 	packagegroup-core-full-cmdline \
@@ -18,3 +19,5 @@ IMAGE_INSTALL_append = " \
 	swupdate-www \
 	u-boot-variscite \
 "
+
+COMPATIBLE_MACHINE = "var-som-mx6-ornl"

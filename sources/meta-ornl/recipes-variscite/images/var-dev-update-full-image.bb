@@ -28,3 +28,5 @@ IMAGE_INSTALL_append = " \
 	swupdate-www \
 	u-boot-variscite \
 "
+
+COMPATIBLE_MACHINE = "var-som-mx6-ornl"

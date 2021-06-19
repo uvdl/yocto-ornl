@@ -10,8 +10,8 @@ require recipes-core/images/ornl-prod-image.bb
 IMAGE_INSTALL_append = " \
 	imx-test \
 	iperf3 \
-	kernel-image \
 	kernel-devicetree \
+	kernel-image \
 	ksz-initscripts \
 	mfgtest \
 	packagegroup-core-full-cmdline \
@@ -25,3 +25,5 @@ IMAGE_INSTALL_append = " \
 	swupdate-www \
 	u-boot-variscite \
 "
+
+COMPATIBLE_MACHINE = "var-som-mx6-ornl"
