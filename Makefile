@@ -68,15 +68,12 @@ YOCTO_CMD := $(YOCTO_IMG)
 # Kernel rebuilding; depends on kernel version, a path in $(YOCTO_DIR)/$(YOCTO_ENV) with dynamic folder names (see find calls below)
 ifeq ($(strip $(YOCTO_VERSION)),thud)
 KERNEL_VER=4.9.88
-KERNEL_SOURCE=$(YOCTO_DIR)/$(YOCTO_ENV)/tmp/work-shared/$(MACHINE)/kernel-source
-KERNEL_IMAGE=tmp/deploy/images/$(MACHINE)/uImage
-KERNEL_DTS=tmp/deploy/images/$(MACHINE)
 else
 KERNEL_VER=5.4.85
+endif
 KERNEL_SOURCE=$(YOCTO_DIR)/$(YOCTO_ENV)/tmp/work-shared/$(MACHINE)/kernel-source
 KERNEL_IMAGE=tmp/deploy/images/$(MACHINE)/uImage
 KERNEL_DTS=tmp/deploy/images/$(MACHINE)
-endif
 
 # mfgtest.sh needs adjustment to default pinghost
 MFGTEST_SH=ornl-layers/meta-ornl/recipes-ornl/mfgtest/mfgtest/$(MACHINE)/mfgtest.sh
@@ -283,7 +280,6 @@ see:
 # var-$(YOCTO_PROD)-update-full-image has a bug in some post-build stage that gives a fault exit code
 # var-$(YOCTO_PROD)-image-swu doesn't exist anymore, only var-image-swu (?)
 swu:
-	@$(MAKE) --no-print-directory -B YOCTO_IMG=var-$(YOCTO_PROD)-update-full-image build
 	@$(MAKE) --no-print-directory -B environment
 	# FIXME: it should not be necessary to ignore the exit status on the next command
 	-@$(MAKE) --no-print-directory -B YOCTO_CMD=var-$(YOCTO_PROD)-update-full-image build
