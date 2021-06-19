@@ -3,7 +3,7 @@ LICENSE = "MIT"
 
 IMAGE_FEATURES += "ssh-server-dropbear splash "
 
-require ornl-min-image.bb
+require recipes-core/images/ornl-min-image.bb
 
 # DART boot is organized for SWUpdate with two rootfs (ping/pong).
 # the kernel, dtb, uboot in a /boot/ folder on both rootfs

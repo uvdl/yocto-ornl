@@ -7,7 +7,7 @@ LICENSE = "MIT"
 # https://wiki.yoctoproject.org/wiki/FAQ:How_do_I_set_or_change_the_root_password
 EXTRA_USERS_PARAMS = "usermod -P root root;"
 
-inherit core-image distro_features_check extrausers
+inherit core-image features_check extrausers
 
 IMAGE_FEATURES += " \
 	debug-tweaks \
@@ -31,7 +31,6 @@ IMAGE_INSTALL_append += " \
 	gstd \
 	gstreamer1.0-plugins-ugly \
 	gst-interpipe \
-	gst-pylibgstc \
 	htop \
 	iotop \
 	iperf3 \
@@ -53,7 +52,6 @@ IMAGE_INSTALL_append += " \
 	packagegroup-cockpit \
 	pkgconfig \
 	powertop \
-	python-compiler \
 	python3 \
 	python3-bottle \
 	python3-dev \

@@ -8,9 +8,11 @@ DATE := $(shell date +%Y-%m-%d_%H%M)
 ARCHIVE := /opt
 EPHEMERAL := /tmp
 
+
 # allow for generation of working eth0
 HOST := 10.223.0.1
 NETMASK := 16
+DEFAULT_NETWORK_FILE := 10-eth0.network
 
 .EXPORT_ALL_VARIABLES:
 
@@ -34,52 +36,54 @@ PROJECT_REMOTE := $(USER)
 PROJECT_TAG := core
 # https://source.android.com/setup/develop#old-repo-python2
 REPO=$(EPHEMERAL)/repo
-REPO_LOC=https://storage.googleapis.com/git-repo-downloads/repo-1
-REPO_SUM=b5caa4be6496419057c5e1b1cdff1e4bdd3c1845eec87bd89ecb2e463a3ee62c
-TOASTER_PORT := 8000
+REPO_LOC=https://storage.googleapis.com/git-repo-downloads/repo-2.14
+REPO_SUM=b74fda4aa5df31b88248a0c562691cb943a9c45cc9dd909d000f0e3cc265b685
 
 # Known variations
 # FIXME: requires mod to BuildScripts/ornl-setup-yocto.sh
 YOCTO_ENV=build_ornl
 YOCTO_PROD=dev
-ifeq ($(MACHINE), var-som-mx6-ornl)
+ifeq ($(strip $(MACHINE)),var-som-mx6-ornl)
 MACHINE_FOLDER=variscite
-YOCTO_VERSION=thud
+YOCTO_VERSION=dunfell
 YOCTO_DISTRO=fslc-framebuffer
 YOCTO_IMG=var-$(YOCTO_PROD)-update-full-image
 YOCTO_DIR := $(EPHEMERAL)/$(PROJECT)-$(YOCTO_VERSION)
-ETH0_NETWORK=$(YOCTO_DIR)/sources/meta-ornl/recipes-core/default-eth0/files/eth0.network
-endif
-ifeq ($(MACHINE), raspberrypi4-64)
+else ifeq ($(strip $(MACHINE)),raspberrypi4-64)
 MACHINE_FOLDER=raspberrypi
 YOCTO_VERSION=gatesgarth
 YOCTO_DISTRO=ornl-rpi
 YOCTO_IMG=raspberrypi-$(YOCTO_PROD)-full-image
 YOCTO_DIR := $(EPHEMERAL)/$(PROJECT)-$(YOCTO_VERSION)
-ETH0_NETWORK=$(YOCTO_DIR)/ornl-yocto-rpi/layers/meta-ornl/recipes-core/default-eth0/files/eth0.network
-endif
-ifeq ($(MACHINE), jetson-xavier-nx-devkit)
+else ifeq ($(strip $(MACHINE)),jetson-xavier-nx-devkit)
 MACHINE_FOLDER=jetson
-YOCTO_VERSION=FIXME
-YOCTO_DISTRO=FIXME
-YOCTO_IMG=FIXME-$(YOCTO_PROD)-full-image
+YOCTO_VERSION=dunfell
+YOCTO_DISTRO=ornl-tegra
+YOCTO_IMG=jetson-$(YOCTO_PROD)-full-image
 YOCTO_DIR := $(EPHEMERAL)/$(PROJECT)-$(YOCTO_VERSION)
-ETH0_NETWORK=$(YOCTO_DIR)/ornl-yocto-tegra/layers/meta-ornl/recipes-core/default-eth0/files/eth0.network
 endif
+ETH0_NETWORK=$(YOCTO_DIR)/ornl-layers/meta-ornl/recipes-core/default-eth0/files/$(DEFAULT_NETWORK_FILE)
 YOCTO_CMD := $(YOCTO_IMG)
 
 # Kernel rebuilding; depends on kernel version, a path in $(YOCTO_DIR)/$(YOCTO_ENV) with dynamic folder names (see find calls below)
+ifeq ($(strip $(YOCTO_VERSION)),thud)
 KERNEL_VER=4.9.88
 KERNEL_SOURCE=$(YOCTO_DIR)/$(YOCTO_ENV)/tmp/work-shared/$(MACHINE)/kernel-source
 KERNEL_IMAGE=tmp/deploy/images/$(MACHINE)/uImage
 KERNEL_DTS=tmp/deploy/images/$(MACHINE)
+else
+KERNEL_VER=5.4.85
+KERNEL_SOURCE=$(YOCTO_DIR)/$(YOCTO_ENV)/tmp/work-shared/$(MACHINE)/kernel-source
+KERNEL_IMAGE=tmp/deploy/images/$(MACHINE)/uImage
+KERNEL_DTS=tmp/deploy/images/$(MACHINE)
+endif
 
 # mfgtest.sh needs adjustment to default pinghost
-MFGTEST_SH=sources/meta-ornl/recipes-ornl/mfgtest/mfgtest/$(MACHINE)/mfgtest.sh
+MFGTEST_SH=ornl-layers/meta-ornl/recipes-ornl/mfgtest/mfgtest/$(MACHINE)/mfgtest.sh
 PINGHOST := $(shell echo $(HOST) | awk 'BEGIN{FS=OFS="."}{$$4=2}1')
 
-.PHONY: all archive build clean dependencies docker-deploy docker-image environment environment-update
-.PHONY: id kernel kernel-config kernel-pull locale mrproper sdk see swu
+.PHONY: all archive build clean dependencies docker-deploy docker-image environment
+.PHONY: id kernel kernel-config kernel-pull locale mrproper sd sdk see swu
 .PHONY: toaster toaster-stop
 
 # https://stackoverflow.com/questions/10858261/how-to-abort-makefile-if-variable-not-set
@@ -88,8 +92,7 @@ PINGHOST := $(shell echo $(HOST) | awk 'BEGIN{FS=OFS="."}{$$4=2}1')
 #     toaster runs on one build folder at a time.  Getting this wrong wastes alot of time...
 ifeq ($(strip $(EPHEMERAL)),)
 $(error EPHEMERAL is not set)
-endif
-ifeq ($(strip $(EPHEMERAL)),/tmp)
+else ifeq ($(strip $(EPHEMERAL)),/tmp)
 $(warning *** Using EPHEMERAL=$(EPHEMERAL) ***)
 endif
 
@@ -112,15 +115,7 @@ $(YOCTO_DIR)/setup-environment: $(REPO) $(YOCTO_DIR)
 		$(REPO) sync -j$(CPUS)
 	@if [ ! -x $@ ] ; then false ; fi
 
-environment: $(YOCTO_DIR)/setup-environment
-	cd $(YOCTO_DIR) && \
-		rm -rf $(YOCTO_DIR)/sources/meta-ornl && \
-		cp -r $(CURDIR)/sources/meta-ornl $(YOCTO_DIR)/sources && \
-		MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV) && \
-		mkdir -p $(YOCTO_DIR)/$(YOCTO_ENV)/conf
-		@echo "$(YOCTO_DIR)/sources/poky/bitbake/bin/../../meta-poky/conf" > $(YOCTO_DIR)/$(YOCTO_ENV)/conf/templateconf.cfg
-
-%/eth0.network:
+%/$(DEFAULT_NETWORK_FILE):
 	@echo "[Match]" > $@ && \
 		echo "Name=eth0" >> $@ && \
 		echo "" >> $@ && \
@@ -131,98 +126,39 @@ environment: $(YOCTO_DIR)/setup-environment
 # but this works better: https://stackoverflow.com/a/40125775
 %/mfgtest.sh:
 	@mkdir -p $(shell dirname $@)
-	cat $(CURDIR)/$(MFGTEST_SH) | sed -e 's/10.223.0.2/$(PINGHOST)/g' > $@
+	cat sources/meta-ornl/recipes-ornl/mfgtest/mfgtest/$(MACHINE)/mfgtest.sh | sed -e 's/10.223.0.2/$(PINGHOST)/g' > $@
 	@chmod a+x $@
 
-environment-update: $(YOCTO_DIR)/setup-environment
-	BuildScripts/ornl-setup-yocto.sh -m $(MACHINE) -v $(YOCTO_VERSION) $(YOCTO_DIR)
-	#@rm -rf $(YOCTO_DIR)/sources/meta-ornl
-	#@cp -r $(CURDIR)/sources/meta-ornl $(YOCTO_DIR)/sources
-	@$(MAKE) --no-print-directory -B $(ETH0_NETWORK)
-ifeq ($(MACHINE), var-som-mx6-ornl)
-	@$(MAKE) --no-print-directory -B $(YOCTO_DIR)/$(MFGTEST_SH)
-endif
-	@echo "*** ENVIRONMENT SETUP ***"
-	@echo "Please execute the following in your shell before giving bitbake commands:"
-	@echo "cd $(YOCTO_DIR) && MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV)"
-
-sd.img$(DOT_GZ): $(YOCTO_DIR)/$(YOCTO_ENV)/tmp/deploy/images/$(MACHINE)/$(YOCTO_IMG)-$(MACHINE).wic$(DOT_GZ)
-	ln -sf $(YOCTO_DIR)/$(YOCTO_ENV)/tmp/deploy/images/$(MACHINE)/$(YOCTO_IMG)-$(MACHINE).wic$(DOT_GZ) $@
-
+# var-$(YOCTO_PROD)-update-full-image has a bug in some post-build stage that gives a fault exit code
+# var-$(YOCTO_PROD)-image-swu doesn't exist anymore, only var-image-swu (?)
 all:
 	@$(MAKE) --no-print-directory -B dependencies
 	@$(MAKE) --no-print-directory -B environment
-	@$(MAKE) --no-print-directory -B environment-update
-	@$(MAKE) --no-print-directory -B toaster
-	@$(MAKE) --no-print-directory -B YOCTO_IMG=var-$(YOCTO_PROD)-update-full-image build
-	@$(MAKE) --no-print-directory -B YOCTO_IMG=var-$(YOCTO_PROD)-image-swu build
-	@$(MAKE) --no-print-directory -B YOCTO_IMG=var-$(YOCTO_PROD)-update-full-image YOCTO_CMD="-c populate_sdk var-$(YOCTO_PROD)-update-full-image" build
+	@$(MAKE) --no-print-directory -B toaster-stop
+	@$(MAKE) --no-print-directory -B YOCTO_CMD="-c clean var-$(YOCTO_PROD)-update-full-image" build
+	-@$(MAKE) --no-print-directory -B YOCTO_CMD=var-$(YOCTO_PROD)-update-full-image build
+	@$(MAKE) --no-print-directory -B YOCTO_CMD="-c clean var-image-swu" build
+	@$(MAKE) --no-print-directory -B YOCTO_CMD=var-image-swu build
+	#@$(MAKE) --no-print-directory -B YOCTO_CMD="-c populate_sdk var-$(YOCTO_PROD)-update-full-image" build
 	@$(MAKE) --no-print-directory -B YOCTO_PROD=$(YOCTO_PROD) archive
 
 archive:
-	@mkdir -p $(ARCHIVE)/$(PROJECT)-$(DATE)
-ifeq ($(MACHINE), var-som-mx6-ornl)
-	@mkdir -p $(ARCHIVE)/$(PROJECT)-$(DATE)/dts
-	@( commit=$$(git log | head -1 | tr -s ' ' | cut -f2 | tr -s ' ' | cut -f2 -d' ') ; echo "yocto-ornl: $$commit" > $(ARCHIVE)/$(PROJECT)-$(DATE)/hashes )
-	@( for f in `find $(YOCTO_DIR)/$(YOCTO_ENV)/$(KERNEL_DTS) -name "*.dtb" -print` ; do n=$$(basename $$f) ; nb=$${n%.*} ; dtc -I dtb -O dts -o $(ARCHIVE)/$(PROJECT)-$(DATE)/dts/$${nb}.dts $$f ; ( set -x && cp $$f $(ARCHIVE)/$(PROJECT)-$(DATE)/dts/$${nb}.dtb ) ; done )
-	@mkdir -p $(ARCHIVE)/$(PROJECT)-$(DATE)/$(YOCTO_ENV)/tmp/deploy/images
-	@rsync --links -rtp --exclude={*.wic.gz,*.manifest,*testdata*,*.ubi*,*.cfg} $(YOCTO_DIR)/$(YOCTO_ENV)/tmp/deploy/images/$(MACHINE) $(ARCHIVE)/$(PROJECT)-$(DATE)/$(YOCTO_ENV)/tmp/deploy/images/
-	@mkdir -p $(ARCHIVE)/$(PROJECT)-$(DATE)/$(YOCTO_ENV)/sources/meta-variscite-fslc/scripts
-	cp -r $(YOCTO_DIR)/sources/meta-variscite-fslc/scripts/var_mk_yocto_sdcard/var-create-yocto-sdcard.sh $(ARCHIVE)/$(PROJECT)-$(DATE)/$(YOCTO_ENV)/sources/meta-variscite-fslc/scripts
-	cp -r $(YOCTO_DIR)/sources/meta-variscite-fslc/scripts/var_mk_yocto_sdcard/variscite_scripts $(ARCHIVE)/$(PROJECT)-$(DATE)/$(YOCTO_ENV)/sources/meta-variscite-fslc/scripts
-	cp $(YOCTO_DIR)/$(YOCTO_ENV)/$(KERNEL_IMAGE) $(ARCHIVE)/$(PROJECT)-$(DATE)
-	tar czf $(ARCHIVE)/$(PROJECT)-$(DATE)/kernel-source.tgz -C $(shell dirname $(KERNEL_SOURCE)) $(shell basename $(KERNEL_SOURCE))
-	@( cd $(KERNEL_SOURCE) && commit=$$(git log | head -1 | tr -s ' ' | cut -f2 | tr -s ' ' | cut -f2 -d' ') ; echo "kernel: $$commit" >> $(ARCHIVE)/$(PROJECT)-$(DATE)/hashes )
-	( set -x ; swu=$$(find $(YOCTO_DIR)/$(YOCTO_ENV) -name "var-image-swu-$(MACHINE).swu" | head -1) ; set +x ; \
-		if [ ! -z $${swu} ] ; then set -x ; cp $${swu} $(ARCHIVE)/$(PROJECT)-$(DATE)/var-$(YOCTO_PROD)-image-$(HOST)-$(NETMASK).swu ; fi )
-	@if [ -d $(YOCTO_DIR)/$(YOCTO_ENV)/tmp/deploy/sdk ] ; then set -x ; cp -r $(YOCTO_DIR)/$(YOCTO_ENV)/tmp/deploy/sdk $(ARCHIVE)/$(PROJECT)-$(DATE) ; fi
-	@echo "# To write image to MMC, do:" > $(ARCHIVE)/$(PROJECT)-$(DATE)/readme.txt
-	@echo "DEV=/dev/sdx" >> $(ARCHIVE)/$(PROJECT)-$(DATE)/readme.txt
-	@echo "$(SUDO) MACHINE=$(MACHINE) $(YOCTO_ENV)/sources/meta-variscite-fslc/scripts/var-create-yocto-sdcard.sh -a -r $(YOCTO_ENV)/tmp/deploy/images/$(MACHINE)/$(YOCTO_IMG)-$(MACHINE) \$${DEV}" >> $(ARCHIVE)/$(PROJECT)-$(DATE)/readme.txt
-	@if [ -e $(ARCHIVE)/$(PROJECT)-$(DATE)/var-$(YOCTO_PROD)-image-$(HOST)-$(NETMASK).swu ] ; then echo "# load var-$(YOCTO_PROD)-image-$(HOST)-$(NETMASK).swu to port :9080" >> $(ARCHIVE)/$(PROJECT)-$(DATE)/readme.txt ; fi
-	@if [ -d $(ARCHIVE)/$(PROJECT)-$(DATE)/sdk ] ; then echo "# A Cross-platform SDK is available in ./sdk" >> $(ARCHIVE)/$(PROJECT)-$(DATE)/readme.txt ; fi
-endif
-ifeq ($(MACHINE), jetson-xavier-nx-devkit)
-	@tar -xf $(YOCTO_DIR)/$(YOCTO_ENV)/tmp/deploy/images/$(MACHINE)/$(YOCTO_IMG)-$(MACHINE).tegraflash.tar.gz -C $(ARCHIVE)/$(PROJECT)-$(DATE)
-endif
-ifeq ($(MACHINE), raspberrypi4-64)
-	cp -f $(YOCTO_DIR)/$(YOCTO_ENV)/tmp-glibc/deploy/images/$(MACHINE)/$(YOCTO_IMG)-$(MACHINE).wic.bz2 $(ARCHIVE)/$(PROJECT)-$(DATE)
-	@cd $(ARCHIVE)/$(PROJECT)-$(DATE) && \
-		bzip2 -d $(YOCTO_IMG)-$(MACHINE).wic.bz2
-endif
+	BuildScripts/ornl-create-archive.sh -p $(YOCTO_PROD) -m $(MACHINE) -ip $(HOST) -nm $(NETMASK) $(YOCTO_DIR)
 
-build: 
-ifeq ($(MACHINE), var-som-mx6-ornl)
-	cd $(YOCTO_DIR) && \
-		MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV) && \
-		if [ -e $(YOCTO_DIR)/$(YOCTO_ENV)/.toaster ] ; then cd $(YOCTO_DIR) && \
-			source toaster stop && sleep 5 && \
-			source toaster webport=0.0.0.0:$(TOASTER_PORT) start ; fi && \
-		cd $(YOCTO_DIR)/$(YOCTO_ENV) && \
-			LANG=$(LANG) bitbake $(YOCTO_CMD)
-endif
-ifeq ($(MACHINE), jetson-xavier-nx-devkit)
-	cd $(YOCTO_DIR) && \
-		. $(YOCTO_DIR)/ornl-yocto-tegra/setup-env --machine $(MACHINE) --distro ornl-tegra $(YOCTO_ENV) && \
-		if [ -e $(YOCTO_DIR)/$(YOCTO_ENV)/.toaster ] ; then cd $(YOCTO_DIR) && \
-			source toaster stop && sleep 5 && \
-			source toaster webport=0.0.0.0:$(TOASTER_PORT) start ; fi && \
-		cd $(YOCTO_DIR)/$(YOCTO_ENV) && \
-			LANG=$(LANG) bitbake $(YOCTO_CMD)
-endif
-ifeq ($(MACHINE), raspberrypi4-64)
-	cd $(YOCTO_DIR) && \
-		. $(YOCTO_DIR)/ornl-yocto-rpi/layers/poky/oe-init-build-env $(YOCTO_ENV) && \
-		if [ -e $(YOCTO_DIR)/$(YOCTO_ENV)/.toaster ] ; then cd $(YOCTO_DIR) && \
-			source toaster stop && sleep 5 && \
-			source toaster webport=0.0.0.0:$(TOASTER_PORT) start ; fi && \
-		cd $(YOCTO_DIR)/$(YOCTO_ENV) && \
-			if [ -e .toaster ] ; then source toaster stop ; source toaster start ; /bin/true ; fi && \
-			LANG=$(LANG) bitbake $(YOCTO_CMD)
-endif
+build:
+	BuildScripts/ornl-bitbake.sh -m $(MACHINE) -d $(YOCTO_DIR) -e $(YOCTO_ENV) $(YOCTO_CMD)
 
+# NB: need to run toaster-stop before wiping folders
+# want to not fail if that is not setup/running, so have to use submake with
+# needed pass-thrus of variables.
 clean:
+	-@$(MAKE) --no-print-directory MACHINE=$(MACHINE) YOCTO_DIR=$(YOCTO_DIR) YOCTO_ENV=$(YOCTO_ENV) toaster-stop
+	BuildScripts/ornl-bitbake.sh -m $(MACHINE) -d $(YOCTO_DIR) -e $(YOCTO_ENV) "-c clean u-boot-variscite"
+	BuildScripts/ornl-bitbake.sh -m $(MACHINE) -d $(YOCTO_DIR) -e $(YOCTO_ENV) "-c clean var-$(YOCTO_PROD)-update-full-image"
+	BuildScripts/ornl-bitbake.sh -m $(MACHINE) -d $(YOCTO_DIR) -e $(YOCTO_ENV) "-c clean linux-variscite"
 	-rm -rf $(YOCTO_DIR)/sources
+	-rm -rf $(YOCTO_DIR)/ornl-layers
+	-rm -rf $(YOCTO_DIR)/$(YOCTO_ENV)/tmp/deploy/images/$(MACHINE)
 	-rm $(YOCTO_DIR)/$(YOCTO_ENV)/conf/local.conf
 	-rm $(YOCTO_DIR)/$(YOCTO_ENV)/conf/bblayers.conf
 
@@ -235,7 +171,7 @@ Dockerfile: Makefile
 	@echo "FROM ubuntu:16.04" > $@
 	@echo "RUN apt-get -y update && apt-get -y upgrade" >> $@
 	@echo "RUN apt-get -y install git make sudo vim" >> $@
-ifeq ($(PROJECT_TAG),base)
+ifeq ($(strip $(PROJECT_TAG)),base)
 	@echo "RUN apt-get -y install $(PKGDEPS1) && apt-get -y install $(PKGDEPS2)" >> $@
 endif
 	@echo "RUN apt-get -y install locales && locale-gen $(LANG) && update-locale LC ALL=$(LANG) LANG=$(LANG)" >> $@
@@ -254,6 +190,11 @@ docker-deploy: docker-image
 docker-image: Dockerfile
 	docker build -t $(PROJECT):$(PROJECT_TAG) .
 
+environment: $(YOCTO_DIR)/setup-environment
+	BuildScripts/ornl-setup-yocto.sh -m $(MACHINE) -v $(YOCTO_VERSION) $(YOCTO_DIR)
+	@$(MAKE) --no-print-directory -B HOST=$(HOST) NETMASK=$(NETMASK) $(ETH0_NETWORK)
+	@$(MAKE) --no-print-directory -B HOST=$(HOST) $(YOCTO_DIR)/$(MFGTEST_SH)
+
 id:
 	git config --global user.name "UVDL Developer"
 	git config --global user.email "uvdl@ornl.gov"
@@ -264,7 +205,7 @@ id:
 # https://github.com/uvdl/yocto-ornl/issues/11#issuecomment-462969336
 # Edison's email from 2019-03-15 Re: FEC driver debugging
 kernel:
-	-rm sd.img$(DOT_GZ)
+ifeq ($(strip $(MACHINE)),var-som-mx6-ornl)
 	cd $(YOCTO_DIR) && \
 		MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV) && \
 		kernel=$(shell find $(YOCTO_DIR)/$(YOCTO_ENV) -type d -name "$(KERNEL_VER)*-r0" -print | head -1) && \
@@ -272,13 +213,20 @@ kernel:
 		./run.do_compile && \
 		./run.do_compile_kernelmodules && \
 		echo "kernel built in $(YOCTO_DIR)/$(YOCTO_ENV)/$(KERNEL_IMAGE)"
+else
+	echo "kernel build for $(MACHINE) is not defined" && false
+endif
 
 kernel-config:
+ifeq ($(strip $(MACHINE)),var-som-mx6-ornl)
 	cd $(YOCTO_DIR) && \
 		MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV) && \
 		kernel=$(shell find $(YOCTO_DIR)/$(YOCTO_ENV) -type d -name "$(KERNEL_VER)*-r0" -print | head -1) && \
 		cd $${kernel}/temp && \
 		LANG=$(LANG) bitbake linux-variscite -c menuconfig
+else
+	echo "kernel config for $(MACHINE) is not defined" && false
+endif
 
 kernel-pull:
 	@( cd $(KERNEL_SOURCE) && git pull )
@@ -293,18 +241,25 @@ locale:
 mrproper: clean toaster-stop
 	-rm -rf $(YOCTO_DIR)
 
-sd: $(YOCTO_DIR)/sources/meta-variscite-fslc/scripts/var_mk_yocto_sdcard/var-create-yocto-sdcard.sh $(YOCTO_DIR)/$(YOCTO_ENV)/tmp/deploy/images/$(MACHINE)/$(YOCTO_IMG)
-	@if ! [ -z "$(DEV)" ] ; then cd $(YOCTO_DIR) && \
+sd:
+ifeq ($(strip $(MACHINE)),var-som-mx6-ornl)
+	@file $(YOCTO_DIR)/$(YOCTO_ENV)/tmp/deploy/images/$(MACHINE)/$(YOCTO_IMG)
+	@file $(YOCTO_DIR)/sources/meta-variscite-fslc/scripts/var_mk_yocto_sdcard/var-create-yocto-sdcard.sh
+	@if [ ! -z "$(DEV)" ] ; then cd $(YOCTO_DIR) && \
 		MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV) && \
 		$(SUDO) MACHINE=$(MACHINE) $(YOCTO_DIR)/sources/meta-variscite-fslc/scripts/var_mk_yocto_sdcard/var-create-yocto-sdcard.sh -a -r $(YOCTO_DIR)/$(YOCTO_ENV)/tmp/deploy/images/$(MACHINE)/$(YOCTO_IMG) $(DEV) ; \
 	else \
 		echo "Please provide a DEV; make DEV=/dev/sdb sd" && false ; \
 	fi
+else
+	echo "SD card write for $(MACHINE) is not defined" && false
+endif
 
+# var-$(YOCTO_PROD)-update-full-image has a bug in some post-build stage that gives a fault exit code
 sdk:
-	@$(MAKE) --no-print-directory -B environment-update
-	@$(MAKE) --no-print-directory -B build
-	@$(MAKE) --no-print-directory -B YOCTO_IMG=var-$(YOCTO_PROD)-update-full-image YOCTO_CMD="-c populate_sdk var-$(YOCTO_PROD)-update-full-image" build
+	@$(MAKE) --no-print-directory -B environment
+	-@$(MAKE) --no-print-directory -B YOCTO_CMD=var-$(YOCTO_PROD)-update-full-image build
+	@$(MAKE) --no-print-directory -B YOCTO_CMD="-c populate_sdk var-$(YOCTO_PROD)-update-full-image" build
 	@$(MAKE) --no-print-directory -B YOCTO_PROD=$(YOCTO_PROD) archive
 
 see:
@@ -322,26 +277,36 @@ see:
 	@echo "MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV)"
 	@echo "cd $(YOCTO_DIR)/$(YOCTO_ENV) && LANG=$(LANG) bitbake $(YOCTO_CMD)"
 	@echo "**********************"
-	@echo "Use: \"make toaster\" to install it so it can track the build (port $(TOASTER_PORT))"
+	@echo "Use: \"make toaster\" to install it so it can track every build"
 	@echo "Use: \"make all\" to perform this build"
 
+# var-$(YOCTO_PROD)-update-full-image has a bug in some post-build stage that gives a fault exit code
+# var-$(YOCTO_PROD)-image-swu doesn't exist anymore, only var-image-swu (?)
 swu:
-	@$(MAKE) --no-print-directory -B environment-update
 	@$(MAKE) --no-print-directory -B YOCTO_IMG=var-$(YOCTO_PROD)-update-full-image build
-	@$(MAKE) --no-print-directory -B YOCTO_IMG=var-$(YOCTO_PROD)-image-swu build
+	@$(MAKE) --no-print-directory -B environment
+	# FIXME: it should not be necessary to ignore the exit status on the next command
+	-@$(MAKE) --no-print-directory -B YOCTO_CMD=var-$(YOCTO_PROD)-update-full-image build
+	# FIXME: it should be this @$(MAKE) --no-print-directory -B YOCTO_IMG=var-$(YOCTO_PROD)-image-swu build
+	@$(MAKE) --no-print-directory -B YOCTO_CMD=var-image-swu build
 	@$(MAKE) --no-print-directory -B YOCTO_PROD=$(YOCTO_PROD) archive
 
-toaster: $(YOCTO_DIR)/setup-environment
+toaster:
+	BuildScripts/ornl-bitbake.sh -m $(MACHINE) -d $(YOCTO_DIR) -e $(YOCTO_ENV) toaster enable
+
+old-toaster:
+	@$(MAKE) --no-print-directory -B environment
 	# https://www.yoctoproject.org/docs/latest/toaster-manual/toaster-manual.html#toaster-manual-start
 	cd $(YOCTO_DIR) && \
-		rm -rf $(YOCTO_DIR)/sources/meta-ornl && \
-		cp -r $(CURDIR)/sources/meta-ornl $(YOCTO_DIR)/sources && \
 		MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV) && \
 		cd $(YOCTO_DIR)/sources/poky && \
 			pip3 install --user -r bitbake/toaster-requirements.txt && \
 			touch $(YOCTO_DIR)/$(YOCTO_ENV)/.toaster
 
 toaster-stop:
+	BuildScripts/ornl-bitbake.sh -m $(MACHINE) -d $(YOCTO_DIR) -e $(YOCTO_ENV) toaster stop
+
+old-toaster-stop:
 	@if [ -e $(YOCTO_DIR)/$(YOCTO_ENV)/.toaster ] ; then cd $(YOCTO_DIR) && \
 		MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV) && \
 		( cd $(YOCTO_DIR)/$(YOCTO_ENV) ; source toaster stop ) ; true ; fi

@@ -24,7 +24,7 @@ UBI_VOLNAME  = "rootfs"
 
 # Variscite BSP default providers
 PREFERRED_PROVIDER_virtual/kernel ?= "linux-variscite"
-PREFERRED_VERSION_linux-variscite = "4.9.88"
+PREFERRED_VERSION_linux-variscite = "5.4_%"
 
 PREFERRED_PROVIDER_u-boot = "u-boot-variscite"
 PREFERRED_PROVIDER_virtual/bootloader = "u-boot-variscite"
@@ -33,6 +33,8 @@ PREFERRED_PROVIDER_u-boot-fw-utils = "u-boot-fw-utils"
 PREFERRED_PROVIDER_wpa-supplicant-cli = "wpa-supplicant"
 PREFERRED_PROVIDER_wpa-supplicant-passphrase = "wpa-supplicant"
 PREFERRED_PROVIDER_wpa-supplicant = "wpa-supplicant"
+
+PREFERRED_VERSION_python3-pyserial = "3.5"
 
 PREFERRED_RPROVIDER_ptpd = "ptpd"
 PREFERRED_RPROVIDER_ptpd-dev = "ptpd"
@@ -62,7 +64,6 @@ IMAGE_INSTALL_append = " \
 
 BBMASK_prepend = "fsl-image-mfgtool-initramfs "
 
-WKS_FILE = "imx-uboot-spl-bootpart.wks"
 IMAGE_FSTYPES += "tar.gz multiubi"
 
 # do multiubi last
