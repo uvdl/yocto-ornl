@@ -324,7 +324,7 @@ function sync_raspberries()
                     echo "==============================================="
                     exit 1
             fi
-            # FIXME: master is being deprected in favor of main, etc.
+            # FIXME: master is being deprecated in favor of main, etc.
             git clone -b master https://github.com/sbabic/meta-swupdate-boards.git
             if [ $? -ne 0 ]
                 then
