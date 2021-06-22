@@ -50,6 +50,7 @@ IMAGE_INSTALL_append += " \
 	python3-lxml \
 	python3-mavproxy \
 	python3-netifaces \
+	python3-numpy \
 	python3-pexpect \
 	python3-pip \
 	python3-protobuf \
