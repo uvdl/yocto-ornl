@@ -17,6 +17,14 @@ to create the recover SD card with.  The files will be in the folder:
 
 With the time based on when the `make archive` command is called.
 
+#### `linuxsystembuilder.ornl.gov`
+
+On the Cades VM, I typically do the following:
+
+<pre>
+for k in clean all archive ; do make EPHEMERAL=/ephemeral YOCTO_SRC=$HOME/yocto-ornl TOASTER=True $k ; done
+</pre>
+
 ### Quick Fully Automatic Method
 
 This option takes advantage of even more Makefile automation.  If you have already
