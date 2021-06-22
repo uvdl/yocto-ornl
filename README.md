@@ -19,10 +19,11 @@ With the time based on when the `make archive` command is called.
 
 #### `linuxsystembuilder.ornl.gov`
 
-On the Cades VM, I typically do the following:
+On the Cades VM, I typically do the following *(after make dependencies is done once)*:
 
 <pre>
-for k in clean all archive ; do make EPHEMERAL=/ephemeral YOCTO_SRC=$HOME/yocto-ornl TOASTER=True $k ; done
+make EPHEMERAL=/ephemeral toaster
+for k in clean all archive ; do make EPHEMERAL=/ephemeral YOCTO_SRC=$HOME/yocto-ornl $k ; done
 </pre>
 
 ### Quick Fully Automatic Method
@@ -56,6 +57,14 @@ make ARCHIVE=/tmp HOST=192.168.1.10 NETMASK=24 swu
 
 Would build a micro SD/.swu full os image for a system
 whose eth0 port will be defined as 192.168.1.10/24.
+
+#### `linuxsystembuilder.ornl.gov`
+
+On the Cades VM, I typically do the following *(for a vehicle in the `Testing` comm group (octet 13) vehicle sysid 10 (a.k.a. R1-24)*:
+
+<pre>
+make EPHEMERAL=/ephemeral HOST=172.20.13.10 NETMASK=16 swu
+</pre>
 
 ### `EPHEMERAL`
 
