@@ -220,6 +220,16 @@ $YOCTO_DIR/$YOCTO_ENV> source toaster stop ; source toaster start
 
 Then, open a browser to http://localhost:8000 to get the UI.
 
+#### `linuxsystembuilder.ornl.gov`
+
+When using the Cades VM (or an AWS instance to build), you will need to create an SSH tunnel to forward TCP/IP port 8000 to your local machine:
+
+<pre>
+ssh -i cadescloudvm.pem -L 8000:localhost:8000 cades@linuxsystembuilder.ornl.gov
+</pre>
+
+The `.pem` file is the private key to enable login.  You will have your own if you made a VM or an AWS instance.  You can always start up another SSH if you forgot to do this when you initially logged in.  Then you can open your browser as described above.
+
 ## Create an SDcard
 
 Use the var-create-yocto-sdcard.sh script that is supplied by Variscite under the meta-variscite-fslc layer.  We have a companion script that can be run from this directory, use the following command. This will **ONLY** copy the Variscite script to the new directory.  From there just follow the directions from the [Variscite Build Guide](https://variwiki.com/index.php?title=Yocto_Build_Release&release=RELEASE_SUMO_V1.2_VAR-SOM-MX6#Create_an_extended_SD_card)
@@ -238,6 +248,51 @@ Where:
 - $MACHINE: This is always `var-som-mx6-ornl` *(until its not, but thats another story...)*
 - $YOCTO_DIR: This is the path to where the Yocto system was initialized
 - $YOCTO_ENV: This is the name of the build folder in the path where Yocto was initialized. *Typically `build_ornl` unless you took pains to change it...*
+
+#### `linuxsystembuilder.ornl.gov`
+
+When using the Cades VM (or an AWS instance to build), you will need to copy the archive file back to your local machine in order to put it on an SD card.  Here is what I use for Cades *(substituting the actual date code to the archive folder)*:
+
+<pre>
+scp -r -i cadescloudvm.pem cades@linuxsystembuilder.ornl.gov:/opt/yocto-ornl-YYYY-MM-DD_HHMM .
+</pre>
+
+Afterward, you will see the following files, with `readme.txt` giving hints as to what you can do:
+
+```
+~/yocto-ornl-2021-06-22_1603$ ls -al
+total 398424
+drwxr-xr-x  4 6ov users      4096 Jun 22 16:06 .
+drwxr-xr-x 41 6ov users      4096 Jun 22 16:06 ..
+drwxr-xr-x  4 6ov users      4096 Jun 22 16:06 build_ornl
+drwxr-xr-x  2 6ov users      4096 Jun 22 16:06 dts
+-rw-r--r--  1 6ov users        44 Jun 22 16:06 hashes
+-rw-r--r--  1 6ov users 187886014 Jun 22 16:06 kernel-source.tgz
+-rw-r--r--  1 6ov users       301 Jun 22 16:06 readme.txt
+-rw-r--r--  1 6ov users   7960688 Jun 22 16:06 uImage
+-rw-r--r--  1 6ov users 212102144 Jun 22 16:06 var-dev-image-10.223.0.1-16.swu
+~/yocto-ornl-2021-06-22_1603$ cat readme.txt 
+# To write image to MMC, do:
+DEV=/dev/sdx
+sudo MACHINE=var-som-mx6-ornl build_ornl/sources/meta-variscite-fslc/scripts/var-create-yocto-sdcard.sh -a -r build_ornl/tmp/deploy/images/var-som-mx6-ornl/var-dev-update-full-image-var-som-mx6-ornl ${DEV}
+# load var-dev-image-10.223.0.1-16.swu to port :9080
+```
+
+To figure out what to use for `/dev/sdx`, you can use the follwing command to determine what your microSD card was mapped at:
+
+<pre>
+dmesg | tail -3
+</pre>
+
+Which will give you something like:
+```
+6ov@uvdl3:~/opt/cades/yocto-ornl-2021-06-22_1603$ dmesg | tail -3
+[18601.606923] sd 11:0:0:1: [sde] 31457280 512-byte logical blocks: (16.1 GB/15.0 GiB)
+[18601.612617]  sde: sde1 sde2
+[18602.243590] EXT4-fs (sde2): mounted filesystem with ordered data mode. Opts: (null)
+```
+
+So in this case, we would set `DEV=/dev/sde` to flash this microSD card with the above instruction.
 
 ## Flash SD To eMMC
 
