@@ -169,7 +169,6 @@ index 000000000000..821b6d668a12
 +&uart2 {
 +	pinctrl-names = "default";
 +	pinctrl-0 = <&pinctrl_uart2_1>;
-+	dma-names = "", "";
 +	status = "okay";
 +};
 +
@@ -177,7 +176,6 @@ index 000000000000..821b6d668a12
 +&uart3 {
 +	pinctrl-names = "default";
 +	pinctrl-0 = <&pinctrl_uart3_1>;
-+	dma-names = "", "";
 +	status = "okay";
 +};
 +
@@ -185,7 +183,6 @@ index 000000000000..821b6d668a12
 +&uart4 {
 +	pinctrl-names = "default";
 +	pinctrl-0 = <&pinctrl_uart4_1>;
-+	dma-names = "", "";
 +	status = "okay";
 +};
 +
@@ -442,7 +439,6 @@ index 000000000000..578b3196b9ef
 +&uart2 {
 +	pinctrl-names = "default";
 +	pinctrl-0 = <&pinctrl_uart2_1>;
-+	dma-names = "", "";
 +	status = "okay";
 +};
 +
@@ -450,7 +446,6 @@ index 000000000000..578b3196b9ef
 +&uart3 {
 +	pinctrl-names = "default";
 +	pinctrl-0 = <&pinctrl_uart3_1>;
-+	dma-names = "", "";
 +	status = "okay";
 +};
 +
@@ -458,7 +453,6 @@ index 000000000000..578b3196b9ef
 +&uart4 {
 +	pinctrl-names = "default";
 +	pinctrl-0 = <&pinctrl_uart4_1>;
-+	dma-names = "", "";
 +	status = "okay";
 +};
 +
@@ -708,7 +702,6 @@ index 000000000000..40cae1f40259
 +	pinctrl-names = "default";
 +	pinctrl-0 = <&pinctrl_uart2_3>;
 +	status = "okay";
-+	dma-names = "", "";
 +};
 +
 +/* ttymxc2 UART (Micro) */
@@ -716,7 +709,6 @@ index 000000000000..40cae1f40259
 +	pinctrl-names = "default";
 +	pinctrl-0 = <&pinctrl_uart3_1>;
 +	status = "okay";
-+	dma-names = "", "";
 +};
 +
 +/* ttymxc3 UART (Pixhawk) */
@@ -724,7 +716,6 @@ index 000000000000..40cae1f40259
 +	pinctrl-names = "default";
 +	pinctrl-0 = <&pinctrl_uart4_1>;
 +	status = "okay";
-+	dma-names = "", "";
 +};
 +
 +/* ttymxc4 UART (Iridium) */
