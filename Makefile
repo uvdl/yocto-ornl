@@ -20,7 +20,7 @@ DEV=
 DOT_GZ=.gz
 EULA=1	# https://patchwork.openembedded.org/patch/100815/
 # var-som-mx6-ornl, raspberrypi4-64, jetson-xavier-nx-devkit
-MACHINE=var-som-mx6-ornl
+MACHINE=jetson-nano-devkit
 PKGDEPS1=gawk wget git-core diffstat unzip texinfo gcc-multilib \
 build-essential chrpath socat cpio python python3 python3-pip python3-pexpect \
 xz-utils debianutils iputils-ping libsdl1.2-dev xterm
@@ -47,7 +47,7 @@ ifeq ($(MACHINE), var-som-mx6-ornl)
 MACHINE_FOLDER=variscite
 YOCTO_VERSION=dunfell
 YOCTO_DISTRO=fslc-framebuffer
-YOCTO_IMG=var-$(YOCTO_PROD)-image-swu
+YOCTO_IMG=var-$(YOCTO_PROD)-update-full-image
 YOCTO_DIR := $(EPHEMERAL)/$(PROJECT)-$(YOCTO_VERSION)
 ETH0_NETWORK=$(YOCTO_DIR)/ornl-layers/meta-ornl/recipes-core/default-eth0/files/$(DEFAULT_NETWORK_FILE)
 endif
@@ -59,11 +59,11 @@ YOCTO_IMG=raspberrypi-$(YOCTO_PROD)-full-image
 YOCTO_DIR := $(EPHEMERAL)/$(PROJECT)-$(YOCTO_VERSION)
 ETH0_NETWORK=$(YOCTO_DIR)/ornl-layers/meta-ornl/recipes-core/default-eth0/files/$(DEFAULT_NETWORK_FILE)
 endif
-ifeq ($(MACHINE), jetson-xavier-nx-devkit)
+ifneq (,$(findstring jetson, $(MACHINE))
 MACHINE_FOLDER=jetson
 YOCTO_VERSION=dunfell
 YOCTO_DISTRO=ornl-tegra
-YOCTO_IMG=FIXME-$(YOCTO_PROD)-full-image
+YOCTO_IMG=tegra-$(YOCTO_PROD)-full-image
 YOCTO_DIR := $(EPHEMERAL)/$(PROJECT)-$(YOCTO_VERSION)
 ETH0_NETWORK=$(YOCTO_DIR)/ornl-layers/meta-ornl/recipes-core/default-eth0/files/$(DEFAULT_NETWORK_FILE)
 endif
@@ -106,12 +106,6 @@ $(REPO): $(shell dirname $(REPO))
 
 $(YOCTO_DIR):
 	mkdir -p $(YOCTO_DIR)
-
-$(YOCTO_DIR)/setup-environment: $(REPO) $(YOCTO_DIR)
-	cd $(YOCTO_DIR) && \
-		$(REPO) init -u $(PLATFORM_GIT) -b $(YOCTO_VERSION) && \
-		$(REPO) sync -j$(CPUS)
-	@if [ ! -x $@ ] ; then false ; fi
 
 %/$(DEFAULT_NETWORK_FILE):
 	@echo "[Match]" > $@ && \
@@ -188,10 +182,12 @@ docker-deploy: docker-image
 docker-image: Dockerfile
 	docker build -t $(PROJECT):$(PROJECT_TAG) .
 
-environment: $(YOCTO_DIR)/setup-environment
+environment:
 	BuildScripts/ornl-setup-yocto.sh -m $(MACHINE) -v $(YOCTO_VERSION) $(YOCTO_DIR)
 	@$(MAKE) --no-print-directory -B HOST=$(HOST) NETMASK=$(NETMASK) $(ETH0_NETWORK)
+ifeq ($(MACHINE), var-som-mx6-ornl)
 	@$(MAKE) --no-print-directory -B HOST=$(HOST) $(YOCTO_DIR)/$(MFGTEST_SH)
+endif
 
 id:
 	git config --global user.name "UVDL Developer"

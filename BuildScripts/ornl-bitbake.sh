@@ -53,6 +53,8 @@ var-som-mx6-ornl)
 	cd ${YOCTO_DIR}
 	MACHINE=${MACHINE} DISTRO=${YOCTO_DISTRO} EULA=${EULA} . setup-environment ${YOCTO_ENV}
 	;;
+jetson-nano-devkit)
+	;&
 jetson-xavier-nx-devkit)
 	cd ${YOCTO_DIR}
 	source ${YOCTO_DIR}/ornl-yocto-tegra/setup-env --machine ${MACHINE} --distro ornl-tegra ${YOCTO_ENV}
