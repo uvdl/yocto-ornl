@@ -213,6 +213,18 @@ function sync_variscite_platform()
                     exit 1
             fi
     fi
+    if [ ! -d "sources/meta-security" ]
+        then
+            git clone -b dunfell git://git.yoctoproject.org/meta-security
+            if [ $? -ne 0 ]
+                then
+                    echo
+                    echo "==============================================="
+                    echo "${BOLD}Failed to clone security ${NORMAL}"
+                    echo "==============================================="
+                    exit 1
+            fi
+    fi
     eval cd $OLD_LOCATION
 }
 
@@ -251,6 +263,7 @@ function sync_tegra_platform()
         rm -rf layers/meta-demo-ci/
         rm -rf layers/meta-tegrademo/
         rm -rf layers/meta-tegra-support/
+        cp -rf repos/meta-openembedded/meta-perl layers/
         # Need to clone .Net Core in the correct folder
         eval cd layers/
         git clone https://github.com/RDunkley/meta-dotnet-core.git
@@ -262,10 +275,15 @@ function sync_tegra_platform()
                 echo "==============================================="
                 exit 1
         fi
-        eval cd ../..
-    fi
-    if [ ! -d "ornl-yocto-tegra/layers/meta-python2" ]
-        then
+        git clone -b dunfell git://git.yoctoproject.org/meta-security
+        if [ $? -ne 0 ]
+            then
+                echo
+                echo "==============================================="
+                echo "${BOLD}Failed to clone security ${NORMAL}"
+                echo "==============================================="
+                exit 1
+        fi
         git clone -b dunfell https://git.openembedded.org/meta-python2/
         if [ $? -ne 0 ]
             then
@@ -275,8 +293,8 @@ function sync_tegra_platform()
                 echo "==============================================="
                 exit 1
         fi
-        mv meta-python2/ ornl-yocto-tegra/layers/
     fi
+
     eval cd $OLD_LOCATION
 }
 
@@ -352,6 +370,15 @@ function sync_raspberries()
                     echo
                     echo "==============================================="
                     echo "${BOLD}Failed to clone swupdate boards${NORMAL}"
+                    echo "==============================================="
+                    exit 1
+            fi
+            git clone -b gatesgarth git://git.yoctoproject.org/meta-security
+            if [ $? -ne 0 ]
+                then
+                    echo
+                    echo "==============================================="
+                    echo "${BOLD}Failed to clone security ${NORMAL}"
                     echo "==============================================="
                     exit 1
             fi

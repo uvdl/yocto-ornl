@@ -66,6 +66,10 @@ BBMASK_prepend = "fsl-image-mfgtool-initramfs "
 
 IMAGE_FSTYPES += "tar.gz multiubi"
 
+#.Net Core specifics
+PREFERRED_VERSION_dotnet-core = "5.0.0"
+PACKAGECONFIG_pn-curl = "vers krb5 ssl zlib ipv6"
+
 # do multiubi last
 IMAGE_TYPEDEP_multiubi += "${IMAGE_FSTYPES}"
 IMAGE_TYPEDEP_multiubi_remove = "multiubi"

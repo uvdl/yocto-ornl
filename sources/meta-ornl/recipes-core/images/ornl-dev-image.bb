@@ -21,6 +21,7 @@ IMAGE_FEATURES += " \
 IMAGE_INSTALL_append += " \
 	bind-utils \
 	default-eth0 \
+	dotnet-core \
 	dtc \
 	elp-h264 \
 	flex \
