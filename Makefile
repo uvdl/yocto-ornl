@@ -59,7 +59,7 @@ YOCTO_IMG=raspberrypi-$(YOCTO_PROD)-full-image
 YOCTO_DIR := $(EPHEMERAL)/$(PROJECT)-$(YOCTO_VERSION)
 ETH0_NETWORK=$(YOCTO_DIR)/ornl-layers/meta-ornl/recipes-core/default-eth0/files/$(DEFAULT_NETWORK_FILE)
 endif
-ifneq (,$(findstring jetson, $(MACHINE))
+ifneq (,$(findstring jetson, $(MACHINE)))
 MACHINE_FOLDER=jetson
 YOCTO_VERSION=dunfell
 YOCTO_DISTRO=ornl-tegra
