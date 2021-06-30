@@ -1,5 +1,5 @@
 diff --git a/arch/arm/boot/dts/imx6q-iris2-R0.dts b/arch/arm/boot/dts/imx6q-iris2-R0.dts
-index 821b6d668a12..2b5be9c13d22 100644
+index 821b6d668a12..ba9f0574be5f 100644
 --- a/arch/arm/boot/dts/imx6q-iris2-R0.dts
 +++ b/arch/arm/boot/dts/imx6q-iris2-R0.dts
 @@ -163,6 +163,7 @@
@@ -10,7 +10,15 @@ index 821b6d668a12..2b5be9c13d22 100644
  	status = "okay";
  };
  
-@@ -177,6 +178,7 @@
+@@ -170,6 +171,7 @@
+ &uart3 {
+ 	pinctrl-names = "default";
+ 	pinctrl-0 = <&pinctrl_uart3_1>;
++	dma-names = "", "";
+ 	status = "okay";
+ };
+ 
+@@ -177,6 +179,7 @@
  &uart4 {
  	pinctrl-names = "default";
  	pinctrl-0 = <&pinctrl_uart4_1>;
@@ -19,7 +27,7 @@ index 821b6d668a12..2b5be9c13d22 100644
  };
  
 diff --git a/arch/arm/boot/dts/imx6q-iris2-R1.dts b/arch/arm/boot/dts/imx6q-iris2-R1.dts
-index 578b3196b9ef..243906f13715 100644
+index 578b3196b9ef..de429bf16aa9 100644
 --- a/arch/arm/boot/dts/imx6q-iris2-R1.dts
 +++ b/arch/arm/boot/dts/imx6q-iris2-R1.dts
 @@ -238,6 +238,7 @@
@@ -30,7 +38,15 @@ index 578b3196b9ef..243906f13715 100644
  	status = "okay";
  };
  
-@@ -252,6 +253,7 @@
+@@ -245,6 +246,7 @@
+ &uart3 {
+ 	pinctrl-names = "default";
+ 	pinctrl-0 = <&pinctrl_uart3_1>;
++	dma-names = "", "";
+ 	status = "okay";
+ };
+ 
+@@ -252,6 +254,7 @@
  &uart4 {
  	pinctrl-names = "default";
  	pinctrl-0 = <&pinctrl_uart4_1>;
@@ -39,7 +55,7 @@ index 578b3196b9ef..243906f13715 100644
  };
  
 diff --git a/arch/arm/boot/dts/imx6q-nightcrawler-R0.dts b/arch/arm/boot/dts/imx6q-nightcrawler-R0.dts
-index 40cae1f40259..dae810bb862e 100644
+index 40cae1f40259..69bb8fa683b6 100644
 --- a/arch/arm/boot/dts/imx6q-nightcrawler-R0.dts
 +++ b/arch/arm/boot/dts/imx6q-nightcrawler-R0.dts
 @@ -230,6 +230,7 @@
@@ -50,7 +66,15 @@ index 40cae1f40259..dae810bb862e 100644
  	status = "okay";
  };
  
-@@ -244,6 +245,7 @@
+@@ -237,6 +238,7 @@
+ &uart3 {
+ 	pinctrl-names = "default";
+ 	pinctrl-0 = <&pinctrl_uart3_1>;
++	dma-names = "", "";
+ 	status = "okay";
+ };
+ 
+@@ -244,6 +246,7 @@
  &uart4 {
  	pinctrl-names = "default";
  	pinctrl-0 = <&pinctrl_uart4_1>;
