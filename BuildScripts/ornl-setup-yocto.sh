@@ -188,7 +188,8 @@ function sync_variscite_platform()
             echo "==============================================="
             exit 1
     fi
-    if [ ! -d "sources/meta-python2" ]
+    eval cd sources/
+    if [ ! -d "meta-python2" ]
         then
         git clone -b dunfell https://git.openembedded.org/meta-python2/
         if [ $? -ne 0 ]
@@ -199,21 +200,8 @@ function sync_variscite_platform()
                 echo "==============================================="
                 exit 1
         fi
-        mv meta-python2/ sources/
     fi
-    if [ ! -d "sources/meta-dotnet-core" ]
-        then
-            git clone https://github.com/RDunkley/meta-dotnet-core.git
-            if [ $? -ne 0 ]
-                then
-                    echo
-                    echo "==============================================="
-                    echo "${BOLD}Failed to clone .Net Core ${NORMAL}"
-                    echo "==============================================="
-                    exit 1
-            fi
-    fi
-    if [ ! -d "sources/meta-security" ]
+    if [ ! -d "meta-security" ]
         then
             git clone -b dunfell git://git.yoctoproject.org/meta-security
             if [ $? -ne 0 ]
@@ -266,15 +254,6 @@ function sync_tegra_platform()
         cp -rf repos/meta-openembedded/meta-perl layers/
         # Need to clone .Net Core in the correct folder
         eval cd layers/
-        git clone https://github.com/RDunkley/meta-dotnet-core.git
-        if [ $? -ne 0 ]
-            then
-                echo
-                echo "==============================================="
-                echo "${BOLD}Failed to clone .Net Core ${NORMAL}"
-                echo "==============================================="
-                exit 1
-        fi
         git clone -b dunfell git://git.yoctoproject.org/meta-security
         if [ $? -ne 0 ]
             then
@@ -379,16 +358,6 @@ function sync_raspberries()
                     echo
                     echo "==============================================="
                     echo "${BOLD}Failed to clone security ${NORMAL}"
-                    echo "==============================================="
-                    exit 1
-            fi
-            # Layer for .Net Core, needs to be tested with Gatesgarth
-            git clone https://github.com/RDunkley/meta-dotnet-core.git
-            if [ $? -ne 0 ]
-                then
-                    echo
-                    echo "==============================================="
-                    echo "${BOLD}Failed to clone .Net Core ${NORMAL}"
                     echo "==============================================="
                     exit 1
             fi
