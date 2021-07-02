@@ -8,7 +8,8 @@ DATE := $(shell date +%Y-%m-%d_%H%M)
 
 # These are defaults and may be used if desired. Just
 # uncomment to use them. Normally, you should set your work
-# environemnt up for whatever build you want to achieve
+# environemnt up for whatever build you want to achieve, i.e. exports. However,
+# please DO NOT check them in to github with these variables set.
 #
 # ARCHIVE=/opt 
 # EPHEMERAL=/tmp
