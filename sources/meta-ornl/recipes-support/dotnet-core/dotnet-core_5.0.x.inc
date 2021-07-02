@@ -36,6 +36,11 @@ do_install_append() {
 export DOTNET_ROOT=/usr/share/dotnet
 export PATH=$PATH:/usr/share/dotnet
 EOF
+    cat >> ${D}/home/root/.bashrc <<EOF
+# for dotnet-core
+export DOTNET_ROOT=/usr/share/dotnet
+export PATH=$PATH:/usr/share/dotnet
+EOF
 }
 
 
