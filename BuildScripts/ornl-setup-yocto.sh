@@ -201,6 +201,15 @@ function sync_variscite_platform()
                 exit 1
         fi
     fi
+    git clone -b master https://github.com/RDunkley/meta-dotnet-core.git
+    if [ $? -ne 0 ]
+        then
+            echo
+            echo "==============================================="
+            echo "${BOLD}Failed to .NET ${NORMAL}"
+            echo "==============================================="
+            exit 1
+    fi
     if [ ! -d "meta-security" ]
         then
             git clone -b dunfell git://git.yoctoproject.org/meta-security
@@ -254,6 +263,15 @@ function sync_tegra_platform()
         cp -rf repos/meta-openembedded/meta-perl layers/
         # Need to clone .Net Core in the correct folder
         eval cd layers/
+        git clone -b master https://github.com/RDunkley/meta-dotnet-core.git
+        if [ $? -ne 0 ]
+            then
+                echo
+                echo "==============================================="
+                echo "${BOLD}Failed to .NET ${NORMAL}"
+                echo "==============================================="
+                exit 1
+        fi
         git clone -b dunfell git://git.yoctoproject.org/meta-security
         if [ $? -ne 0 ]
             then
@@ -349,6 +367,15 @@ function sync_raspberries()
                     echo
                     echo "==============================================="
                     echo "${BOLD}Failed to clone swupdate boards${NORMAL}"
+                    echo "==============================================="
+                    exit 1
+            fi
+            git clone -b master https://github.com/RDunkley/meta-dotnet-core.git
+            if [ $? -ne 0 ]
+                then
+                    echo
+                    echo "==============================================="
+                    echo "${BOLD}Failed to .NET ${NORMAL}"
                     echo "==============================================="
                     exit 1
             fi

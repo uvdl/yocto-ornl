@@ -35,6 +35,7 @@ IMAGE_INSTALL_append += " \
 	htop \
 	iotop \
 	iperf3 \
+	i2c-tools \
 	libgps \
 	libsodium \
 	libsodium-dev \
@@ -77,6 +78,7 @@ IMAGE_INSTALL_append += " \
 	sudo \
 	systemd-analyze \
 	tcpdump \
+	vsdbg \
 	v4l-utils \
 	webcam-tools \
 	x264 \
