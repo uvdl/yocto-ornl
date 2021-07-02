@@ -5,9 +5,37 @@ CPUS := $(shell nproc)
 SUDO := $(shell test $${EUID} -ne 0 && echo "sudo")
 LANG := en_US.UTF-8
 DATE := $(shell date +%Y-%m-%d_%H%M)
-ARCHIVE := /opt
-EPHEMERAL := /tmp
 
+# These are defaults and may be used if desired. Just
+# uncomment to use them. Normally, you should set your work
+# environemnt up for whatever build you want to achieve
+#
+# ARCHIVE=/opt 
+# EPHEMERAL=/tmp
+# MACHINE=var-som-mx6-ornl
+# YOCTO_PROD=dev
+
+# Check that given variables are set and all have non-empty values,
+# die with an error otherwise.
+#
+# Params:
+#   1. Variable name(s) to test.
+#   2. (optional) Error message to print.
+check_defined = \
+    $(strip $(foreach 1,$1, \
+        $(call __check_defined,$1,$(strip $(value 2)))))
+__check_defined = $(if $(value $1),, \
+      $(error Undefined $1 $(if $2, ($2))))
+
+
+$(call check_defined, MACHINE, The plateform to build - var-som-mx6-ornl raspberrypi4-64 or jetson-*platform*-devkit )
+$(call check_defined, ARCHIVE, Where to put output files after the build)
+$(call check_defined, EPHEMERAL, The parent directory of the build folder)
+$(call check_defined, YOCTO_PROD, The image version dev prod min - dev prod or min)
+
+# NB: EPHEMERAL is the parent folder of the yocto build and is extremely important.
+#     The yoocto build folder cannot be moved, grows to ~76GB during the build and
+#     toaster runs on one build folder at a time.  Getting this wrong wastes alot of time...
 
 # allow for generation of working eth0
 HOST := 10.223.0.1
@@ -20,7 +48,6 @@ DEV=
 DOT_GZ=.gz
 EULA=1	# https://patchwork.openembedded.org/patch/100815/
 # var-som-mx6-ornl, raspberrypi4-64, jetson-xavier-nx-devkit
-MACHINE=jetson-nano-devkit
 PKGDEPS1=gawk wget git-core diffstat unzip texinfo gcc-multilib \
 build-essential chrpath socat cpio python python3 python3-pip python3-pexpect \
 xz-utils debianutils iputils-ping libsdl1.2-dev xterm
@@ -42,7 +69,6 @@ REPO_SUM=b74fda4aa5df31b88248a0c562691cb943a9c45cc9dd909d000f0e3cc265b685
 # Known variations
 # FIXME: requires mod to BuildScripts/ornl-setup-yocto.sh
 YOCTO_ENV=build_ornl
-YOCTO_PROD=dev
 ifeq ($(MACHINE), var-som-mx6-ornl)
 MACHINE_FOLDER=variscite
 YOCTO_VERSION=dunfell
@@ -82,17 +108,6 @@ PINGHOST := $(shell echo $(HOST) | awk 'BEGIN{FS=OFS="."}{$$4=2}1')
 .PHONY: all archive build clean dependencies docker-deploy docker-image environment
 .PHONY: id kernel kernel-config kernel-pull locale mrproper sd sdk see swu
 .PHONY: toaster toaster-stop
-
-# https://stackoverflow.com/questions/10858261/how-to-abort-makefile-if-variable-not-set
-# NB: EPHEMERAL is the parent folder of the yocto build and is extremely important.
-#     The yoocto build folder cannot be moved, grows to ~76GB during the build and
-#     toaster runs on one build folder at a time.  Getting this wrong wastes alot of time...
-ifeq ($(strip $(EPHEMERAL)),)
-$(error EPHEMERAL is not set)
-endif
-ifeq ($(strip $(EPHEMERAL)),/tmp)
-$(warning *** Using EPHEMERAL=$(EPHEMERAL) ***)
-endif
 
 default: see
 
