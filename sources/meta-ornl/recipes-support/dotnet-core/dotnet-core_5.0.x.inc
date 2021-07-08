@@ -31,15 +31,10 @@ do_install() {
 # Only needed for running locally.
 do_install_append() {
     install -d ${D}/home/root/
-    cat >> ${D}/home/root/.bash_profile <<EOF
+    cat >> ${D}/etc/environment <<EOF
 # for dotnet-core
-export DOTNET_ROOT=/usr/share/dotnet
-export PATH=$PATH:/usr/share/dotnet
-EOF
-    cat >> ${D}/home/root/.bashrc <<EOF
-# for dotnet-core
-export DOTNET_ROOT=/usr/share/dotnet
-export PATH=$PATH:/usr/share/dotnet
+DOTNET_ROOT=/usr/share/dotnet
+PATH=$PATH:/usr/share/dotnet
 EOF
 }
 

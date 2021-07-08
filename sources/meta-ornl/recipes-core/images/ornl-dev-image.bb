@@ -45,7 +45,10 @@ IMAGE_INSTALL_append += " \
 	m4 \
 	make \
 	minicom \
+	nano \
+	net-tools \
 	networkmanager \
+	nload \
 	nodejs \
 	ntp \
 	ntp-bin \

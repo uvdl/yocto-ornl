@@ -11,8 +11,8 @@ DATE := $(shell date +%Y-%m-%d_%H%M)
 # environemnt up for whatever build you want to achieve, i.e. exports. However,
 # please DO NOT check them in to github with these variables set.
 #
-# ARCHIVE=/opt
-# EPHEMERAL=/tmp
+# ARCHIVE=$(HOME)
+# EPHEMERAL=$(HOME)
 # MACHINE=var-som-mx6-ornl
 # YOCTO_PROD=dev
 
@@ -38,7 +38,8 @@ HOST := 10.223.0.1
 NETMASK := 16
 DEFAULT_NETWORK_FILE := 10-eth0.network
 
-.EXPORT_ALL_VARIABLES:
+# TODO : figure out why we are exporting all variables
+# .EXPORT_ALL_VARIABLES:
 
 DEV=
 DOT_GZ=.gz
