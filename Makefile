@@ -11,8 +11,8 @@ DATE := $(shell date +%Y-%m-%d_%H%M)
 # environemnt up for whatever build you want to achieve, i.e. exports. However,
 # please DO NOT check them in to github with these variables set.
 #
-# ARCHIVE=/opt 
-# EPHEMERAL=/tmp
+# ARCHIVE=$(HOME) 
+# EPHEMERAL=$(HOME)
 # MACHINE=var-som-mx6-ornl
 # YOCTO_PROD=dev
 
@@ -25,15 +25,14 @@ DATE := $(shell date +%Y-%m-%d_%H%M)
 check_defined = \
     $(strip $(foreach 1,$1, \
         $(call __check_defined,$1,$(strip $(value 2)))))
-__check_defined = $(if $(value $1),, \
-      $(error Undefined $1 $(if $2, ($2))))
-
+__check_defined = \
+    $(if $(value $1),, \
+        $(error Undefined $1 $(if $2, ($2))))
 
 $(call check_defined, MACHINE, The plateform to build - var-som-mx6-ornl raspberrypi4-64 or jetson-*platform*-devkit )
 $(call check_defined, ARCHIVE, Where to put output files after the build)
 $(call check_defined, EPHEMERAL, The parent directory of the build folder)
 $(call check_defined, YOCTO_PROD, The image version dev prod min - dev prod or min)
-
 # NB: EPHEMERAL is the parent folder of the yocto build and is extremely important.
 #     The yoocto build folder cannot be moved, grows to ~76GB during the build and
 #     toaster runs on one build folder at a time.  Getting this wrong wastes alot of time...
@@ -43,7 +42,8 @@ HOST := 10.223.0.1
 NETMASK := 16
 DEFAULT_NETWORK_FILE := 10-eth0.network
 
-.EXPORT_ALL_VARIABLES:
+# TODO : figure out why we are exporting all variables
+# .EXPORT_ALL_VARIABLES:
 
 DEV=
 DOT_GZ=.gz

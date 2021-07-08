@@ -201,14 +201,17 @@ function sync_variscite_platform()
                 exit 1
         fi
     fi
-    git clone -b master https://github.com/RDunkley/meta-dotnet-core.git
-    if [ $? -ne 0 ]
+    if [ ! -d "meta-dotnet-core" ]
         then
-            echo
-            echo "==============================================="
-            echo "${BOLD}Failed to .NET ${NORMAL}"
-            echo "==============================================="
-            exit 1
+        git clone -b master https://github.com/RDunkley/meta-dotnet-core.git
+        if [ $? -ne 0 ]
+            then
+                echo
+                echo "==============================================="
+                echo "${BOLD}Failed to .NET ${NORMAL}"
+                echo "==============================================="
+                exit 1
+        fi
     fi
     if [ ! -d "meta-security" ]
         then
