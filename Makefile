@@ -287,8 +287,8 @@ see:
 	@echo "ETH0_NETWORK=$(shell grep Address $(ETH0_NETWORK))"
 	@echo -n "KERNEL_SOURCE=$(KERNEL_SOURCE): "
 	@( cd $(KERNEL_SOURCE) && commit=$$(git log | head -1 | tr -s ' ' | cut -f2 | tr -s ' ' | cut -f2 -d' ') ; echo $$commit )
-	-@echo "*** local.conf ***" && diff build/conf/$(MACHINE_FOLDER)/local.conf $(YOCTO_DIR)/$(YOCTO_ENV)/conf/local.conf
-	-@echo "*** bblayers.conf ***" && diff build/conf/$(MACHINE_FOLDER)/bblayers.conf $(YOCTO_DIR)/$(YOCTO_ENV)/conf/bblayers.conf
+	-@echo "*** local.conf ***" && ( diff build/conf/$(MACHINE_FOLDER)/local.conf $(YOCTO_DIR)/$(YOCTO_ENV)/conf/local.conf ; true )
+	-@echo "*** bblayers.conf ***" && ( diff build/conf/$(MACHINE_FOLDER)/bblayers.conf $(YOCTO_DIR)/$(YOCTO_ENV)/conf/bblayers.conf ; true )
 ifeq ($(strip $(MACHINE)),var-som-mx6-ornl)
 	@echo "*** Build Commands for $(MACHINE) ***"
 	@echo "cd $(YOCTO_DIR)"
