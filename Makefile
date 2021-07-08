@@ -149,8 +149,8 @@ all:
 	@$(MAKE) --no-print-directory -B toaster-stop
 	@$(MAKE) --no-print-directory -B YOCTO_CMD="-c clean var-$(YOCTO_PROD)-update-full-image" build
 	-@$(MAKE) --no-print-directory -B YOCTO_CMD=var-$(YOCTO_PROD)-update-full-image build
-	@$(MAKE) --no-print-directory -B YOCTO_CMD="-c clean var-image-swu" build
-	@$(MAKE) --no-print-directory -B YOCTO_CMD=var-image-swu build
+	@$(MAKE) --no-print-directory -B YOCTO_CMD="-c clean var-$(YOCTO_PROD)-image-swu" build
+	@$(MAKE) --no-print-directory -B YOCTO_CMD=var-$(YOCTO_PROD)-image-swu build
 	#@$(MAKE) --no-print-directory -B YOCTO_CMD="-c populate_sdk var-$(YOCTO_PROD)-update-full-image" build
 	@$(MAKE) --no-print-directory -B YOCTO_PROD=$(YOCTO_PROD) archive
 
@@ -304,10 +304,9 @@ endif
 # var-$(YOCTO_PROD)-image-swu doesn't exist anymore, only var-image-swu (?)
 swu:
 	@$(MAKE) --no-print-directory -B environment
-	# FIXME: it should not be necessary to ignore the exit status on the next command
-	-@$(MAKE) --no-print-directory -B YOCTO_CMD=var-$(YOCTO_PROD)-update-full-image build
-	# FIXME: it should be this @$(MAKE) --no-print-directory -B YOCTO_IMG=var-$(YOCTO_PROD)-image-swu build
-	@$(MAKE) --no-print-directory -B YOCTO_CMD=var-image-swu build
+	# NB: making the swu auto-builds the image
+	@$(MAKE) --no-print-directory -B YOCTO_PROD=$(YOCTO_PROD) YOCTO_CMD="-c clean var-$(YOCTO_PROD)-image-swu" build
+	@$(MAKE) --no-print-directory -B YOCTO_PROD=$(YOCTO_PROD) YOCTO_CMD=var-$(YOCTO_PROD)-image-swu build
 	@$(MAKE) --no-print-directory -B YOCTO_PROD=$(YOCTO_PROD) archive
 
 toaster:
