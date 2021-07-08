@@ -38,8 +38,8 @@ HOST := 10.223.0.1
 NETMASK := 16
 DEFAULT_NETWORK_FILE := 10-eth0.network
 
-# TODO : figure out why we are exporting all variables
-# .EXPORT_ALL_VARIABLES:
+# NB: we are exporting all variables because otherwise a variscite build will go interactive on the EULA acceptance, etc.
+.EXPORT_ALL_VARIABLES:
 
 DEV=
 DOT_GZ=.gz
