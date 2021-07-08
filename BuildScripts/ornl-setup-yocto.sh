@@ -216,19 +216,19 @@ function sync_variscite_platform()
                     exit 1
             fi
     fi
-    if [ ! -d "meta-security" ]
-        then
-            # https://www.yoctoproject.org/pipermail/yocto/2016-June/030614.html
-            git clone -b $YOCTO_VERSION https://git.yoctoproject.org/git/meta-security.git
-            if [ $? -ne 0 ]
-                then
-                    echo
-                    echo "==============================================="
-                    echo "${BOLD}Failed to clone security ${NORMAL}"
-                    echo "==============================================="
-                    exit 1
-            fi
-    fi
+    #if [ ! -d "meta-security" ]
+    #    then
+    #        # https://www.yoctoproject.org/pipermail/yocto/2016-June/030614.html
+    #        git clone -b $YOCTO_VERSION https://git.yoctoproject.org/git/meta-security.git
+    #        if [ $? -ne 0 ]
+    #            then
+    #                echo
+    #                echo "==============================================="
+    #                echo "${BOLD}Failed to clone security ${NORMAL}"
+    #                echo "==============================================="
+    #                exit 1
+    #        fi
+    #fi
     eval cd $OLD_LOCATION
 }
 
