@@ -22,11 +22,7 @@ DATE := $(shell date +%Y-%m-%d_%H%M)
 # Params:
 #   1. Variable name(s) to test.
 #   2. (optional) Error message to print.
-check_defined = \
-    $(strip $(foreach 1,$1, \
-        $(call __check_defined,$1,$(strip $(value 2)))))
-__check_defined = $(if $(value $1),, \
-      $(error Undefined $1 $(if $2, ($2))))
+check_defined = $(strip $(foreach 1,$1, $(if $(value $1),, $(error Undefined $1 $(if $(strip $(value 2)),, $(strip $(value 2)))))))
 
 $(call check_defined, MACHINE, The platform to build - var-som-mx6-ornl raspberrypi4-64 or jetson-*platform*-devkit )
 $(call check_defined, ARCHIVE, Where to put output files after the build)
@@ -87,8 +83,6 @@ YOCTO_VERSION=dunfell
 YOCTO_DISTRO=ornl-tegra
 YOCTO_IMG=tegra-$(YOCTO_PROD)-full-image
 YOCTO_DIR := $(EPHEMERAL)/$(PROJECT)-$(YOCTO_VERSION)
-else
-$(warning *** MACHINE is not set and it needs to be for proper automation. ***)
 endif
 ETH0_NETWORK=$(YOCTO_DIR)/ornl-layers/meta-ornl/recipes-core/default-eth0/files/$(DEFAULT_NETWORK_FILE)
 YOCTO_CMD := $(YOCTO_IMG)
