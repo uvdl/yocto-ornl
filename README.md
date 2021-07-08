@@ -4,6 +4,25 @@
 
 This option takes advantage of Makefile automation.
 
+Important environment variables are:
+
+  * `ARCHIVE := /opt` - controls the folder where the output files are written
+  * `EPHEMERAL := $(HOME)` - controls the folder where the yocto builds are made
+  * `HOST := 10.223.0.1` - controls the default eth0 address of the processor
+  * `NETMASK := 16` - controls the netmask to be used
+  * `YOCTO_PROD := dev` - controls which yocto image to build {dev, prod, min}
+
+Ensure the environment variables are set:
+
+<pre>
+export ARCHIVE=<path>
+export EPHEMERAL=<path>
+export MACHINE=<choice>
+export YOCTO_PROD=<choice>
+</pre>
+
+Once these variables are set, you can build:
+
 <pre>
 make dependencies
 make build
@@ -22,8 +41,8 @@ With the time based on when the `make archive` command is called.
 On the Cades VM, I typically do the following *(after make dependencies is done once)*:
 
 <pre>
-make EPHEMERAL=/ephemeral toaster
-for k in clean all archive ; do make EPHEMERAL=/ephemeral YOCTO_SRC=$HOME/yocto-ornl $k ; done
+make toaster
+for k in clean all archive ; do make YOCTO_SRC=$HOME/yocto-ornl $k ; done
 </pre>
 
 ### Quick Fully Automatic Method
@@ -42,14 +61,7 @@ them into a folder that can be taken to another machine or used to program a
 micro SD card as in the [flash sd to emmc](#flash-sd-to-emmc) section below.
 
 The files will be stored in `/opt/yocto-ornl-yyyy-mm-dd_hhmm` **(or wherever the `ARCHIVE` variable points to)**.
-Important environment variables are:
-
-  * `ARCHIVE := /opt` - controls the folder where the output files are written
-  * `EPHEMERAL := $(HOME)` - controls the folder where the yocto builds are made
-  * `HOST := 10.223.0.1` - controls the eth0 address of the processor
-  * `NETMASK := 16` - controls the netmask to be used.
-
-These can be overriden in the make command, for example:
+The environment variables can be overriden in the make command, for example:
 
 <pre>
 make ARCHIVE=/tmp HOST=192.168.1.10 NETMASK=24 swu
@@ -63,7 +75,7 @@ whose eth0 port will be defined as 192.168.1.10/24.
 On the Cades VM, I typically do the following *(for a vehicle in the `Testing` comm group (octet 13) vehicle sysid 10 (a.k.a. R1-24)*:
 
 <pre>
-make EPHEMERAL=/ephemeral HOST=172.20.13.10 NETMASK=16 swu
+make HOST=172.20.13.10 NETMASK=16 swu
 </pre>
 
 ### `EPHEMERAL`
@@ -84,10 +96,10 @@ persistent storage volume.
 
 #### `linuxsystembuilder.ornl.gov`
 
-This Cades VM is setup as a build resource.  It has an NVMe disk mounted at `/ephemeral`, so your build commands will need:
+This Cades VM is setup as a build resource.  It has an NVMe disk mounted at `/ephemeral`, so your EPHEMERAL environment variable will need to be set as: `export EPHEMERAL=/ephemeral`
 
 <pre>
-make EPHEMERAL=/ephemeral HOST=192.168.0.1 NETMASK=24 swu
+make HOST=192.168.0.1 NETMASK=24 swu
 </pre>
 
 ## Manual Step-by-Step Method
