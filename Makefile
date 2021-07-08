@@ -164,9 +164,9 @@ build:
 # needed pass-thrus of variables.
 clean:
 	-@$(MAKE) --no-print-directory MACHINE=$(MACHINE) YOCTO_DIR=$(YOCTO_DIR) YOCTO_ENV=$(YOCTO_ENV) toaster-stop
-	BuildScripts/ornl-bitbake.sh -m $(MACHINE) -d $(YOCTO_DIR) -e $(YOCTO_ENV) "-c clean u-boot-variscite"
-	BuildScripts/ornl-bitbake.sh -m $(MACHINE) -d $(YOCTO_DIR) -e $(YOCTO_ENV) "-c clean var-$(YOCTO_PROD)-update-full-image"
-	BuildScripts/ornl-bitbake.sh -m $(MACHINE) -d $(YOCTO_DIR) -e $(YOCTO_ENV) "-c clean linux-variscite"
+	-BuildScripts/ornl-bitbake.sh -m $(MACHINE) -d $(YOCTO_DIR) -e $(YOCTO_ENV) "-c clean u-boot-variscite"
+	-BuildScripts/ornl-bitbake.sh -m $(MACHINE) -d $(YOCTO_DIR) -e $(YOCTO_ENV) "-c clean var-$(YOCTO_PROD)-update-full-image"
+	-BuildScripts/ornl-bitbake.sh -m $(MACHINE) -d $(YOCTO_DIR) -e $(YOCTO_ENV) "-c clean linux-variscite"
 	-rm -rf $(YOCTO_DIR)/sources
 	-rm -rf $(YOCTO_DIR)/ornl-layers
 	-rm -rf $(YOCTO_DIR)/$(YOCTO_ENV)/tmp/deploy/images/$(MACHINE)
