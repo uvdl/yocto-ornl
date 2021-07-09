@@ -154,7 +154,7 @@ all:
 	@$(MAKE) --no-print-directory -B YOCTO_PROD=$(YOCTO_PROD) archive
 
 archive:
-	BuildScripts/ornl-create-archive.sh -p $(YOCTO_PROD) -m $(MACHINE) -ip $(HOST) -nm $(NETMASK) $(YOCTO_DIR)
+	BuildScripts/ornl-create-archive.sh -p $(YOCTO_PROD) -m $(MACHINE) -ip auto -nm auto $(YOCTO_DIR)
 
 build:
 	BuildScripts/ornl-bitbake.sh -m $(MACHINE) -d $(YOCTO_DIR) -e $(YOCTO_ENV) $(YOCTO_CMD)
@@ -284,7 +284,7 @@ see:
 	@echo "YOCTO_DIR=$(YOCTO_DIR)"
 	@echo "YOCTO_IMG=$(YOCTO_IMG)"
 	@echo "ARCHIVE-TO=$(ARCHIVE)/$(PROJECT)-$(DATE)"
-	@echo "ETH0_NETWORK=$(shell grep Address $(ETH0_NETWORK))"
+	@echo "ETH0_NETWORK.$(shell grep Address $(ETH0_NETWORK))"
 	@echo -n "KERNEL_SOURCE=$(KERNEL_SOURCE): "
 	@( cd $(KERNEL_SOURCE) && commit=$$(git log | head -1 | tr -s ' ' | cut -f2 | tr -s ' ' | cut -f2 -d' ') ; echo $$commit )
 	-@echo "*** local.conf ***" && ( diff build/conf/$(MACHINE_FOLDER)/local.conf $(YOCTO_DIR)/$(YOCTO_ENV)/conf/local.conf ; true )

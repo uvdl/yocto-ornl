@@ -27,12 +27,12 @@ help() {
 	echo " options:"
 	echo " -h		display this Help message"
 	echo " -e		override YOCTO_ENV (default ${YOCTO_ENV})"
-	echo " -ip		override HOST (default ${HOST})"
+	echo " -ip		override HOST (auto to get from build, default ${HOST})"
 	echo " -m		define MACHINE (default ${MACHINE}); valid:"
     echo "          var-som-mx6-ornl, var-som-mx6 - Variscite DART-MX6"
     echo "          jetson-xavier-nx-devkit - Jetson Xavier NX on devkit"
     echo "          raspberrypi4-64 - RPi Compute Module 4"
-	echo " -nm		override NETMASK (default ${NETMASK})"
+	echo " -nm		override NETMASK (auto to get from build, default ${NETMASK})"
 	echo " -o		override OUTPUT folder (default ${_OUT})"
 	echo " -p		override YOCTO_PROD (default ${YOCTO_PROD}); valid"
     echo "          dev, prod, min"
@@ -78,6 +78,7 @@ while [ "$moreoptions" = 1 -a $# -gt 0 ]; do
 done
 
 ### Boilerplate
+ETH0_NETWORK=ornl-layers/meta-ornl/recipes-core/default-eth0/files/10-eth0.network
 KERNEL_DTS=tmp/deploy/images/${MACHINE}
 KERNEL_IMAGE=tmp/deploy/images/${MACHINE}/uImage
 KERNEL_SOURCE=${YOCTO_DIR}/${YOCTO_ENV}/tmp/work-shared/${MACHINE}/kernel-source
@@ -106,6 +107,14 @@ if [[ ($MACHINE == var-som-mx6 || $MACHINE == var-som-mx6-ornl) ]] ; then
     # kernel image and sources
 	cp ${YOCTO_DIR}/${YOCTO_ENV}/${KERNEL_IMAGE} ${_OUT}
 	tar czf ${_OUT}/kernel-source.tgz -C $(dirname ${KERNEL_SOURCE}) $(basename ${KERNEL_SOURCE})
+
+    # determine HOST, NETMASK
+    if [[ $HOST == auto ]] ; then
+        HOST=$(grep Address ${YOCTO_DIR}/${YOCTO_ENV}/${ETH0_NETWORK} | cut -f2 -d= | cut -f1 -d/)
+    fi
+    if [[ $NETMASK == auto ]] ; then
+        HOST=$(grep Address ${YOCTO_DIR}/${YOCTO_ENV}/${ETH0_NETWORK} | cut -f2 -d= | cut -f2 -d/)
+    fi
 
     # .swu files for this MACHINE
 	( set -x ; swu=$(find ${YOCTO_DIR}/${YOCTO_ENV}/tmp/work -name "var-${YOCTO_PROD}-image-swu-${MACHINE}.swu" | head -1) ; set +x ;
