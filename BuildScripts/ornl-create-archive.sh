@@ -108,7 +108,7 @@ if [[ ($MACHINE == var-som-mx6 || $MACHINE == var-som-mx6-ornl) ]] ; then
 	tar czf ${_OUT}/kernel-source.tgz -C $(dirname ${KERNEL_SOURCE}) $(basename ${KERNEL_SOURCE})
 
     # .swu files for this MACHINE
-	( set -x ; swu=$(find ${YOCTO_DIR}/${YOCTO_ENV} -name "var-image-swu-${MACHINE}.swu" | head -1) ; set +x ;
+	( set -x ; swu=$(find ${YOCTO_DIR}/${YOCTO_ENV}/tmp/work -name "var-${YOCTO_PROD}-image-swu-${MACHINE}.swu" | head -1) ; set +x ;
 		if [ ! -z ${swu} ] ; then set -x ; cp ${swu} ${_OUT}/var-${YOCTO_PROD}-image-${HOST}-${NETMASK}.swu ; fi )
 
     # the SDK for this MACHINE
