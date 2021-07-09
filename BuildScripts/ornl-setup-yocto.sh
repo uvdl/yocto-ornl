@@ -121,6 +121,8 @@ function run_build()
     var-som-mx6-ornl)
         sync_variscite_platform
         ;;
+    jetson-nano-devkit)
+        ;&
     jetson-xavier-nx-devkit)
         sync_tegra_platform
         ;;
@@ -186,7 +188,8 @@ function sync_variscite_platform()
             echo "==============================================="
             exit 1
     fi
-    if [ ! -d "sources/meta-python2" ]
+    eval cd sources/
+    if [ ! -d "meta-python2" ]
         then
         git clone -b dunfell https://git.openembedded.org/meta-python2/
         if [ $? -ne 0 ]
@@ -197,7 +200,30 @@ function sync_variscite_platform()
                 echo "==============================================="
                 exit 1
         fi
-        mv meta-python2/ sources/
+    fi
+    if [ ! -d "meta-dotnet-core" ]
+        then
+        git clone -b master https://github.com/RDunkley/meta-dotnet-core.git
+        if [ $? -ne 0 ]
+            then
+                echo
+                echo "==============================================="
+                echo "${BOLD}Failed to .NET ${NORMAL}"
+                echo "==============================================="
+                exit 1
+        fi
+    fi
+    if [ ! -d "meta-security" ]
+        then
+            git clone -b dunfell git://git.yoctoproject.org/meta-security
+            if [ $? -ne 0 ]
+                then
+                    echo
+                    echo "==============================================="
+                    echo "${BOLD}Failed to clone security ${NORMAL}"
+                    echo "==============================================="
+                    exit 1
+            fi
     fi
     eval cd $OLD_LOCATION
 }
@@ -237,10 +263,27 @@ function sync_tegra_platform()
         rm -rf layers/meta-demo-ci/
         rm -rf layers/meta-tegrademo/
         rm -rf layers/meta-tegra-support/
-        eval cd ..
-    fi
-    if [ ! -d "ornl-yocto-tegra/layers/meta-python2" ]
-        then
+        cp -rf repos/meta-openembedded/meta-perl layers/
+        # Need to clone .Net Core in the correct folder
+        eval cd layers/
+        git clone -b master https://github.com/RDunkley/meta-dotnet-core.git
+        if [ $? -ne 0 ]
+            then
+                echo
+                echo "==============================================="
+                echo "${BOLD}Failed to .NET ${NORMAL}"
+                echo "==============================================="
+                exit 1
+        fi
+        git clone -b dunfell git://git.yoctoproject.org/meta-security
+        if [ $? -ne 0 ]
+            then
+                echo
+                echo "==============================================="
+                echo "${BOLD}Failed to clone security ${NORMAL}"
+                echo "==============================================="
+                exit 1
+        fi
         git clone -b dunfell https://git.openembedded.org/meta-python2/
         if [ $? -ne 0 ]
             then
@@ -250,8 +293,8 @@ function sync_tegra_platform()
                 echo "==============================================="
                 exit 1
         fi
-        mv meta-python2/ ornl-yocto-tegra/layers/
     fi
+
     eval cd $OLD_LOCATION
 }
 
@@ -327,6 +370,24 @@ function sync_raspberries()
                     echo
                     echo "==============================================="
                     echo "${BOLD}Failed to clone swupdate boards${NORMAL}"
+                    echo "==============================================="
+                    exit 1
+            fi
+            git clone -b master https://github.com/RDunkley/meta-dotnet-core.git
+            if [ $? -ne 0 ]
+                then
+                    echo
+                    echo "==============================================="
+                    echo "${BOLD}Failed to .NET ${NORMAL}"
+                    echo "==============================================="
+                    exit 1
+            fi
+            git clone -b gatesgarth git://git.yoctoproject.org/meta-security
+            if [ $? -ne 0 ]
+                then
+                    echo
+                    echo "==============================================="
+                    echo "${BOLD}Failed to clone security ${NORMAL}"
                     echo "==============================================="
                     exit 1
             fi
@@ -431,6 +492,8 @@ function make_build_dir()
         # Variscite kind of forces us to overwrite the original config files
         copy_config_files
         ;;
+    jetson-nano-devkit)
+        ;&
     jetson-xavier-nx-devkit)
         # copy the config files over so there isn't a need to overwrite them
         copy_config_files
@@ -487,6 +550,8 @@ function copy_config_files()
     #  Find the folder name based on the machine type
     MACHINE_FOLDER=""
     case "$TARGET_MACHINE" in
+    jetson-nano-devkit)
+        ;&
     jetson-xavier-nx-devkit-emmc)
         # Fallthrough example
         ;&
@@ -574,7 +639,6 @@ function help_menu()
 # TODO :: change this to not be so clunky
 if [ $# -eq 3 ]
     then
-        echo "Butt"
         help_menu
 fi
 
