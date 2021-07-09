@@ -24,6 +24,7 @@ UBI_VOLNAME  = "rootfs"
 
 # Variscite BSP default providers
 PREFERRED_PROVIDER_virtual/kernel ?= "linux-variscite"
+# FIXME: this breaks thud when it uses 4.9.88
 PREFERRED_VERSION_linux-variscite = "5.4_%"
 
 PREFERRED_PROVIDER_u-boot = "u-boot-variscite"
@@ -65,6 +66,11 @@ IMAGE_INSTALL_append = " \
 BBMASK_prepend = "fsl-image-mfgtool-initramfs "
 
 IMAGE_FSTYPES += "tar.gz multiubi"
+
+#.Net Core specifics
+PREFERRED_VERSION_dotnet-core ?= "5.0.301"
+PREFERRED_VERSION_vsdbg ?= "16.8.11005.1"
+PACKAGECONFIG_pn-curl = "vers krb5 ssl zlib ipv6"
 
 # do multiubi last
 IMAGE_TYPEDEP_multiubi += "${IMAGE_FSTYPES}"

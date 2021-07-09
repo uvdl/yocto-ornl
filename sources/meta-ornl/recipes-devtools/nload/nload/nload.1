@@ -1,0 +1,285 @@
+.\"
+.\" Man page for nload
+.\" Copyright (C) 2001 - 2012 by Roland Riegel <feedback@roland.riegel.de>
+.\"
+.TH nload 1 "February 06, 2012" nload "Network monitoring tools"
+.SH NAME
+nload \- displays the current network usage
+
+.SH SYNOPSIS
+.B nload
+.RB [ \-a
+.IR period ]
+.RB [ \-i
+.IR max_scaling ]
+.RB [ \-m ]
+.RB [ \-o
+.IR max_scaling ]
+.RB [ \-t
+.IR interval ]
+.RB [ \-u
+.IR h|H|b|B|k|K|m|M|g|G ]
+.RB [ \-U
+.IR h|H|b|B|k|K|m|M|g|G ]
+.RI [ devices ]
+
+.B nload \-\-help|\-h
+
+.SH DESCRIPTION
+.B nload
+is a console application which monitors network traffic and bandwidth usage in real time.
+It visualizes the in- and outgoing traffic using two graphs and provides additional info
+like the total amount of transfered data and min/max network usage.
+
+.SH USAGE
+When running
+.B nload,
+you can switch between the devices (which you gave
+.B nload
+either on the command line or which were auto-detected) by pressing the left and right arrow keys. If the
+.B \-m
+command line parameter is given, the arrow keys switch as many devices back and forth as
+there are shown on the screen. If you want to quit, do so by pressing 'q' or 'Ctrl+C'.
+
+For further key shortcuts, have a look at the sections
+.B MAIN WINDOW
+and
+.B OPTION WINDOW
+below.
+
+.SH OPTIONS
+A summary of the options supported by
+.B nload
+is included below.
+
+.TP
+.B \-a period
+Sets the length in seconds of the time window for average calculation.
+The default is 300.
+.TP
+.B \-i max_scaling
+Specifies the 100% mark in kBit/s of the graph indicating the incoming bandwidth usage.
+Use 0 for automatic scaling. Ignored if the switch \-m is given. The default value for max_scaling
+is 0 (automatic).
+.TP
+.B \-m
+Show multiple devices at a time; do not show the traffic graphs.
+.TP
+.B \-o max_scaling
+Same as \-i but for the graph indicating the outgoing bandwidth usage.
+.TP
+.B \-t interval
+Determines the refresh interval of the display in milliseconds.
+The default value of interval is 500.
+
+PLEASE NOTE:
+Specifying refresh intervals shorter than about 100 milliseconds makes traffic
+calculation very unprecise. Also the display may flicker using such short
+refresh intervals.
+.B nload
+tries to balance this out by doing extra time measurements, but this may
+not always succeed.
+.TP
+.B \-u h|H|b|B|k|K|m|M|g|G
+Sets the type of unit used for the display of traffic numbers.
+h means human readable (auto), b Bit/s, k kBit/s, m MBit/s and g GBit/s.
+The upper case letters mean the corresponding units in Bytes (instead of Bits).
+The default is k.
+.TP
+.B \-U h|H|b|B|k|K|m|M|g|G
+Same as \-u, but for an amount of data, e.g. Bit, kByte, GBit etc. (without "/s").
+The default is M.
+.TP
+.B \-f filename
+Appends traffic data to the named file. See the section
+.B TRAFFIC LOGGING FORMAT
+below for an explanation of the logged information.
+.TP
+.B devices
+Network devices to use. The default is "all", which means to display all auto-detected devices.
+.TP
+.B \-h, \-\-help
+Show a short summary of these command line options.
+
+.SH MAIN WINDOW
+After starting,
+.B nload
+begins to monitor the network devices given on the
+command line, or, if none where specified, the default device. In this mode,
+the following key shortcuts are available.
+
+.TP
+.B 'ArrowRight', 'ArrowDown', 'PageDown', 'Enter', 'Tab'
+Switch the display to the next network device, or, when started with the
+.B \-m
+flag, to the next page of devices.
+
+.TP
+.B 'ArrowLeft', 'ArrowUp', 'PageUp'
+Switch the display to the previous network device, or, when started with
+the
+.B \-m
+flag, to the previous page of devices.
+
+.TP
+.B 'F2'
+Show the option window (see section 
+.B OPTION WINDOW
+below).
+
+.TP
+.B 'F5'
+Save current settings to the user's config file.
+
+.TP
+.B 'F6'
+Reload settings from the config files.
+
+.TP
+.B 'q', 'Ctrl+C'
+Quit
+.BR nload .
+
+.SH OPTION WINDOW
+The parameters given to
+.B nload
+on the command line can be adjusted during run time by pressing the 'F2' key. A
+small window appears on the top of the screen, listing the available settings.
+
+.TP
+.B 'F2'
+Show/hide the option window.
+
+.TP
+.B 'ArrowLeft', 'ArrowRight', 'Home', 'End'
+Navigate within the edit fields.
+
+.TP
+.B 'ArrowUp', 'ArrowDown', 'Enter'
+Navigate between the settings.
+
+.TP
+.B 'PageUp', 'PageDown', 'Tab'
+Toggle between the different values possible for the current field.
+
+.TP
+.B '+' / '-'
+Switch to the next / previous page of settings.
+
+.SH TRAFFIC LOGGING FORMAT
+
+Traffic is logged as a simple text table, with each line describing the traffic status of a single network device at a specific time.
+The first line of output serves as a table header naming each column of data. Columns are separated by a single space character. The meaning of each column is described below.
+
+.TP
+.B Date
+The date of the log entry in YYYY-MM-DD format, where YYYY is the four-digit year, MM the two-digit month (01-12) and DD the two-digit day (01-31).
+
+.TP
+.B Time
+The time of the log entry in HH:MM:SS format, where HH, MM and SS are the two-digit hours (00-23), minutes (00-59) and seconds (00-60).
+
+.TP
+.B DeviceName
+The name of the network device for which this log entry applies.
+
+.TP
+.B DataInTotal
+The number of bytes received since boot.
+
+.TP
+.B DataOutTotal
+The number of bytes transmitted since boot.
+
+.TP
+.B DataInPerSecond
+The number of bytes currently being received per second.
+
+.TP
+.B DataOutPerSecond
+The number of bytes currently being transmitted per second.
+
+.TP
+.B DataInAverage
+The number of bytes being received in average, calculated by using the time interval specified with the
+.B -a
+parameter or configured in the configuration file.
+
+.TP
+.B DataOutAverge
+The number of bytes being transmitted in average, calculated by using the time interval specified with the
+.B -a
+parameter or configured in the configuration file.
+
+.TP
+.B DataInMin
+The absolute minimum number of bytes received per second, calculated since starting
+.BR nload .
+
+.TP
+.B DataOutMin
+The absolute minimum number of bytes transmitted per second, calculated since starting
+.BR nload .
+
+.TP
+.B DataInMax
+The absolute maximum number of bytes received per second, calculated since starting
+.BR nload .
+
+.TP
+.B DataOutMax
+The absolute maximum number of bytes transmitted per second, calculated since starting
+.BR nload .
+
+.TP
+.B TimeSeconds
+The date and time of the log entry as seconds since the Unix Epoch, 1970-01-01 00:00:00 +0000 (UTC).
+
+.TP
+.B TimeMicroSeconds
+The microseconds part of the date and time in
+.BR TimeSeconds .
+
+.SH FILES
+
+.TP
+.I $(HOME)/.nload
+User-specific configuration file (overrides system-wide settings). Press
+.B 'F5'
+from within nload to save the current settings to this file.
+
+.TP
+.I /etc/nload.conf
+System-wide configuration file. It uses the same syntax as the user-specific
+configuration file.
+
+.TP
+.I /sys/class/net/*/* /proc/net/dev
+are read by
+.B nload
+when running on Linux to get the network traffic data.
+
+.SH VERSION
+This manual page describes version @VERSION@ of
+.BR nload .
+
+For updates, look at the nload homepage:
+.br
+.B http://www.roland-riegel.de/nload/
+
+.SH AUTHOR
+Copyright (C) 2001 - 2018 Roland Riegel <feedback@roland-riegel.de>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
