@@ -110,10 +110,10 @@ if [[ ($MACHINE == var-som-mx6 || $MACHINE == var-som-mx6-ornl) ]] ; then
 
     # determine HOST, NETMASK
     if [[ $HOST == auto ]] ; then
-        HOST=$(grep Address ${YOCTO_DIR}/${YOCTO_ENV}/${ETH0_NETWORK} | cut -f2 -d= | cut -f1 -d/)
+        HOST=$(grep Address ${YOCTO_DIR}/${ETH0_NETWORK} | cut -f2 -d= | cut -f1 -d/)
     fi
     if [[ $NETMASK == auto ]] ; then
-        HOST=$(grep Address ${YOCTO_DIR}/${YOCTO_ENV}/${ETH0_NETWORK} | cut -f2 -d= | cut -f2 -d/)
+        NETMASK=$(grep Address ${YOCTO_DIR}/${ETH0_NETWORK} | cut -f2 -d= | cut -f2 -d/)
     fi
 
     # .swu files for this MACHINE
