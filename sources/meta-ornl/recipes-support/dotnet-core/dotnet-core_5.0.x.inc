@@ -19,7 +19,6 @@ do_compile[noexec] = "1"
 
 FILES_${PN} += " \
 	${datadir}/dotnet \
-    /home/root/.bash_profile \
 "
 
 do_install() {
@@ -27,15 +26,4 @@ do_install() {
 
     cp -rf ${S}* ${D}${datadir}/dotnet/
 }
-
-# Only needed for running locally.
-do_install_append() {
-    install -d ${D}/etc/
-    cat >> ${D}/etc/environment <<EOF
-# for dotnet-core
-DOTNET_ROOT=/usr/share/dotnet
-PATH=$PATH:/usr/share/dotnet
-EOF
-}
-
 
