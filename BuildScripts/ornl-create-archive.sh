@@ -122,14 +122,18 @@ if [[ ($MACHINE == var-som-mx6 || $MACHINE == var-som-mx6-ornl) ]] ; then
 
     # the SDK for this MACHINE
 	if [ -d ${YOCTO_DIR}/${YOCTO_ENV}/tmp/deploy/sdk ] ; then
-        ( set -x ; cp -r ${YOCTO_DIR}/${YOCTO_ENV}/tmp/deploy/sdk ${_OUT} )
+        ( set -x ; cp -r ${YOCTO_DIR}/${YOCTO_ENV}/tmp/deploy/sdk ${_OUT} ; set +x )
     fi
 
     # calculate hashes for various files
 	commit=$(git log | head -1 | tr -s ' ' | cut -f2 | tr -s ' ' | cut -f2 -d' ') ;
-        echo "yocto-ornl: $$commit" > ${_OUT}/hashes
-	( cd ${KERNEL_SOURCE} && commit=$(git log | head -1 | tr -s ' ' | cut -f2 | tr -s ' ' | cut -f2 -d' ') ;
-        echo "kernel: $$commit" >> ${_OUT}/hashes )
+	echo "yocto-ornl: $commit" > ${_OUT}/hashes
+	if [ -e ${KERNEL_SOURCE}/.git ] ; then
+		( cd ${KERNEL_SOURCE} && commit=$(git log | head -1 | tr -s ' ' | cut -f2 | tr -s ' ' | cut -f2 -d' ') ;
+		echo "kernel: $commit" >> ${_OUT}/hashes )
+	else
+		echo "kernel: no .git in ${KERNEL_SOURCE}" >> ${_OUT}/hashes
+	fi
 
     # write instructions on use out
 	echo "# To write image to MMC, do:" > ${_OUT}/readme.txt
