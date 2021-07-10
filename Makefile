@@ -309,6 +309,9 @@ swu:
 	@$(MAKE) --no-print-directory -B YOCTO_PROD=$(YOCTO_PROD) archive
 
 toaster:
+ifeq ($(strip $(MACHINE)),var-som-mx6-ornl)
+	@$(MAKE) --no-print-directory YOCTO_VERSION=$(YOCTO_VERSION) $(YOCTO_DIR)/setup-environment
+endif
 	BuildScripts/ornl-bitbake.sh -m $(MACHINE) -d $(YOCTO_DIR) -e $(YOCTO_ENV) toaster enable
 
 toaster-stop:
