@@ -146,7 +146,6 @@ endif
 all:
 	@$(MAKE) --no-print-directory -B dependencies
 	@$(MAKE) --no-print-directory -B environment
-	@$(MAKE) --no-print-directory -B toaster-stop
 	@$(MAKE) --no-print-directory -B YOCTO_CMD="-c clean var-$(YOCTO_PROD)-update-full-image" build
 	-@$(MAKE) --no-print-directory -B YOCTO_CMD=var-$(YOCTO_PROD)-update-full-image build
 	@$(MAKE) --no-print-directory -B YOCTO_CMD="-c clean var-$(YOCTO_PROD)-image-swu" build
@@ -155,7 +154,7 @@ all:
 	@$(MAKE) --no-print-directory -B YOCTO_PROD=$(YOCTO_PROD) archive
 
 archive:
-	BuildScripts/ornl-create-archive.sh -p $(YOCTO_PROD) -m $(MACHINE) -ip $(HOST) -nm $(NETMASK) -o $(ARCHIVE) $(YOCTO_DIR) 
+	BuildScripts/ornl-create-archive.sh -p $(YOCTO_PROD) -m $(MACHINE) -ip auto -nm auto -o $(ARCHIVE) $(YOCTO_DIR)
 
 build:
 	BuildScripts/ornl-bitbake.sh -m $(MACHINE) -d $(YOCTO_DIR) -e $(YOCTO_ENV) $(YOCTO_CMD)
@@ -285,7 +284,7 @@ see:
 	@echo "YOCTO_DIR=$(YOCTO_DIR)"
 	@echo "YOCTO_IMG=$(YOCTO_IMG)"
 	@echo "ARCHIVE-TO=$(ARCHIVE)/$(PROJECT)-$(DATE)"
-	@echo "ETH0_NETWORK=$(shell grep Address $(ETH0_NETWORK))"
+	@echo "ETH0_NETWORK.$(shell grep Address $(ETH0_NETWORK))"
 	@echo -n "KERNEL_SOURCE=$(KERNEL_SOURCE): "
 	@( cd $(KERNEL_SOURCE) && commit=$$(git log | head -1 | tr -s ' ' | cut -f2 | tr -s ' ' | cut -f2 -d' ') ; echo $$commit )
 	-@echo "*** local.conf ***" && ( diff build/conf/$(MACHINE_FOLDER)/local.conf $(YOCTO_DIR)/$(YOCTO_ENV)/conf/local.conf ; true )
@@ -310,6 +309,9 @@ swu:
 	@$(MAKE) --no-print-directory -B YOCTO_PROD=$(YOCTO_PROD) archive
 
 toaster:
+ifeq ($(strip $(MACHINE)),var-som-mx6-ornl)
+	@$(MAKE) --no-print-directory YOCTO_VERSION=$(YOCTO_VERSION) $(YOCTO_DIR)/setup-environment
+endif
 	BuildScripts/ornl-bitbake.sh -m $(MACHINE) -d $(YOCTO_DIR) -e $(YOCTO_ENV) toaster enable
 
 toaster-stop:

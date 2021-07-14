@@ -25,6 +25,7 @@ Once these variables are set, you can build:
 
 <pre>
 make dependencies
+make environment
 make build
 make archive
 </pre>
@@ -41,8 +42,7 @@ With the time based on when the `make archive` command is called.
 On the Cades VM, I typically do the following *(after make dependencies is done once)*:
 
 <pre>
-make toaster
-for k in clean all archive ; do make YOCTO_SRC=$HOME/yocto-ornl $k ; done
+for k in clean toaster all ; do make $k ; done
 </pre>
 
 ### Quick Fully Automatic Method
