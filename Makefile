@@ -13,7 +13,7 @@ DATE := $(shell date +%Y-%m-%d_%H%M)
 #
 # ARCHIVE=$(HOME)
 # EPHEMERAL=$(HOME)
-# MACHINE=var-som-mx6-ornl
+# MACHINE=jetson-nano-devkit
 # YOCTO_PROD=dev
 
 # Check that given variables are set and all have non-empty values,
@@ -155,7 +155,7 @@ all:
 	@$(MAKE) --no-print-directory -B YOCTO_PROD=$(YOCTO_PROD) archive
 
 archive:
-	BuildScripts/ornl-create-archive.sh -p $(YOCTO_PROD) -m $(MACHINE) -ip $(HOST) -nm $(NETMASK) $(YOCTO_DIR)
+	BuildScripts/ornl-create-archive.sh -p $(YOCTO_PROD) -m $(MACHINE) -ip $(HOST) -nm $(NETMASK) -o $(ARCHIVE) $(YOCTO_DIR) 
 
 build:
 	BuildScripts/ornl-bitbake.sh -m $(MACHINE) -d $(YOCTO_DIR) -e $(YOCTO_ENV) $(YOCTO_CMD)
