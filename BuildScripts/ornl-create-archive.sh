@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-ARCHIVE=/opt
+# ARCHIVE=/opt
 PROJECT=yocto-ornl
 DATE=$(date +%Y-%m-%d_%H%M)
 _OUT=${ARCHIVE}/${PROJECT}-${DATE}
@@ -61,9 +61,9 @@ while [ "$moreoptions" = 1 -a $# -gt 0 ]; do
                 #MACHINE_FOLDER=raspberrypi
                 YOCTO_VERSION=gatesgarth
                 #YOCTO_DISTRO=ornl-rpi
-            elif [[ $MACHINE == jetson-xavier-nx-devkit ]] ; then
+            elif [[ $MACHINE == *jetson* ]] ; then
                 #MACHINE_FOLDER=jetson
-                YOCTO_VERSION=FIXME
+                YOCTO_VERSION=dunfell
                 #YOCTO_DISTRO=FIXME
 	    fi
         ;;
@@ -133,8 +133,8 @@ if [[ ($MACHINE == var-som-mx6 || $MACHINE == var-som-mx6-ornl) ]] ; then
         echo "# A Cross-platform SDK is available in ./sdk" >> ${_OUT}/readme.txt
     fi
 
-elif [[ $MACHINE == jetson-xavier-nx-devkit ]] ; then
-	@tar -xf ${YOCTO_DIR}/${YOCTO_ENV}/tmp/deploy/images/${MACHINE}/jetson-${YOCTO_PROD}-full-image-${MACHINE}.tegraflash.tar.gz -C ${_OUT}
+elif [[ $MACHINE == *jetson* ]] ; then
+	tar -xf ${YOCTO_DIR}/${YOCTO_ENV}/tmp/deploy/images/${MACHINE}/tegra-${YOCTO_PROD}-full-image-${MACHINE}.tegraflash.tar.gz -C ${_OUT}
 
 elif [[ $MACHINE == raspberrypi4-64 ]] ; then
 	cp -f ${YOCTO_DIR}/${YOCTO_ENV}/tmp-glibc/deploy/images/${MACHINE}/raspberrypi-${YOCTO_PROD}-full-image-${MACHINE}.wic.bz2 ${_OUT}
