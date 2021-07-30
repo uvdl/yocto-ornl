@@ -9,6 +9,12 @@ NETWORK_MANAGER ?= "networkmanager"
 
 inherit features_check
 
+IMAGE_INSTALL_append += " \
+    nvgstapps \
+    deepstream-5.1 \
+    exiftool \
+"
+
 REQUIRED_DISTRO_FEATURES = "x11 opengl"
 
 CORE_IMAGE_BASE_INSTALL += "${@bb.utils.contains('DISTRO_FEATURES', 'vulkan', 'packagegroup-tegra-vulkantests', '', d)}"

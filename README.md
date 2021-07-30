@@ -4,8 +4,28 @@
 
 This option takes advantage of Makefile automation.
 
+Important environment variables are:
+
+  * `ARCHIVE := /opt` - controls the folder where the output files are written
+  * `EPHEMERAL := $(HOME)` - controls the folder where the yocto builds are made
+  * `HOST := 10.223.0.1` - controls the default eth0 address of the processor
+  * `NETMASK := 16` - controls the netmask to be used
+  * `YOCTO_PROD := dev` - controls which yocto image to build {dev, prod, min}
+
+Ensure the environment variables are set:
+
+<pre>
+export ARCHIVE=<path>
+export EPHEMERAL=<path>
+export MACHINE=<choice>
+export YOCTO_PROD=<choice>
+</pre>
+
+Once these variables are set, you can build:
+
 <pre>
 make dependencies
+make environment
 make build
 make archive
 </pre>
@@ -16,6 +36,14 @@ to create the recover SD card with.  The files will be in the folder:
 `/opt/yocto-ornl-YYYY-MM-DD_HHMM/`
 
 With the time based on when the `make archive` command is called.
+
+#### `linuxsystembuilder.ornl.gov`
+
+On the Cades VM, I typically do the following *(after make dependencies is done once)*:
+
+<pre>
+for k in clean toaster all ; do make $k ; done
+</pre>
 
 ### Quick Fully Automatic Method
 
@@ -33,21 +61,22 @@ them into a folder that can be taken to another machine or used to program a
 micro SD card as in the [flash sd to emmc](#flash-sd-to-emmc) section below.
 
 The files will be stored in `/opt/yocto-ornl-yyyy-mm-dd_hhmm` **(or wherever the `ARCHIVE` variable points to)**.
-Important environment variables are:
-
-  * `ARCHIVE := /opt` - controls the folder where the output files are written
-  * `EPHEMERAL := $(HOME)` - controls the folder where the yocto builds are made
-  * `HOST := 10.223.0.1` - controls the eth0 address of the processor
-  * `NETMASK := 16` - controls the netmask to be used.
-
-These can be overriden in the make command, for example:
+The environment variables can be overriden in the make command, for example:
 
 <pre>
-make ARCHIVE=/tmp HOST=192.168.1.10 NETMASK=24 smu
+make ARCHIVE=/tmp HOST=192.168.1.10 NETMASK=24 swu
 </pre>
 
 Would build a micro SD/.swu full os image for a system
 whose eth0 port will be defined as 192.168.1.10/24.
+
+#### `linuxsystembuilder.ornl.gov`
+
+On the Cades VM, I typically do the following *(for a vehicle in the `Testing` comm group (octet 13) vehicle sysid 10 (a.k.a. R1-24)*:
+
+<pre>
+make HOST=172.20.13.10 NETMASK=16 swu
+</pre>
 
 ### `EPHEMERAL`
 
@@ -65,87 +94,18 @@ has alot of memory, or a mount point to a fast storage drive).  If you wish to b
 restart your system and keep the build state you have, then ensure EPHEMERAL points to a
 persistent storage volume.
 
+#### `linuxsystembuilder.ornl.gov`
+
+This Cades VM is setup as a build resource.  It has an NVMe disk mounted at `/ephemeral`, so your EPHEMERAL environment variable will need to be set as: `export EPHEMERAL=/ephemeral`
+
+<pre>
+make HOST=192.168.0.1 NETMASK=24 swu
+</pre>
+
 ## Manual Step-by-Step Method
 
-This method describes the various steps needed in all the gory details.  These instructions
-are taken from the upstream project that this unit is based off of.  The details have been
-adjusted so that they apply to this project.
-
-### Installing required packages
-
-Please make sure your host PC is running Ubuntu 16.04 64-bit and install the following packages:
-
-<pre>
-sudo apt-get install gawk wget git-core diffstat unzip texinfo gcc-multilib \
-build-essential chrpath socat cpio python python3 python3-pip python3-pexpect \
-xz-utils debianutils iputils-ping libsdl1.2-dev xterm
-
-sudo apt-get install autoconf libtool libglib2.0-dev libarchive-dev python-git \
-sed cvs subversion coreutils texi2html docbook-utils python-pysqlite2 \
-help2man make gcc g++ desktop-file-utils libgl1-mesa-dev libglu1-mesa-dev \
-mercurial automake groff curl lzop asciidoc u-boot-tools dos2unix mtd-utils pv \
-libncurses5 libncurses5-dev libncursesw5-dev libelf-dev zlib1g-dev
-</pre>
-
-### Downloading Yocto Sumo
-
-- Configure your git global configuration settings (important in order to push changes to repo)
-
-<pre>
-git config --global user.name "Your Name"
-git config --global user.email "Your Email"
-</pre>
-
-- Download and install repo tool (/home/$USER/bin is the preferred path)
-
-<pre>
-mkdir ~/bin
-curl http://commondatastorage.googleapis.com/git-repo-downloads/repo > ~/bin/repo
-chmod a+x ~/bin/repo
-export PATH=~/bin:$PATH
-</pre>
-
-- Create and populate Yocto working directory (the path to the directory can be adjusted as required)
-
-<pre>
-YOCTO_DIR=$HOME/ornl-dart-yocto
-YOCTO_ENV=build_ornl
-</pre>
-
-<pre>
-mkdir -p $YOCTO_DIR && cd $YOCTO_DIR
-$YOCTO_DIR> repo init -u https://github.com/varigit/variscite-bsp-platform.git -b sumo
-$YOCTO_DIR> repo sync -j4
-</pre>
-
-### Download ORNL layer
-
-<pre>
-$YOCTO_DIR> git clone https://github.com/uvdl/yocto-ornl.git -b merge/DevelopRefactor
-$YOCTO_DIR> cp -r yocto-ornl/sources/meta-ornl sources
-</pre>
-
-### Set-up Yocto build environment
-
-<pre>
-$YOCTO_DIR> MACHINE=var-som-mx6-ornl DISTRO=fslc-framebuffer . setup-environment $YOCTO_ENV
-</pre>
-
-### Build Yocto
-
-- Before building the project, overwrite the configuration files
-
-<pre>
-$YOCTO_DIR> cp yocto-ornl/build/conf/local.conf $YOCTO_ENV/conf/
-$YOCTO_DIR> cp yocto-ornl/build/conf/bblayers.conf $YOCTO_ENV/conf/
-</pre>
-
-### Finally, start the build
-
-<pre>
-$YOCTO_DIR> cd $YOCTO_ENV
-$YOCTO_DIR/$YOCTO_ENV> bitbake var-dev-update-full-image
-</pre>
+The manual method is deprecated (because it was not kept up to date).  Use the automatic methods.
+The steps can be found at `Documentation/VarisciteManualBuild.md`
 
 ## Semi-Automatic Methods
 
@@ -238,6 +198,11 @@ $YOCTO_DIR/$YOCTO_ENV> bitbake -c populate_sdk var-dev-update-full-image
 
 Upon success a shell archive will be available in `$YOCTO_DIR/$YOCTO_ENV/tmp/deploy/sdk/fslc-framebuffer-glibc-x86_64-var-dev-update-full-image-armv7at2hf-neon-toolchain-2.6.2.sh`.  Copy this file to a new machine and execute it to unpack the SDK.  *(it will ask you where to extract it, refer to that folder as SDK_DIR)*
 
+**In the fully automatic method, you can say:**
+<pre>
+make EPHEMERAL=[path_to_ephemeral_directory] sdk
+</pre>
+
 Once this is done, please do the following:
 
 <pre>
@@ -267,80 +232,19 @@ $YOCTO_DIR/$YOCTO_ENV> source toaster stop ; source toaster start
 
 Then, open a browser to http://localhost:8000 to get the UI.
 
+#### `linuxsystembuilder.ornl.gov`
+
+When using the Cades VM (or an AWS instance to build), you will need to create an SSH tunnel to forward TCP/IP port 8000 to your local machine:
+
+<pre>
+ssh -i cadescloudvm.pem -L 8000:localhost:8000 cades@linuxsystembuilder.ornl.gov
+</pre>
+
+The `.pem` file is the private key to enable login.  You will have your own if you made a VM or an AWS instance.  You can always start up another SSH if you forgot to do this when you initially logged in.  Then you can open your browser as described above.
+
 ## Create an SDcard
 
-Use the var-create-yocto-sdcard.sh script that is supplied by Variscite under the meta-variscite-fslc layer.  We have a companion script that can be run from this directory, use the following command. This will **ONLY** copy the Variscite script to the new directory.  From there just follow the directions from the [Variscite Build Guide](https://variwiki.com/index.php?title=Yocto_Build_Release&release=RELEASE_SUMO_V1.2_VAR-SOM-MX6#Create_an_extended_SD_card)
-
-**NOTES**
-- The Yocto Path needs to be the full path.
-
-When using the Variscite script use the -a **AND** -r options. The following command should be used : 
-
-<pre>
-sudo MACHINE=var-som-mx6-ornl $YOCTO_DIR/sources/meta-variscite-fslc/scripts/var_mk_yocto_sdcard/var-create-yocto-sdcard.sh -a -r $YOCTO_DIR/$YOCTO_ENV/tmp/deploy/images/$MACHINE/$YOCTO_IMG-$MACHINE /dev/xxx
-</pre>
-Where:
-- /dev/xxx: The device that is the entire micro SD card. Example /dev/sdb
-- $YOCTO_IMG: The name of the full image you used in the `bitbake` command.  I.e. `var-dev-update-full-image`
-- $MACHINE: This is always `var-som-mx6-ornl` *(until its not, but thats another story...)*
-- $YOCTO_DIR: This is the path to where the Yocto system was initialized
-- $YOCTO_ENV: This is the name of the build folder in the path where Yocto was initialized. *Typically `build_ornl` unless you took pains to change it...*
-
-## Flash SD To eMMC
-
-### Boot up the board
-
-Boot up the board with the micro SD card that was prepared above.  If your system has not been flashed before, you may experience a 90sec delay.
-Then, the system will go into 'emergency mode':
-```
-You are in emergency mode. After logging in, type "journalctl -xb" to view
-system logs, "systemctl reboot" to reboot, "systemctl default" or "exit"
-to boot into default mode.
-Give root password for maintenance
-(or press Control-D to continue):
-```
-
-**Don't panic**.  Go ahead and give the root password for the image and you will get a shell prompt.
-
-Once the board has booted up run the install_yocto.sh script located in /usr/bin and follow the instructions below:
-
-**NOTES**
-- Please set the date on the device if it does not have the correct date+time
-
-### To check and set the date
-
-<pre>
-date
-date -s "yyyy-mm-dd hh:mm"
-</pre>
-
-### For one eMMC partition
-
-In this scheme, the eMMC is used in its entirety and the root filesystem expands to the entire available space.
-
-<pre>
-/usr/bin/install_yocto.sh -b dart
-</pre>
-
-### For two eMMC partitions
-
-In this scheme, the eMMC is split into two rootfs partitions and the bootloader boots into one of them.  During a swupdate, the unused partition is written to and the next reboot will boot that and make it the active.  This allows one known good configuration to always be available.
-
-<pre>
-/usr/bin/install_yocto.sh -b dart -u
-</pre>
-
-You should see the following:
-```
-*** Variscite MX6 Yocto eMMC/NAND Recovery ***
-
-Carrier board: DART-MX6
-Creating two rootfs partitions
-<<< bunch of stuff about partitions >>>
-Setting U-Boot enviroment variables
-
-Yocto installed successfully
-```
+Instructions for creating a microSD card is available for the Variscite IMX6 SOM.  See `Documentation/VarisciteSdCard.md` for details.
 
 ## OS Updates
 

@@ -17,6 +17,7 @@ IMAGE_FEATURES += " \
 IMAGE_INSTALL_append += " \
 	bind-utils \
 	default-eth0 \
+	dotnet-core \
 	dtc \
 	elp-h264 \
 	flex \
@@ -26,6 +27,7 @@ IMAGE_INSTALL_append += " \
 	gstd \
 	gstreamer1.0-plugins-ugly \
 	gst-interpipe \
+	i2c-tools \
 	libgps \
 	libsodium \
 	libsodium-dev \
@@ -50,6 +52,7 @@ IMAGE_INSTALL_append += " \
 	python3-lxml \
 	python3-mavproxy \
 	python3-netifaces \
+	python3-numpy \
 	python3-pexpect \
 	python3-pip \
 	python3-protobuf \
