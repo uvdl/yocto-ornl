@@ -19,11 +19,14 @@ do_compile[noexec] = "1"
 
 FILES_${PN} += " \
 	${datadir}/dotnet \
+	/etc/profile.d/dotnet.sh \
 "
 
 do_install() {
 	install -d ${D}${datadir}/dotnet/
+	install -d ${D}/etc/profile.d/
 
     cp -rf ${S}* ${D}${datadir}/dotnet/
+	cp -f ${WORKDIR}/dotnet.sh ${D}/etc/profile.d/
 }
 
