@@ -52,6 +52,8 @@ IMAGE_INSTALL_append += " \
 	nodejs \
 	ntp \
 	ntp-bin \
+	ntpdate \
+	n2n \
 	openssl \
 	openssl-bin \
 	packagegroup-cockpit \
@@ -74,6 +76,7 @@ IMAGE_INSTALL_append += " \
 	python3-pytz \
 	python3-pyyaml \
 	python3-requests \
+	python3-pyubx2 \
 	python3-uptime \
 	python3-urllib3 \
 	screen \
