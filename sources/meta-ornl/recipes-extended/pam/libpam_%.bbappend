@@ -4,9 +4,7 @@ DESCRIPTION = "This is ONLY included to append to the environment file in etc"
 do_install_append() {
     install -d ${D}/etc/
     cat >> ${D}/etc/environment <<EOF
-# for dotnet-core
-DOTNET_ROOT=/usr/share/dotnet
-PATH=$PATH:/usr/share/dotnet
+# Indicator of how to write to the /etc/environment file 
 EOF
 }
 
