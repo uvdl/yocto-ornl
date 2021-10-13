@@ -251,7 +251,7 @@ function sync_tegra_platform()
     eval cd $YOCTO_DIR_LOCATION/
     if [ ! -d "ornl-yocto-tegra" ]
         then
-        git clone -b ${YOCTO_VERSION}-l4t-r32.5.0 https://github.com/OE4T/tegra-demo-distro.git
+        git clone -b ${YOCTO_VERSION} https://github.com/OE4T/tegra-demo-distro.git
         if [ $? -ne 0 ]
             then
                 echo
