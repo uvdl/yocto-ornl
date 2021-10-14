@@ -14,8 +14,9 @@ IMAGE_INSTALL_append += " \
     deepstream-5.1 \
     libvisionworks \
     exiftool \
-    tensorrt \
     cudnn \
+    cuda-samples \
+    tensorrt-core \
     gstreamer1.0-plugins-nvvideo4linux2 \
 "
 
@@ -24,7 +25,6 @@ IMAGE_INSTALL_append += " \
     nvidia-docker \
     nvidia-container-runtime \
     cudnn-container-csv \
-    tensorrt-container-csv \
     libvisionworks-container-csv \
 "
 
