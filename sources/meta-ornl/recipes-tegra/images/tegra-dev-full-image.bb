@@ -12,7 +12,20 @@ inherit features_check
 IMAGE_INSTALL_append += " \
     nvgstapps \
     deepstream-5.1 \
+    libvisionworks \
     exiftool \
+    tensorrt \
+    cudnn \
+    gstreamer1.0-plugins-nvvideo4linux2 \
+"
+
+# These are needed for docker images
+IMAGE_INSTALL_append += " \
+    nvidia-docker \
+    nvidia-container-runtime \
+    cudnn-container-csv \
+    tensorrt-container-csv \
+    libvisionworks-container-csv \
 "
 
 REQUIRED_DISTRO_FEATURES = "x11 opengl"

@@ -52,6 +52,7 @@ IMAGE_INSTALL_append += " \
 	nodejs \
 	ntp \
 	ntp-bin \
+	n2n \
 	openssl \
 	openssl-bin \
 	packagegroup-cockpit \
