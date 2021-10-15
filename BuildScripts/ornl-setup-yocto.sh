@@ -302,7 +302,6 @@ function sync_tegra_platform()
                 exit 1
         fi
     fi
-    touch ../../build_ornl/conf/distrolayer.cfg
     eval cd $OLD_LOCATION
 }
 
