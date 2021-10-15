@@ -11,9 +11,10 @@ DATE := $(shell date +%Y-%m-%d_%H%M)
 # environemnt up for whatever build you want to achieve, i.e. exports. However,
 # please DO NOT check them in to github with these variables set.
 #
-# ARCHIVE=$(HOME)
-# EPHEMERAL=$(HOME)
-# MACHINE=jetson-nano-devkit
+# USER=twaddle
+# ARCHIVE=/data/share/yocto-builds
+# EPHEMERAL=/ephemeral/$(USER)/
+# MACHINE=jetson-xavier-nx-devkit
 # YOCTO_PROD=dev
 
 # Check that given variables are set and all have non-empty values,
@@ -28,6 +29,7 @@ $(call check_defined, MACHINE, The platform to build - var-som-mx6-ornl raspberr
 $(call check_defined, ARCHIVE, Where to put output files after the build)
 $(call check_defined, EPHEMERAL, The parent directory of the build folder)
 $(call check_defined, YOCTO_PROD, The image version - dev prod or min)
+$(call check_defined, USER, The user for the build directory)
 
 # NB: EPHEMERAL is the parent folder of the yocto build and is extremely important.
 #     The yocto build folder cannot be moved, grows to ~76GB during the build and
