@@ -261,8 +261,8 @@ function sync_tegra_platform()
                 exit 1
         fi
         # CADES Poops the bed when it uses ssh, so this replaces the ssh with https
-        cp -f $OLD_LOCATION/BuildScripts/tegra-git-submodule.conf tegra-demo-distro/.gitsubmodule
-
+        cp -f $OLD_LOCATION/BuildScripts/tegra-git-submodule.conf tegra-demo-distro/.gitmodules
+        
         # Prep the layers and build directory
         mv tegra-demo-distro/ ornl-yocto-tegra/
         eval cd ornl-yocto-tegra/
