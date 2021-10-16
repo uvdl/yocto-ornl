@@ -1,56 +1,65 @@
-diff --git a/nvidia/platform/t210/porg/kernel-dts/tegra210-porg-p3448-common.dtsi b/nvidia/platform/t210/porg/kernel-dts/tegra210-porg-p3448-common.dtsi
-index 2a7d84445089..3cfcf5f7a845 100644
---- a/nvidia/platform/t210/porg/kernel-dts/tegra210-porg-p3448-common.dtsi
-+++ b/nvidia/platform/t210/porg/kernel-dts/tegra210-porg-p3448-common.dtsi
-@@ -111,7 +111,7 @@
+diff --git a/nvidia/platform/t19x/jakku/kernel-dts/common/tegra194-p3509-disp.dtsi b/nvidia/platform/t19x/jakku/kernel-dts/common/tegra194-p3509-disp.dtsi
+index 3a09853c4983..f2459ad1e0c7 100644
+--- a/nvidia/platform/t19x/jakku/kernel-dts/common/tegra194-p3509-disp.dtsi
++++ b/nvidia/platform/t19x/jakku/kernel-dts/common/tegra194-p3509-disp.dtsi
+@@ -27,7 +27,7 @@
+ #include "tegra194-spmic-p3668.dtsi"
  
- 		/* tegradc.0 */
- 		dc@54200000 {
--			status = "okay";
-+			status = "diabled";
- 			nvidia,dc-flags = <TEGRA_DC_FLAG_ENABLED>;
- 			nvidia,emc-clk-rate = <300000000>;
- 			nvidia,cmu-enable = <1>;
-@@ -122,7 +122,7 @@
- 			win-mask = <0x7>; /* Assign only wins A/B/C */
- 		};
- 		dc@54240000 {
--			status = "okay";
-+			status = "disabled";
- 			nvidia,dc-flags = <TEGRA_DC_FLAG_ENABLED>;
- 			nvidia,emc-clk-rate = <300000000>;
- 			nvidia,cmu-enable = <1>;
-@@ -133,10 +133,10 @@
- 			win-mask = <0x7>; /* Assign only wins A/B/C */
- 		};
- 		sor {
--			status = "okay";
-+			status = "disabled";
- 			nvidia,xbar-ctrl = <2 1 0 3 4>;
- 			dp-display {
--				status = "okay";
-+				status = "disabled";
- 			};
- 		};
- 		sor1 {
-@@ -146,16 +146,16 @@
- 			 * SOR1 and the pad.
- 			 */
- 			nvidia,xbar-ctrl = <0 1 2 3 4>;
--			status = "okay";
-+			status = "disabled";
- 			hdmi-display {
--				status = "okay";
-+				status = "disabled";
- 			};
- 		};
- 		dpaux {
--			status = "okay";
-+			status = "disabled";
- 		};
- 		dpaux1 {
--			status = "okay";
-+			status = "disabled";
- 		};
+ &head0 {
+-	status = "okay";
++	status = "disabled";
+ 	nvidia,fb-bpp = <32>;
+ 	nvidia,fbmem-size = <265420800>; /* 8K (7680*4320) 32bpp double buffered */
+ 	nvidia,fb-flags = <TEGRA_FB_FLIP_ON_PROBE>;
+@@ -41,7 +41,7 @@
+ };
+ 
+ &head1 {
+-	status = "okay";
++	status = "disasbled";
+ 	nvidia,fb-bpp = <32>;
+ 	nvidia,fbmem-size = <265420800>; /* 8K (7680*4320) 32bpp double buffered */
+ 	nvidia,fb-flags = <TEGRA_FB_FLIP_ON_PROBE>;
+@@ -57,35 +57,35 @@
+ };
+ 
+ &sor0 {
+-	status = "okay";
++	status = "disabled";
+ 	nvidia,active-panel = <&sor0_dp_display>;
+ };
+ 
+ &sor0_dp_display {
+-	status = "okay";
++	status = "disabled";
+ 	nvidia,is_ext_dp_panel = <1>;
+ };
+ 
+ &sor1 {
+-	status = "okay";
++	status = "disabled";
+ 	nvidia,active-panel = <&sor1_hdmi_display>;
+ };
+ 
+ &sor1_hdmi_display {
+-	status = "okay";
++	status = "disabled";
+ 	disp-default-out {
+ 		nvidia,out-flags = <TEGRA_DC_OUT_HOTPLUG_LOW>;
  	};
+ };
  
+ &dpaux0 {
+-	status = "okay";
++	status = "disabled";
+ };
+ 
+ &dpaux1 {
+-	status = "okay";
++	status = "disabled";
+ };
+ 
+ &tegra_cec {
+-	status = "okay";
++	status = "disabled";
+ };
