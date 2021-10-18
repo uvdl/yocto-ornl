@@ -63,3 +63,16 @@ index 3a09853c4983..f2459ad1e0c7 100644
 -	status = "okay";
 +	status = "disabled";
  };
+diff --git a/nvidia/platform/t19x/jakku/kernel-dts/common/tegra194-p3668-common.dtsi b/nvidia/platform/t19x/jakku/kernel-dts/common/tegra194-p3668-common.dtsi
+index ba0fff2c8052..5c08a86d72e3 100644
+--- a/nvidia/platform/t19x/jakku/kernel-dts/common/tegra194-p3668-common.dtsi
++++ b/nvidia/platform/t19x/jakku/kernel-dts/common/tegra194-p3668-common.dtsi
+@@ -209,7 +209,7 @@
+ 
+ 	host1x {
+ 		dpaux@155F0000 {
+-			status = "okay";
++			status = "disabled";
+ 			compatible = "nvidia,tegra194-dpaux3-padctl";
+ 			/delete-property/ power-domains;
+ 			dpaux_default: pinmux@0 {
