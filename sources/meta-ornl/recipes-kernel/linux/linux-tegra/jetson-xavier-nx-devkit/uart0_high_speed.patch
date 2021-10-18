@@ -1,0 +1,12 @@
+diff --git a/nvidia/platform/t19x/jakku/kernel-dts/common/tegra194-p3509-0000-a00.dtsi b/nvidia/platform/t19x/jakku/kernel-dts/common/tegra194-p3509-0000-a00.dtsi
+index eda744934df3..fd205771003f 100644
+--- a/nvidia/platform/t19x/jakku/kernel-dts/common/tegra194-p3509-0000-a00.dtsi
++++ b/nvidia/platform/t19x/jakku/kernel-dts/common/tegra194-p3509-0000-a00.dtsi
+@@ -87,6 +87,7 @@
+ 	};
+ 	serial@3110000 {
+ 		status = "okay";
++		compatible = "nvidia,tegra186-hsuart";
+ 	};
+ 	tachometer@39c0000 {
+ 		status = "okay";
