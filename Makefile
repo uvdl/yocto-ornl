@@ -11,11 +11,12 @@ DATE := $(shell date +%Y-%m-%d_%H%M)
 # environemnt up for whatever build you want to achieve, i.e. exports. However,
 # please DO NOT check them in to github with these variables set.
 #
-# USER=twaddle
-# ARCHIVE=/data/share/yocto-builds
-# EPHEMERAL=/ephemeral/$(USER)/
-# MACHINE=jetson-xavier-nx-devkit
-# YOCTO_PROD=dev
+#USER=twaddle
+#EPHEMERAL=/ephemeral/$(USER)/
+#MACHINE=jetson-xavier-nx-devkit
+#YOCTO_PROD=dev
+#ARCHIVE=/data/share/build-archives/$(MACHINE)/
+
 
 # Check that given variables are set and all have non-empty values,
 # die with an error otherwise.
