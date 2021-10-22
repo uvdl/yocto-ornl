@@ -182,6 +182,8 @@ function sync_variscite_platform()
             echo "================================================"
             exit 1
     fi
+    # this is only needed for CADES for now due to restricted ssh
+    #cp -f $OLD_LOCATION/BuildScripts/default.xml .repo/manifests/
     repo sync -j4
     if [ $? -ne 0 ]
         then
