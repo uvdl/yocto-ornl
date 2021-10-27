@@ -12,8 +12,8 @@ DATE := $(shell date +%Y-%m-%d_%H%M)
 # please DO NOT check them in to github with these variables set.
 #
 #USER=twaddle
-#EPHEMERAL=/ephemeral/$(USER)/
 #MACHINE=jetson-xavier-nx-devkit
+#EPHEMERAL=/ephemeral/$(USER)/$(MACHINE)
 #YOCTO_PROD=dev
 #ARCHIVE=/data/share/build-archives/$(MACHINE)/
 
@@ -319,3 +319,10 @@ endif
 
 toaster-stop:
 	BuildScripts/ornl-bitbake.sh -m $(MACHINE) -d $(YOCTO_DIR) -e $(YOCTO_ENV) toaster stop
+
+clean-recipe:
+	RECIPE=
+	cd $(YOCTO_DIR) && \
+                MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV) && \
+                bitbake -c cleanall $(RECIPE)
+
