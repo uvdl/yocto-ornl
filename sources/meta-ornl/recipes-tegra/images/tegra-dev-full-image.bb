@@ -17,7 +17,7 @@ IMAGE_INSTALL_append += " \
     cudnn \
     cuda-samples \
     tensorrt-core \
-    gstreamer1.0-plugins-nvvideo4linux2 \
+    gstreamer1.0-plugins-tegra \
 "
 
 # These are needed for docker images
