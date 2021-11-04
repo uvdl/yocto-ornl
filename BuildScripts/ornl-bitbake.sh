@@ -53,6 +53,10 @@ var-som-mx6-ornl)
 	cd ${YOCTO_DIR}
 	MACHINE=${MACHINE} DISTRO=${YOCTO_DISTRO} EULA=${EULA} . setup-environment ${YOCTO_ENV}
 	;;
+jetson-nano-devkit-emmc)
+	;&
+jetson-xavier-nx-devkit-emmc)
+	;&
 jetson-nano-devkit)
 	;&
 jetson-xavier-nx-devkit)
