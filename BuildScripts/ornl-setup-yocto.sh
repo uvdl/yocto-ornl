@@ -182,6 +182,8 @@ function sync_variscite_platform()
             echo "================================================"
             exit 1
     fi
+    # this is only needed for CADES for now due to restricted ssh
+    cp -f $OLD_LOCATION/BuildScripts/default.xml .repo/manifests/
     repo sync -j4
     if [ $? -ne 0 ]
         then
@@ -251,7 +253,7 @@ function sync_tegra_platform()
     eval cd $YOCTO_DIR_LOCATION/
     if [ ! -d "ornl-yocto-tegra" ]
         then
-        git clone -b ${YOCTO_VERSION}-l4t-r32.5.0 https://github.com/OE4T/tegra-demo-distro.git
+        git clone -b ${YOCTO_VERSION} https://github.com/OE4T/tegra-demo-distro.git
         if [ $? -ne 0 ]
             then
                 echo
@@ -260,6 +262,9 @@ function sync_tegra_platform()
                 echo "==============================================="
                 exit 1
         fi
+        # CADES Poops the bed when it uses ssh, so this replaces the ssh with https
+        cp -f $OLD_LOCATION/BuildScripts/tegra-git-submodule.conf tegra-demo-distro/.gitmodules
+        
         # Prep the layers and build directory
         mv tegra-demo-distro/ ornl-yocto-tegra/
         eval cd ornl-yocto-tegra/

@@ -23,6 +23,7 @@ IMAGE_INSTALL_append += " \
 	default-eth0 \
 	dotnet-core \
 	dtc \
+	dos2unix \
 	elp-h264 \
 	flex \
 	gcc \
