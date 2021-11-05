@@ -121,7 +121,11 @@ function run_build()
     var-som-mx6-ornl)
         sync_variscite_platform
         ;;
+    jetson-nano-devkit-emmc)
+        ;&
     jetson-nano-devkit)
+        ;&
+    jetson-xavier-nx-devkit-emmc)
         ;&
     jetson-xavier-nx-devkit)
         sync_tegra_platform
@@ -503,7 +507,11 @@ function make_build_dir()
         # Variscite kind of forces us to overwrite the original config files
         copy_config_files
         ;;
+    jetson-nano-devkit-emmc)
+        ;&
     jetson-nano-devkit)
+        ;&
+    jetson-xavier-nx-devkit-emmc)
         ;&
     jetson-xavier-nx-devkit)
         # copy the config files over so there isn't a need to overwrite them
