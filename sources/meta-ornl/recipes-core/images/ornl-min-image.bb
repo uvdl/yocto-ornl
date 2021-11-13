@@ -11,7 +11,6 @@ inherit core-image
 
 IMAGE_INSTALL_append = " \
 	bind-utils \
-	default-eth0 \
 	libsodium \
 	libsodium-dev \
 	make \
@@ -20,7 +19,6 @@ IMAGE_INSTALL_append = " \
 	ntp-bin \
 	openssl \
 	openssl-bin \
-	packagegroup-cockpit \
 	pkgconfig \
-	python3 \
 "
+
