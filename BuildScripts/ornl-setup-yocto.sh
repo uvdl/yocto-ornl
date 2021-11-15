@@ -629,8 +629,6 @@ function make_build_dir()
         eval cd ${OLD_DIR}
         copy_config_files
         ;;
-    
-    esac
     ts7180)
         eval cd $YOCTO_DIR_LOCATION/
         # Run standard OE setup script
@@ -645,6 +643,7 @@ function make_build_dir()
         fi
         eval cd ${OLD_DIR}
         ;;
+    esac
 
 }
 
