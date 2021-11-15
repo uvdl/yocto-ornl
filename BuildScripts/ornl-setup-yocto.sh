@@ -335,7 +335,7 @@ function sync_raspberries()
         then
             mkdir -p ornl-yocto-rpi/layers
             eval cd ornl-yocto-rpi/layers/
-            git clone -b ${YOCTO_VERSION} git://git.yoctoproject.org/poky
+            git clone -b ${YOCTO_VERSION} https://git.yoctoproject.org/git/poky
             if [ $? -ne 0 ]
                 then
                     echo
@@ -344,7 +344,7 @@ function sync_raspberries()
                     echo "==============================================="
                     exit 1
             fi
-            git clone -b ${YOCTO_VERSION} git://git.openembedded.org/meta-openembedded
+            git clone -b ${YOCTO_VERSION} https://github.com/openembedded/meta-openembedded.git
             if [ $? -ne 0 ]
                 then
                     echo
@@ -437,21 +437,21 @@ function sync_technologic()
         then
             mkdir -p ornl-yocto-ts/layers
             eval cd ornl-yocto-ts/layers/
-            git clone -b ${YOCTO_VERSION} git://git.yoctoproject.org/poky
+            git clone -b ${YOCTO_VERSION} https://git.yoctoproject.org/git/poky
             if [ $? -ne 0 ]
                 then
                     echo
                     echo "==============================================="
-                    echo "${BOLD}Failed to clone Poky for RPi ${NORMAL}"
+                    echo "${BOLD}Failed to clone Poky for TS ${NORMAL}"
                     echo "==============================================="
                     exit 1
             fi
-            git clone -b ${YOCTO_VERSION} git://git.openembedded.org/meta-openembedded
+            git clone -b ${YOCTO_VERSION} https://github.com/openembedded/meta-openembedded.git
             if [ $? -ne 0 ]
                 then
                     echo
                     echo "==============================================="
-                    echo "${BOLD}Failed to clone OE for RPi ${NORMAL}"
+                    echo "${BOLD}Failed to clone OE for TS ${NORMAL}"
                     echo "==============================================="
                     exit 1
             fi
@@ -460,7 +460,7 @@ function sync_technologic()
                 then
                     echo
                     echo "==============================================="
-                    echo "${BOLD}Failed to clone meta-raspberrypi ${NORMAL}"
+                    echo "${BOLD}Failed to clone meta-ts ${NORMAL}"
                     echo "==============================================="
                     exit 1
             fi
