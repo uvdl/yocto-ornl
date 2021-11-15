@@ -642,6 +642,7 @@ function make_build_dir()
                 exit 1
         fi
         eval cd ${OLD_DIR}
+        copy_config_files
         ;;
     esac
 
@@ -680,6 +681,8 @@ function copy_config_files()
     raspberrypi4-64)
         MACHINE_FOLDER="raspberrypi"
         ;;
+    ts7180)
+        MACHINE_FOLDER="technologic"
     esac
 
     echo
