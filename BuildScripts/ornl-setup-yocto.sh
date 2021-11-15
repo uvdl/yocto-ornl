@@ -455,6 +455,24 @@ function sync_technologic()
                     echo "==============================================="
                     exit 1
             fi
+	    git clone -b ${YOCTO_VERSION} https://github.com/Freescale/meta-freescale-distro.git
+	    if [ $? -ne 0 ]
+                then
+                    echo
+                    echo "==============================================="
+                    echo "${BOLD}Failed to clone fsl distro for TS ${NORMAL}"
+                    echo "==============================================="
+                    exit 1
+            fi
+            git clone -b ${YOCTO_VERSION} https://github.com/Freescale/meta-freescale-3rdparty.git
+            if [ $? -ne 0 ]
+                then
+                    echo
+                    echo "==============================================="
+                    echo "${BOLD}Failed to clone fsl 3rd party for TS ${NORMAL}"
+                    echo "==============================================="
+                    exit 1
+            fi
             git clone -b ${YOCTO_VERSION} https://github.com/uvdl/meta-ts.git
             if [ $? -ne 0 ]
                 then
