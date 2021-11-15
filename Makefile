@@ -87,6 +87,12 @@ YOCTO_VERSION=dunfell
 YOCTO_DISTRO=ornl-tegra
 YOCTO_IMG=tegra-$(YOCTO_PROD)-full-image
 YOCTO_DIR := $(EPHEMERAL)/$(PROJECT)-$(YOCTO_VERSION)
+else ifeq ($(strip $(MACHINE)),ts7180)
+MACHINE_FOLDER=ts7180
+YOCTO_VERSION=dunfell
+YOCTO_DISTRO=ornl-ts
+YOCTO_IMG=ts-$(YOCTO_PROD)-full-image
+YOCTO_DIR := $(EPHEMERAL)/$(PROJECT)-$(YOCTO_VERSION)
 endif
 ETH0_NETWORK=$(YOCTO_DIR)/ornl-layers/meta-ornl/recipes-core/default-eth0/files/$(DEFAULT_NETWORK_FILE)
 YOCTO_CMD := $(YOCTO_IMG)
