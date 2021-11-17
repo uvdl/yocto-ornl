@@ -8,5 +8,4 @@ require recipes-core/images/ornl-min-image.bb
 
 IMAGE_INSTALL_append = " \
 	packagegroup-core-full-cmdline \
-	perf \
 "
