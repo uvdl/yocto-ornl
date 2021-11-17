@@ -10,4 +10,6 @@ IMAGE_INSTALL_append = " \
     gstreamer1.0 \
 	packagegroup-core-full-cmdline \
 	perf \
+    python2 \
+    u-boot-ts \
 "

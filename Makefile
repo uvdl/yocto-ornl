@@ -328,7 +328,14 @@ toaster-stop:
 
 clean-recipe:
 	RECIPE=
+ifneq (,$(findstring jetson, $(MACHINE)))
 	cd $(YOCTO_DIR) && \
                 MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV) && \
                 bitbake -c cleanall $(RECIPE)
+else ifeq ($(strip $(MACHINE)),ts7180)
+	cd $(YOCTO_DIR) && \ 
+				. ornl-yocto-ts/layers/poky/oe-init-build-env build_ornl/  && \
+				bitbake -c cleanall $(RECIPE)
+endif
+
 
