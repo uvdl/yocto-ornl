@@ -16,6 +16,7 @@ DATE := $(shell date +%Y-%m-%d_%H%M)
 #EPHEMERAL=/ephemeral/$(USER)/$(MACHINE)
 #YOCTO_PROD=dev
 #ARCHIVE=/data/share/build-archives/$(MACHINE)/
+#S3=s3://yocto.downloads/$(MACHINE)
 
 
 # Check that given variables are set and all have non-empty values,
@@ -163,7 +164,13 @@ all:
 	@$(MAKE) --no-print-directory -B YOCTO_PROD=$(YOCTO_PROD) archive
 
 archive:
-	BuildScripts/ornl-create-archive.sh -p $(YOCTO_PROD) -m $(MACHINE) -ip auto -nm auto -o $(ARCHIVE) $(YOCTO_DIR)
+ifeq ($(S3), n)
+	@mkdir -p $(ARCHIVE_DIR) && \
+		scripts/ornl-create-archive.sh -p $(YOCTO_PROD) -m $(MACHINE) -ip auto -nm auto -o $(ARCHIVE) $(YOCTO_DIR)
+else 
+	@mkdir -p $(ARCHIVE_DIR) && \
+		scripts/ornl-create-archive.sh -p $(YOCTO_PROD) -m $(MACHINE) -ip auto -nm auto -o $(ARCHIVE) -s $(S3) $(YOCTO_DIR)
+endif
 
 build:
 	BuildScripts/ornl-bitbake.sh -m $(MACHINE) -d $(YOCTO_DIR) -e $(YOCTO_ENV) $(YOCTO_CMD)

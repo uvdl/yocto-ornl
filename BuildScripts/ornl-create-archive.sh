@@ -20,6 +20,14 @@ echo "============================="
 echo "=  Archive creation script  ="
 echo "============================="
 
+function s3_upload()
+{
+	echo "Cleaning s3 bucket"
+	aws s3 rm ${S3_URL} --recursive
+	echo "Uploading to S3"
+	aws s3 cp ${_OUT} ${S3_URL} --recursive
+}
+
 help() {
 	bn=`basename $0`
 	echo " Usage: $bn <options> yocto-build-dir"
@@ -38,6 +46,7 @@ help() {
     echo "          dev, prod, min"
 	echo " -v		override YOCTO_VERSION (default ${YOCTO_VERSION}); valid"
     echo "          thud, dunfell, gatesgarth, etc."
+	echo "-s 		S3 bucked URL"
 	echo
 	echo " Example: $bn ornl-create-archive.sh -p dev -m var-som-mx6-ornl -ip 172.18.0.1 -nm 16 /ephemeral/yoctl-ornl-dunfell"
 	echo
@@ -71,6 +80,7 @@ while [ "$moreoptions" = 1 -a $# -gt 0 ]; do
 	    -o) shift ; _OUT=${1} ;;
 	    -p) shift ; YOCTO_PROD=${1} ;;
 	    -v) shift ; YOCTO_VERSION=${1} ;;
+		-s) shift ; S3_URL=${1} ;;
 	    *)  moreoptions=0; YOCTO_DIR=$1 ;;
 	esac
 	[ "$moreoptions" = 0 ] && [ $# -gt 1 ] && help && exit 1
@@ -153,9 +163,18 @@ elif [[ $MACHINE == raspberrypi4-64 ]] ; then
 	cp -f ${YOCTO_DIR}/${YOCTO_ENV}/tmp-glibc/deploy/images/${MACHINE}/raspberrypi-${YOCTO_PROD}-full-image-${MACHINE}.wic.bz2 ${_OUT}
 	( cd ${_OUT} && bzip2 -d raspberrypi-${YOCTO_PROD}-full-image-${MACHINE}.wic.bz2 )
 
+elif [[ $MACHINE == ts7180 ]] ; then
+	tar -cf ${_OUT}/ts7180-archive.tar.gz ${YOCTO_DIR}/${YOCTO_ENV}/tmp/deploy/images/${MACHINE}/
+
 else
 	help
 	exit 1
+fi
+
+# Check to see if we want to upload to an S3 bucket
+if [[ ${S3_URL} != "" ]]
+then
+	s3_upload
 fi
 
 exit 0
