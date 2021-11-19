@@ -118,6 +118,9 @@ function run_build()
     
     # Need to prepare the machine platorm, default is Variscite
     case "$TARGET_MACHINE" in
+    ts7180)
+        sync_technologic
+        ;;
     var-som-mx6-ornl)
         sync_variscite_platform
         ;;
@@ -332,7 +335,7 @@ function sync_raspberries()
         then
             mkdir -p ornl-yocto-rpi/layers
             eval cd ornl-yocto-rpi/layers/
-            git clone -b ${YOCTO_VERSION} git://git.yoctoproject.org/poky
+            git clone -b ${YOCTO_VERSION} https://git.yoctoproject.org/git/poky
             if [ $? -ne 0 ]
                 then
                     echo
@@ -341,7 +344,7 @@ function sync_raspberries()
                     echo "==============================================="
                     exit 1
             fi
-            git clone -b ${YOCTO_VERSION} git://git.openembedded.org/meta-openembedded
+            git clone -b ${YOCTO_VERSION} https://github.com/openembedded/meta-openembedded.git
             if [ $? -ne 0 ]
                 then
                     echo
@@ -408,6 +411,114 @@ function sync_raspberries()
             fi
             rm -rf meta-swupdate-boards/recipes-extended/images/
             rm -rf meta-swupdate-boards/recipes-bsp/libubootenv/
+            eval cd ../..
+    fi
+    eval cd $OLD_LOCATION
+}
+
+# =================================================================================
+#
+# =================================================================================
+function sync_technologic()
+{
+    mkdir -p $YOCTO_DIR_LOCATION/
+    if [ $? -ne 0 ]
+        then
+            echo
+            echo "========================================================="
+            echo "${BOLD}Creating Yocto build directory failed...${NORMAL}"
+            echo "========================================================="
+            exit 1
+    fi
+
+    OLD_LOCATION=$PWD
+    eval cd $YOCTO_DIR_LOCATION/
+    if [ ! -d "ornl-yocto-ts" ]
+        then
+            mkdir -p ornl-yocto-ts/layers
+            eval cd ornl-yocto-ts/layers/
+            git clone -b ${YOCTO_VERSION} https://git.yoctoproject.org/git/poky
+            if [ $? -ne 0 ]
+                then
+                    echo
+                    echo "==============================================="
+                    echo "${BOLD}Failed to clone Poky for TS ${NORMAL}"
+                    echo "==============================================="
+                    exit 1
+            fi
+            git clone -b ${YOCTO_VERSION} https://github.com/openembedded/meta-openembedded.git
+            if [ $? -ne 0 ]
+                then
+                    echo
+                    echo "==============================================="
+                    echo "${BOLD}Failed to clone OE for TS ${NORMAL}"
+                    echo "==============================================="
+                    exit 1
+            fi
+            git clone -b ${YOCTO_VERSION} https://github.com/Freescale/meta-freescale.git
+	        if [ $? -ne 0 ]
+                then
+                    echo
+                    echo "==============================================="
+                    echo "${BOLD}Failed to clone fsl for TS ${NORMAL}"
+                    echo "==============================================="
+                    exit 1
+            fi
+	        git clone -b ${YOCTO_VERSION} https://github.com/Freescale/meta-freescale-distro.git
+	        if [ $? -ne 0 ]
+                then
+                    echo
+                    echo "==============================================="
+                    echo "${BOLD}Failed to clone fsl distro for TS ${NORMAL}"
+                    echo "==============================================="
+                    exit 1
+            fi
+            git clone -b ${YOCTO_VERSION} https://github.com/Freescale/meta-freescale-3rdparty.git
+            if [ $? -ne 0 ]
+                then
+                    echo
+                    echo "==============================================="
+                    echo "${BOLD}Failed to clone fsl 3rd party for TS ${NORMAL}"
+                    echo "==============================================="
+                    exit 1
+            fi
+            git clone -b ${YOCTO_VERSION} https://github.com/uvdl/meta-ts.git
+            if [ $? -ne 0 ]
+                then
+                    echo
+                    echo "==============================================="
+                    echo "${BOLD}Failed to clone meta-ts ${NORMAL}"
+                    echo "==============================================="
+                    exit 1
+            fi
+            git clone -b ${YOCTO_VERSION} https://git.openembedded.org/meta-python2/
+            if [ $? -ne 0 ]
+                then
+                    echo
+                    echo "==============================================="
+                    echo "${BOLD}Failed to clone python2${NORMAL}"
+                    echo "==============================================="
+                    exit 1
+            fi
+            git clone -b master https://github.com/RDunkley/meta-dotnet-core.git
+            if [ $? -ne 0 ]
+                then
+                    echo
+                    echo "==============================================="
+                    echo "${BOLD}Failed to .NET ${NORMAL}"
+                    echo "==============================================="
+                    exit 1
+            fi
+            # https://www.yoctoproject.org/pipermail/yocto/2016-June/030614.html
+            git clone -b $YOCTO_VERSION https://git.yoctoproject.org/git/meta-security.git
+            if [ $? -ne 0 ]
+                then
+                    echo
+                    echo "==============================================="
+                    echo "${BOLD}Failed to clone security ${NORMAL}"
+                    echo "==============================================="
+                    exit 1
+            fi
             eval cd ../..
     fi
     eval cd $OLD_LOCATION
@@ -545,7 +656,21 @@ function make_build_dir()
         eval cd ${OLD_DIR}
         copy_config_files
         ;;
-    
+    ts7180)
+        eval cd $YOCTO_DIR_LOCATION/
+        # Run standard OE setup script
+        source ornl-yocto-ts/layers/poky/oe-init-build-env build_ornl/ 
+        if [ $? -ne 0 ]
+            then
+                echo
+                echo "======================================================"
+                echo "${BOLD}OE setup script failed...${Normal}"
+                echo "======================================================"
+                exit 1
+        fi
+        eval cd ${OLD_DIR}
+        copy_config_files
+        ;;
     esac
 
 }
@@ -583,6 +708,8 @@ function copy_config_files()
     raspberrypi4-64)
         MACHINE_FOLDER="raspberrypi"
         ;;
+    ts7180)
+        MACHINE_FOLDER="technologic"
     esac
 
     echo

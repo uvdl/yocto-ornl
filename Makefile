@@ -12,10 +12,11 @@ DATE := $(shell date +%Y-%m-%d_%H%M)
 # please DO NOT check them in to github with these variables set.
 #
 #USER=twaddle
-#MACHINE=jetson-xavier-nx-devkit
+#MACHINE=ts7180
 #EPHEMERAL=/ephemeral/$(USER)/$(MACHINE)
-#YOCTO_PROD=dev
+#YOCTO_PROD=min
 #ARCHIVE=/data/share/build-archives/$(MACHINE)/
+#S3=s3://yocto.downloads/$(MACHINE)
 
 
 # Check that given variables are set and all have non-empty values,
@@ -75,18 +76,28 @@ YOCTO_VERSION=dunfell
 YOCTO_DISTRO=fslc-framebuffer
 YOCTO_IMG=var-$(YOCTO_PROD)-update-full-image
 YOCTO_DIR := $(EPHEMERAL)/$(PROJECT)-$(YOCTO_VERSION)
+ARCHIVE_DIR=$(ARCHIVE)/var-$(DATE)
 else ifeq ($(strip $(MACHINE)),raspberrypi4-64)
 MACHINE_FOLDER=raspberrypi
 YOCTO_VERSION=gatesgarth
 YOCTO_DISTRO=ornl-rpi
 YOCTO_IMG=raspberrypi-$(YOCTO_PROD)-full-image
 YOCTO_DIR := $(EPHEMERAL)/$(PROJECT)-$(YOCTO_VERSION)
+ARCHIVE_DIR=$(ARCHIVE)/rpi-$(DATE)
 else ifneq (,$(findstring jetson, $(MACHINE)))
 MACHINE_FOLDER=jetson
 YOCTO_VERSION=dunfell
 YOCTO_DISTRO=ornl-tegra
 YOCTO_IMG=tegra-$(YOCTO_PROD)-full-image
 YOCTO_DIR := $(EPHEMERAL)/$(PROJECT)-$(YOCTO_VERSION)
+ARCHIVE_DIR=$(ARCHIVE)/tegra-$(DATE)
+else ifeq ($(strip $(MACHINE)),ts7180)
+MACHINE_FOLDER=ts7180
+YOCTO_VERSION=dunfell
+YOCTO_DISTRO=ornl-ts
+YOCTO_IMG=ts-$(YOCTO_PROD)-full-image
+YOCTO_DIR := $(EPHEMERAL)/$(PROJECT)-$(YOCTO_VERSION)
+ARCHIVE_DIR=$(ARCHIVE)/ts-$(DATE)
 endif
 ETH0_NETWORK=$(YOCTO_DIR)/ornl-layers/meta-ornl/recipes-core/default-eth0/files/$(DEFAULT_NETWORK_FILE)
 YOCTO_CMD := $(YOCTO_IMG)
@@ -157,7 +168,14 @@ all:
 	@$(MAKE) --no-print-directory -B YOCTO_PROD=$(YOCTO_PROD) archive
 
 archive:
-	BuildScripts/ornl-create-archive.sh -p $(YOCTO_PROD) -m $(MACHINE) -ip auto -nm auto -o $(ARCHIVE) $(YOCTO_DIR)
+	@echo $(ARCHIVE_DIR)
+ifeq ($(S3), n)
+	@mkdir -p $(ARCHIVE_DIR) && \
+		BuildScripts/ornl-create-archive.sh -p $(YOCTO_PROD) -m $(MACHINE) -ip auto -nm auto -o $(ARCHIVE_DIR) $(YOCTO_DIR)
+else
+	@mkdir -p $(ARCHIVE_DIR) && \
+		BuildScripts/ornl-create-archive.sh -p $(YOCTO_PROD) -m $(MACHINE) -ip auto -nm auto -o $(ARCHIVE_DIR) -s $(S3) $(YOCTO_DIR)
+endif
 
 build:
 	BuildScripts/ornl-bitbake.sh -m $(MACHINE) -d $(YOCTO_DIR) -e $(YOCTO_ENV) $(YOCTO_CMD)
@@ -322,7 +340,14 @@ toaster-stop:
 
 clean-recipe:
 	RECIPE=
+ifneq (,$(findstring jetson, $(MACHINE)))
 	cd $(YOCTO_DIR) && \
                 MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV) && \
                 bitbake -c cleanall $(RECIPE)
+else ifeq ($(strip $(MACHINE)),ts7180)
+	cd $(YOCTO_DIR) && \
+		. ornl-yocto-ts/layers/poky/oe-init-build-env build_ornl/  && \
+		bitbake -c cleanall $(RECIPE)
+endif
+
 
