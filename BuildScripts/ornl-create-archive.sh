@@ -74,6 +74,10 @@ while [ "$moreoptions" = 1 -a $# -gt 0 ]; do
                 #MACHINE_FOLDER=jetson
                 YOCTO_VERSION=dunfell
                 #YOCTO_DISTRO=FIXME
+			elif [[ $MACHINE == ts7180 ]] ; then
+                #MACHINE_FOLDER=ts7180
+                YOCTO_VERSION=dunfell
+                #YOCTO_DISTRO=FIXME
 	    fi
         ;;
 	    -nm) shift ; NETMASK=${1} ;;
