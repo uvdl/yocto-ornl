@@ -18,5 +18,6 @@ IMAGE_INSTALL_append = " \
 	openssl \
 	openssl-bin \
 	pkgconfig \
+	vim \
 "
 
