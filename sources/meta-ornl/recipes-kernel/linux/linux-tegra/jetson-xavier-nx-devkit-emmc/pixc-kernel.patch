@@ -1,3 +1,23 @@
+diff --git a/nvidia/platform/t19x/jakku/kernel-dts/common/tegra194-camera-jakku-rbpcv2-imx219.dtsi b/nvidia/platform/t19x/jakku/kernel-dts/common/tegra194-camera-jakku-rbpcv2-imx219.dtsi
+index 1f3898243be7..5e2bd1553835 100644
+--- a/nvidia/platform/t19x/jakku/kernel-dts/common/tegra194-camera-jakku-rbpcv2-imx219.dtsi
++++ b/nvidia/platform/t19x/jakku/kernel-dts/common/tegra194-camera-jakku-rbpcv2-imx219.dtsi
+@@ -19,15 +19,12 @@
+ 
+ #define CAM0_PWDN	TEGRA194_MAIN_GPIO(P, 4)
+ #define CAM1_PWDN	TEGRA194_MAIN_GPIO(P, 5)
+-#define CAM_I2C_MUX 	TEGRA194_AON_GPIO(CC, 3)
+ 
+ / {
+ 	cam_i2cmux{
+-		compatible = "i2c-mux-gpio";
+ 		#address-cells = <1>;
+ 		#size-cells = <0>;
+ 		i2c-parent = <&cam_i2c>;
+-		mux-gpios = <&tegra_aon_gpio CAM_I2C_MUX GPIO_ACTIVE_HIGH>;
+ 		i2c@0 {
+ 			reg = <0>;
+ 			#address-cells = <1>;
 diff --git a/nvidia/platform/t19x/jakku/kernel-dts/common/tegra194-camera-jakku-rbpcv3-imx477.dtsi b/nvidia/platform/t19x/jakku/kernel-dts/common/tegra194-camera-jakku-rbpcv3-imx477.dtsi
 index 2cc928ecbb56..bd62331af3bf 100644
 --- a/nvidia/platform/t19x/jakku/kernel-dts/common/tegra194-camera-jakku-rbpcv3-imx477.dtsi
@@ -33,7 +53,7 @@ index 3a09853c4983..b89be9dc3414 100644
  		nvidia,out-flags = <TEGRA_DC_OUT_HOTPLUG_LOW>;
  	};
 diff --git a/nvidia/platform/t19x/jakku/kernel-dts/common/tegra194-p3668-common.dtsi b/nvidia/platform/t19x/jakku/kernel-dts/common/tegra194-p3668-common.dtsi
-index e34f2f8c9ddc..61aaceefa081 100644
+index e34f2f8c9ddc..6b2772afa608 100644
 --- a/nvidia/platform/t19x/jakku/kernel-dts/common/tegra194-p3668-common.dtsi
 +++ b/nvidia/platform/t19x/jakku/kernel-dts/common/tegra194-p3668-common.dtsi
 @@ -308,14 +308,14 @@
@@ -62,3 +82,12 @@ index e34f2f8c9ddc..61aaceefa081 100644
  		};
  	};
  
+@@ -478,7 +478,7 @@
+ 
+ 	leds {
+ 		compatible = "gpio-leds";
+-		status = "okay";
++		status = "disabled";
+ 		pwr {
+ 			gpios = <&tegra_aon_gpio TEGRA194_AON_GPIO(CC, 1) GPIO_ACTIVE_HIGH>;
+ 			default-state = "on";
