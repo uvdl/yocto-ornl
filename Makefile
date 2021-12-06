@@ -12,9 +12,9 @@ DATE := $(shell date +%Y-%m-%d_%H%M)
 # please DO NOT check them in to github with these variables set.
 #
 #USER=twaddle
-#MACHINE=ts7180
+#MACHINE=jetson-nano-devkit
 #EPHEMERAL=/ephemeral/$(USER)/$(MACHINE)
-#YOCTO_PROD=min
+#YOCTO_PROD=dev
 #ARCHIVE=/data/share/build-archives/$(MACHINE)/
 #S3=s3://yocto.downloads/$(MACHINE)
 
@@ -340,9 +340,20 @@ toaster-stop:
 
 clean-recipe:
 	RECIPE=
-ifneq (,$(findstring jetson, $(MACHINE)))
-	cd $(YOCTO_DIR) && \
-                MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV) && \
+ifeq ($(strip $(MACHINE)),var-som-mx6-ornl)
+	@cd $(YOCTO_DIR) && \
+		MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV) && \
+		cd $(YOCTO_DIR)/$(YOCTO_ENV) && \
+		bitbake -c cleanall $(RECIPE)
+else ifeq ($(strip $(MACHINE)),raspberrypi4-64)
+        @cd $(YOCTO_DIR) && \
+                source ${YOCTO_DIR}/ornl-yocto-rpi/layers/poky/oe-init-build-env ${YOCTO_ENV} && \
+                cd $(YOCTO_DIR)/$(YOCTO_ENV) && \
+                bitbake -c cleanall $(RECIPE)
+else ifneq (,$(findstring jetson, $(MACHINE)))
+	@cd $(YOCTO_DIR) && \
+                source ${YOCTO_DIR}/ornl-yocto-tegra/setup-env --machine ${MACHINE} --distro ornl-tegra ${YOCTO_ENV} && \
+                cd $(YOCTO_DIR)/$(YOCTO_ENV) && \
                 bitbake -c cleanall $(RECIPE)
 else ifeq ($(strip $(MACHINE)),ts7180)
 	cd $(YOCTO_DIR) && \
