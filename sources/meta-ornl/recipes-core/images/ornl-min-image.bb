@@ -5,7 +5,7 @@ EXTRA_USERS_PARAMS = "usermod -P root root;"
 
 LICENSE = "MIT"
 
-inherit core-image
+inherit core-image extrausers
 
 IMAGE_INSTALL_append = " \
 	bind-utils \
