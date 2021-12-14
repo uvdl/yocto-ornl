@@ -1,0 +1,13 @@
+diff --git a/nvidia/platform/t210/porg/kernel-dts/tegra210-porg-p3448-common.dtsi b/nvidia/platform/t210/porg/kernel-dts/tegra210-porg-p3448-common.dtsi
+index bf4875be6fd9..14a3e778c40c 100644
+--- a/nvidia/platform/t210/porg/kernel-dts/tegra210-porg-p3448-common.dtsi
++++ b/nvidia/platform/t210/porg/kernel-dts/tegra210-porg-p3448-common.dtsi
+@@ -144,7 +144,7 @@
+ 			nvidia,xbar-ctrl = <0 1 2 3 4>;
+ 			status = "okay";
+ 			hdmi-display {
+-				status = "okay";
++				status = "disabled";
+ 			};
+ 		};
+ 		dpaux {

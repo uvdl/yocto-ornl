@@ -11,14 +11,25 @@ inherit features_check
 
 IMAGE_INSTALL_append += " \
     nvgstapps \
-    deepstream-5.1 \
-    libvisionworks \
     exiftool \
     cudnn \
     cuda-samples \
-    tensorrt-core \
     gstreamer1.0-plugins-tegra \
 "
+
+IMAGE_INSTALL_append_jetson-xavier-nx-devkit += " \
+    deepstream-5.1 \
+    libvisionworks \
+    tensorrt-core \
+"
+
+IMAGE_INSTALL_append_jetson-xavier-nx-emmc-devkit += " \
+    deepstream-5.1 \
+    libvisionworks \
+    tensorrt-core \
+"
+
+# These are needed for docker images
 
 # These are needed for docker images
 IMAGE_INSTALL_append += " \

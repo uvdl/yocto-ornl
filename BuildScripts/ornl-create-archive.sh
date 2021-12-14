@@ -161,7 +161,7 @@ if [[ ($MACHINE == var-som-mx6 || $MACHINE == var-som-mx6-ornl) ]] ; then
     fi
 
 elif [[ $MACHINE == *jetson* ]] ; then
-	tar -xf ${YOCTO_DIR}/${YOCTO_ENV}/tmp/deploy/images/${MACHINE}/tegra-${YOCTO_PROD}-full-image-${MACHINE}.tegraflash.tar.gz -C ${_OUT}
+	cp -f ${YOCTO_DIR}/${YOCTO_ENV}/tmp/deploy/images/${MACHINE}/tegra-${YOCTO_PROD}-full-image-${MACHINE}.tegraflash.tar.gz ${_OUT}
 
 elif [[ $MACHINE == raspberrypi4-64 ]] ; then
 	cp -f ${YOCTO_DIR}/${YOCTO_ENV}/tmp-glibc/deploy/images/${MACHINE}/raspberrypi-${YOCTO_PROD}-full-image-${MACHINE}.wic.bz2 ${_OUT}
