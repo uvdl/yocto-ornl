@@ -5,6 +5,8 @@ SUMMARY = "Contains the SDK for Microsoft's .NET Core 6.0"
 # DOTNET_RUNTIME_ARCH_x86_64 = "x64"
 # DOTNET_RUNTIME_ARCH_aarch64 = "arm64"
 
+SRC_URI = "file://dotnet.sh"
+
 SRC_URI_append_arm += " https://download.visualstudio.microsoft.com/download/pr/72888385-910d-4ef3-bae2-c08c28e42af0/59be90572fdcc10766f1baf5ac39529a/dotnet-sdk-6.0.101-linux-arm.tar.gz;subdir=dotnet-${PV}"
 SRC_URI_append_arm[sha256sum] = "f9e212dc4cccbe665d9aac23da6bdddce4957ae4e4d407cf3f1d6da7e79784ebd408c3a59b3ecc6ceaa930b37cf01a4a91c6b38517970d49227e96e50658cc46"
 
