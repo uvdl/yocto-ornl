@@ -1,3 +1,5 @@
+SUMMARY = "Contains the SDK for Microsoft's .NET Core 6.0"
+
 DOTNET_RUNTIME_ARCH = "none"
 DOTNET_RUNTIME_ARCH_arm = "arm"
 DOTNET_RUNTIME_ARCH_x86-64 = "x64"

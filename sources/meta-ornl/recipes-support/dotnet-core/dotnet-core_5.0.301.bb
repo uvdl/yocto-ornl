@@ -1,6 +1,4 @@
-
-
-SUMMARY = "Contains the binaries for Microsoft's .NET Core 5.0"
+SUMMARY = "Contains the SDK for Microsoft's .NET Core 5.0"
 
 DOTNET_RUNTIME_ARCH = "none"
 DOTNET_RUNTIME_ARCH_arm = "arm"
