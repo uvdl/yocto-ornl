@@ -7,9 +7,8 @@ LICENSE = "MIT"
 require recipes-core/images/ornl-dev-image.bb
 
 IMAGE_INSTALL_append = " \
-    gstreamer1.0 \
+    iperf3 \
 	packagegroup-core-full-cmdline \
 	perf \
-    python2 \
     u-boot-ts \
 "
