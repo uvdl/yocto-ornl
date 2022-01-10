@@ -1,12 +1,5 @@
 SUMMARY = "Contains the SDK for Microsoft's .NET Core 6.0"
 
-# DOTNET_RUNTIME_ARCH = "none"
-# DOTNET_RUNTIME_ARCH_arm = "arm"
-# DOTNET_RUNTIME_ARCH_x86_64 = "x64"
-# DOTNET_RUNTIME_ARCH_aarch64 = "arm64"
-
-#BB_STRICT_CHECKSUM = "0"
-
 SRC_URI = "file://dotnet.sh"
 
 SRC_URI_append_arm += " https://download.visualstudio.microsoft.com/download/pr/72888385-910d-4ef3-bae2-c08c28e42af0/59be90572fdcc10766f1baf5ac39529a/dotnet-sdk-6.0.101-linux-arm.tar.gz;subdir=dotnet-${PV};name=armball"
