@@ -20,6 +20,8 @@ IMAGE_FEATURES += " \
 
 IMAGE_INSTALL_append += " \
 	bind-utils \
+	chrony \
+	chronyc \
 	default-eth0 \
 	dotnet-core \
 	dtc \
@@ -53,8 +55,6 @@ IMAGE_INSTALL_append += " \
 	networkmanager \
 	nload \
 	nodejs \
-	ntp \
-	ntp-bin \
 	n2n \
 	openssl \
 	openssl-bin \
