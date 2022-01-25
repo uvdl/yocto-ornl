@@ -9,12 +9,12 @@ inherit core-image extrausers
 
 IMAGE_INSTALL_append = " \
 	bind-utils \
+	chrony \
+	chronyc \
 	libsodium \
 	libsodium-dev \
 	make \
 	networkmanager \
-	ntp \
-	ntp-bin \
 	openssl \
 	openssl-bin \
 	pkgconfig \

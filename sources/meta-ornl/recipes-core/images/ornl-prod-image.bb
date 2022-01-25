@@ -16,6 +16,8 @@ IMAGE_FEATURES += " \
 
 IMAGE_INSTALL_append += " \
 	bind-utils \
+	chrony \
+	chonyc \
 	default-eth0 \
 	dotnet-core \
 	dtc \
@@ -39,8 +41,6 @@ IMAGE_INSTALL_append += " \
 	minicom \
 	networkmanager \
 	nodejs \
-	ntp \
-	ntp-bin \
 	openssl \
 	openssl-bin \
 	packagegroup-cockpit \
