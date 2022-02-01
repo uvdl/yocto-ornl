@@ -8,8 +8,5 @@ require recipes-core/images/ornl-prod-image.bb
 
 IMAGE_INSTALL_append = " \
 	packagegroup-core-full-cmdline \
-	perf \
-    perl \
-    python2 \
     u-boot-ts \
 "
