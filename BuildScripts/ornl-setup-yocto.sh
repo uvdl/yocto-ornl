@@ -134,12 +134,6 @@ function run_build()
         sync_tegra_platform
         ;;
     raspberrypi4-64)
-      if ! [ $YOCTO_VERSION == "gatesgarth" ]
-        then
-        echo "==============================================================================================="
-        echo "${BOLD}We only support Gatesgarth for now, subject to changes until cm4 makes it to a version${NORMAL}"
-        echo "==============================================================================================="
-      fi
         sync_raspberries
         ;;
     *)
@@ -371,12 +365,12 @@ function sync_raspberries()
                     echo "==============================================="
                     exit 1
             fi
-            git clone -b ${YOCTO_VERSION} https://github.com/sbabic/meta-swupdate.git
+            git clone -b ${YOCTO_VERSION} https://github.com/mendersoftware/meta-mender.git
             if [ $? -ne 0 ]
                 then
                     echo
                     echo "==============================================="
-                    echo "${BOLD}Failed to clone swupdate${NORMAL}"
+                    echo "${BOLD}Failed to clone mender${NORMAL}"
                     echo "==============================================="
                     exit 1
             fi
