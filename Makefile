@@ -79,7 +79,7 @@ YOCTO_DIR := $(EPHEMERAL)/$(PROJECT)-$(YOCTO_VERSION)
 ARCHIVE_DIR=$(ARCHIVE)/var-$(DATE)
 else ifeq ($(strip $(MACHINE)),raspberrypi4-64)
 MACHINE_FOLDER=raspberrypi
-YOCTO_VERSION=gatesgarth
+YOCTO_VERSION=dunfell
 YOCTO_DISTRO=ornl-rpi
 YOCTO_IMG=raspberrypi-$(YOCTO_PROD)-full-image
 YOCTO_DIR := $(EPHEMERAL)/$(PROJECT)-$(YOCTO_VERSION)
