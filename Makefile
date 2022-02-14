@@ -346,17 +346,17 @@ ifeq ($(strip $(MACHINE)),var-som-mx6-ornl)
 		cd $(YOCTO_DIR)/$(YOCTO_ENV) && \
 		bitbake -c cleanall $(RECIPE)
 else ifeq ($(strip $(MACHINE)),raspberrypi4-64)
-        @cd $(YOCTO_DIR) && \
-                source ${YOCTO_DIR}/ornl-yocto-rpi/layers/poky/oe-init-build-env ${YOCTO_ENV} && \
-                cd $(YOCTO_DIR)/$(YOCTO_ENV) && \
-                bitbake -c cleanall $(RECIPE)
+	@cd $(YOCTO_DIR) && \
+		source ${YOCTO_DIR}/ornl-yocto-rpi/layers/poky/oe-init-build-env ${YOCTO_ENV} && \
+		cd $(YOCTO_DIR)/$(YOCTO_ENV) && \
+		bitbake -c cleanall $(RECIPE)
 else ifneq (,$(findstring jetson, $(MACHINE)))
 	@cd $(YOCTO_DIR) && \
-                source ${YOCTO_DIR}/ornl-yocto-tegra/setup-env --machine ${MACHINE} --distro ornl-tegra ${YOCTO_ENV} && \
-                cd $(YOCTO_DIR)/$(YOCTO_ENV) && \
-                bitbake -c cleanall $(RECIPE)
+		source ${YOCTO_DIR}/ornl-yocto-tegra/setup-env --machine ${MACHINE} --distro ornl-tegra ${YOCTO_ENV} && \
+		cd $(YOCTO_DIR)/$(YOCTO_ENV) && \
+		bitbake -c cleanall $(RECIPE)
 else ifeq ($(strip $(MACHINE)),ts7180)
-	cd $(YOCTO_DIR) && \
+	@cd $(YOCTO_DIR) && \
 		. ornl-yocto-ts/layers/poky/oe-init-build-env build_ornl/  && \
 		bitbake -c cleanall $(RECIPE)
 endif
