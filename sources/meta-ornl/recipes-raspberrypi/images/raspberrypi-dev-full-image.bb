@@ -11,6 +11,9 @@ require recipes-core/images/ornl-dev-image.bb
 
 IMAGE_INSTALL_append = " \
 	gstreamer1.0 \
+	gstreamer1.0-omx \
+	gstreamer1.0-rtsp-server \
+	gstreamer1.0-vaapi \
 	packagegroup-core-full-cmdline \
 	mender-client \
 	perf \
