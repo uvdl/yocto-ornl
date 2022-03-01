@@ -14,7 +14,7 @@ IMAGE_INSTALL_append_raspberrypi4-64 += " \
 "	
 
 IMAGE_INSTALL_append_raspberrypi4 += " \
-	gstreamer-omx \
+	gstreamer1.0-omx \
 	userland \
 "
 
