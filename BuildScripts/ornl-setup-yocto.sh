@@ -133,6 +133,8 @@ function run_build()
     jetson-xavier-nx-devkit)
         sync_tegra_platform
         ;;
+    raspberrypi4)
+        ;&
     raspberrypi4-64)
         sync_raspberries
         ;;
@@ -635,6 +637,8 @@ function make_build_dir()
         fi
         eval cd ${OLD_DIR}
         ;;
+    raspberrypi4)
+        ;&
     raspberrypi4-64)
         eval cd $YOCTO_DIR_LOCATION/
         # Run standard OE setup script
@@ -699,6 +703,8 @@ function copy_config_files()
     var-som-mx6-ornl)
         MACHINE_FOLDER="variscite"
         ;;
+    raspberrypi4)
+        ;&
     raspberrypi4-64)
         MACHINE_FOLDER="raspberrypi"
         ;;

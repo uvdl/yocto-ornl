@@ -9,11 +9,18 @@ require recipes-core/images/ornl-dev-image.bb
 # NOTE if using Gatesgarth use Networkmanager-nmcli it is separated out into
 # different packages for that version
 
+IMAGE_INSTALL_append_raspberrypi4-64 += " \
+	gstreamer1.0-libav \
+"	
+
+IMAGE_INSTALL_append_raspberrypi4 += " \
+	gstreamer-omx \
+	userland \
+"
+
 IMAGE_INSTALL_append = " \
 	gstreamer1.0 \
-	gstreamer1.0-omx \
 	gstreamer1.0-rtsp-server \
-	gstreamer1.0-vaapi \
 	packagegroup-core-full-cmdline \
 	mender-client \
 	perf \
