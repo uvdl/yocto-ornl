@@ -63,6 +63,8 @@ jetson-xavier-nx-devkit)
 	cd ${YOCTO_DIR}
 	source ${YOCTO_DIR}/ornl-yocto-tegra/setup-env --machine ${MACHINE} --distro ornl-tegra ${YOCTO_ENV}
 	;;
+raspberrypi4)
+	;&
 raspberrypi4-64)
 	cd ${YOCTO_DIR}
 	source ${YOCTO_DIR}/ornl-yocto-rpi/layers/poky/oe-init-build-env ${YOCTO_ENV}

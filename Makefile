@@ -77,7 +77,7 @@ YOCTO_DISTRO=fslc-framebuffer
 YOCTO_IMG=var-$(YOCTO_PROD)-update-full-image
 YOCTO_DIR := $(EPHEMERAL)/$(PROJECT)-$(YOCTO_VERSION)
 ARCHIVE_DIR=$(ARCHIVE)/var-$(DATE)
-else ifeq ($(strip $(MACHINE)),raspberrypi4-64)
+else ifneq (,$(findstring raspberrypi, $(MACHINE)))
 MACHINE_FOLDER=raspberrypi
 YOCTO_VERSION=dunfell
 YOCTO_DISTRO=ornl-rpi
@@ -345,7 +345,7 @@ ifeq ($(strip $(MACHINE)),var-som-mx6-ornl)
 		MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV) && \
 		cd $(YOCTO_DIR)/$(YOCTO_ENV) && \
 		bitbake -c cleanall $(RECIPE)
-else ifeq ($(strip $(MACHINE)),raspberrypi4-64)
+else ifneq (,$(findstring raspberrypi, $(MACHINE)))
 	@cd $(YOCTO_DIR) && \
 		source ${YOCTO_DIR}/ornl-yocto-rpi/layers/poky/oe-init-build-env ${YOCTO_ENV} && \
 		cd $(YOCTO_DIR)/$(YOCTO_ENV) && \
