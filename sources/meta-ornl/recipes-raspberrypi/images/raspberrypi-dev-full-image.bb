@@ -15,6 +15,7 @@ IMAGE_INSTALL_append_raspberrypi4-64 += " \
 
 IMAGE_INSTALL_append_raspberrypi4 += " \
 	gstreamer1.0-omx \
+	mesa \
 "
 
 IMAGE_INSTALL_append = " \
