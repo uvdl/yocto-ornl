@@ -1,0 +1,19 @@
+diff --git a/nvidia/platform/t19x/jakku/kernel-dts/common/tegra194-p3509-disp.dtsi b/nvidia/platform/t19x/jakku/kernel-dts/common/tegra194-p3509-disp.dtsi
+index 3a09853c4983..c643cd38654b 100644
+--- a/nvidia/platform/t19x/jakku/kernel-dts/common/tegra194-p3509-disp.dtsi
++++ b/nvidia/platform/t19x/jakku/kernel-dts/common/tegra194-p3509-disp.dtsi
+@@ -67,12 +67,12 @@
+ };
+ 
+ &sor1 {
+-	status = "okay";
++	status = "disabled";
+ 	nvidia,active-panel = <&sor1_hdmi_display>;
+ };
+ 
+ &sor1_hdmi_display {
+-	status = "okay";
++	status = "disabled";
+ 	disp-default-out {
+ 		nvidia,out-flags = <TEGRA_DC_OUT_HOTPLUG_LOW>;
+ 	};
