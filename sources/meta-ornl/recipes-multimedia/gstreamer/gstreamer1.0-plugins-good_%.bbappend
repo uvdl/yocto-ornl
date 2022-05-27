@@ -1,4 +1,4 @@
-PACKAGECONFIG_var-som-mx6-ornl += " \ 
+PACKAGECONFIG_pix-c3 += " \ 
     flac \
     speex \
     soup \

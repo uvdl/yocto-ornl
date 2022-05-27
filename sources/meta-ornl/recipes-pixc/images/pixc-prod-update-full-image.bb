@@ -20,9 +20,10 @@ IMAGE_INSTALL_append = " \
 	packagegroup-fsl-tools-gpu \
 	packagegroup-fsl-tools-gpu-external \
 	packagegroup-imx-tools-audio \
+	postinstall \
 	swupdate \
 	swupdate-www \
 	u-boot-variscite \
 "
 
-COMPATIBLE_MACHINE = "var-som-6ul"
+COMPATIBLE_MACHINE = "pix-c3"

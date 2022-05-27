@@ -14,10 +14,9 @@ IMAGE_INSTALL_append = " \
 	ksz-initscripts \
 	mfgtest \
 	packagegroup-core-full-cmdline \
-	postinstall \
 	swupdate \
 	swupdate-www \
 	u-boot-variscite \
 "
 
-COMPATIBLE_MACHINE = "var-som-mx6-ornl"
+COMPATIBLE_MACHINE = "var-som-6ul"

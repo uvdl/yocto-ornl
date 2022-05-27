@@ -1,11 +1,11 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
 
 
-SRC_URI_append_var-som-mx6-ornl = " \
+SRC_URI_append_pix-c3 = " \
 	file://variscite-bt.conf \
 "
 
-do_install_append_var-som-mx6-ornl() {
+do_install_append_pix-c3() {
 	install -m 0644 ${WORKDIR}/variscite-bt.conf ${D}${sysconfdir}/bluetooth
 }
 

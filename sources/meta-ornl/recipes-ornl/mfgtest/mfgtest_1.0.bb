@@ -38,4 +38,4 @@ do_install() {
     fi
 }
 
-COMPATIBLE_MACHINE = "(var-som-mx6|var-som-mx6-ornl)"
+COMPATIBLE_MACHINE = "(pix-c3)"

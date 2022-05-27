@@ -23,10 +23,9 @@ IMAGE_INSTALL_append = " \
 	packagegroup-imx-tools-audio \
 	packagegroup-tools-bluetooth \
 	perf \
-	postinstall \
 	swupdate \
 	swupdate-www \
 	u-boot-variscite \
 "
 
-COMPATIBLE_MACHINE = "var-som-mx6-ornl"
+COMPATIBLE_MACHINE = "var-som-6ul"

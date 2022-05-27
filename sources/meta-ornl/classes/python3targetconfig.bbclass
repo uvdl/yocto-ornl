@@ -17,4 +17,4 @@ do_install_prepend_class-target() {
 }
 
 # this class is missing in Variscite Dunfell branch
-COMPATIBLE_MACHINE = "var-som-mx6-ornl"
+COMPATIBLE_MACHINE = "pix-c3"

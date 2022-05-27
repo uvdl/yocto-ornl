@@ -27,7 +27,7 @@ DATE := $(shell date +%Y-%m-%d_%H%M)
 #   2. (optional) Error message to print.
 check_defined = $(strip $(foreach 1,$1, $(if $(value $1),, $(error Undefined $1 $(if $(strip $(value 2)),, $(strip $(value 2)))))))
 
-$(call check_defined, MACHINE, The platform to build - var-som-mx6-ornl raspberrypi4-64 or jetson-*platform*-devkit )
+$(call check_defined, MACHINE, The platform to build - pix-c3 var-som-6ul raspberrypi4-64 or jetson-*platform*-devkit )
 $(call check_defined, ARCHIVE, Where to put output files after the build)
 $(call check_defined, EPHEMERAL, The parent directory of the build folder)
 $(call check_defined, YOCTO_PROD, The image version - dev prod or min)
@@ -48,7 +48,7 @@ DEFAULT_NETWORK_FILE := 10-eth0.network
 DEV=
 DOT_GZ=.gz
 EULA=1	# https://patchwork.openembedded.org/patch/100815/
-# var-som-mx6-ornl, raspberrypi4-64, jetson-xavier-nx-devkit
+# pix-c3, raspberrypi4-64, jetson-xavier-nx-devkit, var-som-6ul
 PKGDEPS1=gawk wget git-core diffstat unzip texinfo gcc-multilib \
 build-essential chrpath socat cpio python python3 python3-pip python3-pexpect \
 xz-utils debianutils iputils-ping libsdl1.2-dev xterm
@@ -70,8 +70,8 @@ REPO_SUM=b74fda4aa5df31b88248a0c562691cb943a9c45cc9dd909d000f0e3cc265b685
 # Known variations
 # FIXME: requires mod to BuildScripts/ornl-setup-yocto.sh
 YOCTO_ENV=build_ornl
-ifeq ($(strip $(MACHINE)),var-som-mx6-ornl)
-MACHINE_FOLDER=variscite
+ifeq ($(strip $(MACHINE)),pix-c3)
+MACHINE_FOLDER=pix-c3
 YOCTO_VERSION=dunfell
 YOCTO_DISTRO=fslc-framebuffer
 YOCTO_IMG=var-$(YOCTO_PROD)-update-full-image
@@ -133,7 +133,7 @@ $(REPO): $(shell dirname $(REPO))
 $(YOCTO_DIR):
 	mkdir -p $(YOCTO_DIR)
 
-ifeq ($(strip $(MACHINE)),var-som-mx6-ornl)
+ifeq ($(strip $(MACHINE)),pix-c3)
 $(YOCTO_DIR)/setup-environment: $(REPO) $(YOCTO_DIR)
 	cd $(YOCTO_DIR) && \
 		$(REPO) init -u https://github.com/varigit/variscite-bsp-platform.git -b $(YOCTO_VERSION) && \
@@ -198,7 +198,7 @@ dependencies:
 	$(SUDO) apt-get update
 	$(SUDO) apt-get install -y $(PKGDEPS1)
 	$(SUDO) apt-get install -y $(PKGDEPS2)
-ifeq ($(strip $(MACHINE)),var-som-mx6-ornl)
+ifeq ($(strip $(MACHINE)),pix-c3)
 	@$(MAKE) --no-print-directory -B YOCTO_VERSION=$(YOCTO_VERSION) $(YOCTO_DIR)/setup-environment
 endif
 
@@ -228,7 +228,7 @@ docker-image: Dockerfile
 environment:
 	BuildScripts/ornl-setup-yocto.sh -m $(MACHINE) -v $(YOCTO_VERSION) $(YOCTO_DIR)
 	@$(MAKE) --no-print-directory -B HOST=$(HOST) NETMASK=$(NETMASK) $(ETH0_NETWORK)
-ifeq ($(strip $(MACHINE)),var-som-mx6-ornl)
+ifeq ($(strip $(MACHINE)),pix-c3)
 	@$(MAKE) --no-print-directory -B HOST=$(HOST) $(YOCTO_DIR)/$(MFGTEST_SH)
 endif
 
@@ -242,7 +242,7 @@ id:
 # https://github.com/uvdl/yocto-ornl/issues/11#issuecomment-462969336
 # Edison's email from 2019-03-15 Re: FEC driver debugging
 kernel:
-ifeq ($(strip $(MACHINE)),var-som-mx6-ornl)
+ifeq ($(strip $(MACHINE)),pix-c3)
 	cd $(YOCTO_DIR) && \
 		MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV) && \
 		kernel=$(shell find $(YOCTO_DIR)/$(YOCTO_ENV) -type d -name "$(KERNEL_VER)*-r0" -print | head -1) && \
@@ -255,7 +255,7 @@ else
 endif
 
 kernel-config:
-ifeq ($(strip $(MACHINE)),var-som-mx6-ornl)
+ifeq ($(strip $(MACHINE)),pix-c3)
 	cd $(YOCTO_DIR) && \
 		MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV) && \
 		kernel=$(shell find $(YOCTO_DIR)/$(YOCTO_ENV) -type d -name "$(KERNEL_VER)*-r0" -print | head -1) && \
@@ -279,7 +279,7 @@ mrproper: clean toaster-stop
 	-rm -rf $(YOCTO_DIR)
 
 sd:
-ifeq ($(strip $(MACHINE)),var-som-mx6-ornl)
+ifeq ($(strip $(MACHINE)),pix-c3)
 	@file $(YOCTO_DIR)/$(YOCTO_ENV)/tmp/deploy/images/$(MACHINE)/$(YOCTO_IMG)
 	@file $(YOCTO_DIR)/sources/meta-variscite-fslc/scripts/var_mk_yocto_sdcard/var-create-yocto-sdcard.sh
 	@if [ ! -z "$(DEV)" ] ; then cd $(YOCTO_DIR) && \
@@ -310,7 +310,7 @@ see:
 	@( cd $(KERNEL_SOURCE) && commit=$$(git log | head -1 | tr -s ' ' | cut -f2 | tr -s ' ' | cut -f2 -d' ') ; echo $$commit )
 	-@echo "*** local.conf ***" && ( diff build/conf/$(MACHINE_FOLDER)/local.conf $(YOCTO_DIR)/$(YOCTO_ENV)/conf/local.conf ; true )
 	-@echo "*** bblayers.conf ***" && ( diff build/conf/$(MACHINE_FOLDER)/bblayers.conf $(YOCTO_DIR)/$(YOCTO_ENV)/conf/bblayers.conf ; true )
-ifeq ($(strip $(MACHINE)),var-som-mx6-ornl)
+ifeq ($(strip $(MACHINE)),pix-c3)
 	@echo "*** Build Commands for $(MACHINE) ***"
 	@echo "cd $(YOCTO_DIR)"
 	@echo "MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV)"
@@ -330,7 +330,7 @@ swu:
 	@$(MAKE) --no-print-directory -B YOCTO_PROD=$(YOCTO_PROD) archive
 
 toaster:
-ifeq ($(strip $(MACHINE)),var-som-mx6-ornl)
+ifeq ($(strip $(MACHINE)),pix-c3)
 	@$(MAKE) --no-print-directory YOCTO_VERSION=$(YOCTO_VERSION) $(YOCTO_DIR)/setup-environment
 endif
 	BuildScripts/ornl-bitbake.sh -m $(MACHINE) -d $(YOCTO_DIR) -e $(YOCTO_ENV) toaster enable
@@ -340,7 +340,7 @@ toaster-stop:
 
 clean-recipe:
 	RECIPE=
-ifeq ($(strip $(MACHINE)),var-som-mx6-ornl)
+ifeq ($(strip $(MACHINE)),pix-c3)
 	@cd $(YOCTO_DIR) && \
 		MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV) && \
 		cd $(YOCTO_DIR)/$(YOCTO_ENV) && \

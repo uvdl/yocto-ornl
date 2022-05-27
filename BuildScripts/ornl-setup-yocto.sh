@@ -121,7 +121,7 @@ function run_build()
     ts7180)
         sync_technologic
         ;;
-    var-som-mx6-ornl)
+    pix-c3)
         sync_variscite_platform
         ;;
     jetson-nano-devkit-emmc)
@@ -597,7 +597,7 @@ function make_build_dir()
     OLD_DIR=${PWD}
 
     case "$TARGET_MACHINE" in
-    var-som-mx6-ornl)
+    pix-c3)
         # From scope of script change into the directory.
         eval cd $YOCTO_DIR_LOCATION/
         # Run Variscite environment script
@@ -700,7 +700,7 @@ function copy_config_files()
     jetson-xavier-nx-devkit)
         MACHINE_FOLDER="jetson"
         ;;
-    var-som-mx6-ornl)
+    pix-c3)
         MACHINE_FOLDER="variscite"
         ;;
     raspberrypi4)
