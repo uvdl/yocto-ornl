@@ -23,9 +23,7 @@ export USER=<choice>
 export S3=<choice>
 </pre>
 
-If you do not wish to import there are variable examples in the Makefile that you can uncomment. **NOTE**: if you choose to use these default variables remember to do the same in the **submodules** (specifically *yocto-ornl*)
-
-Once these variables are set, you can build:
+If you do not wish to import there are variable examples in the Makefile that you can uncomment.  Once these variables are set, you can build:
 
 <pre>
 make environment
