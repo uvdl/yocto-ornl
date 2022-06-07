@@ -11,8 +11,6 @@ IMAGE_INSTALL_append = " \
 	imx-test \
 	mfgtest \
 	packagegroup-core-full-cmdline \
-	swupdate \
-	swupdate-www \
 "
 
 COMPATIBLE_MACHINE = "imx6ul-var-dart"

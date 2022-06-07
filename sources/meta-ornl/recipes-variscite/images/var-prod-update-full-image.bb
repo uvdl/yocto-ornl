@@ -17,8 +17,6 @@ IMAGE_INSTALL_append = " \
 	packagegroup-fsl-tools-gpu \
 	packagegroup-fsl-tools-gpu-external \
 	packagegroup-imx-tools-audio \
-	swupdate \
-	swupdate-www \
 "
 
 COMPATIBLE_MACHINE = "imx6ul-var-dart"

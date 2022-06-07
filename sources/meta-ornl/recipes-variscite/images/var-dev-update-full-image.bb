@@ -20,8 +20,6 @@ IMAGE_INSTALL_append = " \
 	packagegroup-imx-tools-audio \
 	packagegroup-tools-bluetooth \
 	perf \
-	swupdate \
-	swupdate-www \
 "
 
 COMPATIBLE_MACHINE = "imx6ul-var-dart"
