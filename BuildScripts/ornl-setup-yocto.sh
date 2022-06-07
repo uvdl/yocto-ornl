@@ -704,15 +704,12 @@ function copy_config_files()
     jetson-xavier-nx-devkit)
         MACHINE_FOLDER="jetson"
         ;;
-    imx6ul-var-dart)
-        MACHINE_FOLDER="imx6ul"
-        ;;
     pix-c3)
         MACHINE_FOLDER="pixc"
         ;;
     imx6ul-var-dart)
-	MACHINE_FOLDER="variscite"
-	;;
+	    MACHINE_FOLDER="variscite"
+	    ;;
     raspberrypi4)
         ;&
     raspberrypi4-64)
