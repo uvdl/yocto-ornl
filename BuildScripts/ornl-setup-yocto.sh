@@ -701,8 +701,11 @@ function copy_config_files()
         MACHINE_FOLDER="jetson"
         ;;
     pix-c3)
-        MACHINE_FOLDER="variscite"
+        MACHINE_FOLDER="pixc"
         ;;
+    var-som-6ul)
+	MACHINE_FOLDER="variscite"
+	;;
     raspberrypi4)
         ;&
     raspberrypi4-64)
