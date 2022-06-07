@@ -27,7 +27,7 @@ DATE := $(shell date +%Y-%m-%d_%H%M)
 #   2. (optional) Error message to print.
 check_defined = $(strip $(foreach 1,$1, $(if $(value $1),, $(error Undefined $1 $(if $(strip $(value 2)),, $(strip $(value 2)))))))
 
-$(call check_defined, MACHINE, The platform to build - pix-c3 var-som-6ul raspberrypi4-64 or jetson-*platform*-devkit )
+$(call check_defined, MACHINE, The platform to build - pix-c3 imx6ul-var-dart raspberrypi4-64 or jetson-*platform*-devkit )
 $(call check_defined, ARCHIVE, Where to put output files after the build)
 $(call check_defined, EPHEMERAL, The parent directory of the build folder)
 $(call check_defined, YOCTO_PROD, The image version - dev prod or min)
@@ -48,7 +48,7 @@ DEFAULT_NETWORK_FILE := 10-eth0.network
 DEV=
 DOT_GZ=.gz
 EULA=1	# https://patchwork.openembedded.org/patch/100815/
-# pix-c3, raspberrypi4-64, jetson-xavier-nx-devkit, var-som-6ul
+# pix-c3, raspberrypi4-64, jetson-xavier-nx-devkit, imx6ul-var-dart
 PKGDEPS1=gawk wget git-core diffstat unzip texinfo gcc-multilib \
 build-essential chrpath socat cpio python python3 python3-pip python3-pexpect \
 xz-utils debianutils iputils-ping libsdl1.2-dev xterm
@@ -72,6 +72,13 @@ REPO_SUM=b74fda4aa5df31b88248a0c562691cb943a9c45cc9dd909d000f0e3cc265b685
 YOCTO_ENV=build_ornl
 ifeq ($(strip $(MACHINE)),pix-c3)
 MACHINE_FOLDER=pix-c3
+YOCTO_VERSION=dunfell
+YOCTO_DISTRO=fslc-framebuffer
+YOCTO_IMG=pixc-$(YOCTO_PROD)-update-full-image
+YOCTO_DIR := $(EPHEMERAL)/$(PROJECT)-$(YOCTO_VERSION)
+ARCHIVE_DIR=$(ARCHIVE)/var-$(DATE)
+ifeq ($(strip $(MACHINE)),imx6ul-var-dart)
+MACHINE_FOLDER=imx6ul-var-dart
 YOCTO_VERSION=dunfell
 YOCTO_DISTRO=fslc-framebuffer
 YOCTO_IMG=var-$(YOCTO_PROD)-update-full-image
@@ -141,6 +148,14 @@ $(YOCTO_DIR)/setup-environment: $(REPO) $(YOCTO_DIR)
 	@if [ ! -x $@ ] ; then false ; fi
 endif
 
+ifeq ($(strip $(MACHINE)),imx6ul-var-dart)
+$(YOCTO_DIR)/setup-environment: $(REPO) $(YOCTO_DIR)
+	cd $(YOCTO_DIR) && \
+		$(REPO) init -u https://github.com/varigit/variscite-bsp-platform.git -b $(YOCTO_VERSION) && \
+		$(REPO) sync -j$(CPUS)
+	@if [ ! -x $@ ] ; then false ; fi
+endif
+
 %/$(DEFAULT_NETWORK_FILE):
 	@echo "[Match]" > $@ && \
 		echo "Name=eth0" >> $@ && \
@@ -199,6 +214,9 @@ dependencies:
 	$(SUDO) apt-get install -y $(PKGDEPS1)
 	$(SUDO) apt-get install -y $(PKGDEPS2)
 ifeq ($(strip $(MACHINE)),pix-c3)
+	@$(MAKE) --no-print-directory -B YOCTO_VERSION=$(YOCTO_VERSION) $(YOCTO_DIR)/setup-environment
+endif
+ifeq ($(strip $(MACHINE)),imx6ul-var-dart)
 	@$(MAKE) --no-print-directory -B YOCTO_VERSION=$(YOCTO_VERSION) $(YOCTO_DIR)/setup-environment
 endif
 
@@ -341,6 +359,11 @@ toaster-stop:
 clean-recipe:
 	RECIPE=
 ifeq ($(strip $(MACHINE)),pix-c3)
+	@cd $(YOCTO_DIR) && \
+		MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV) && \
+		cd $(YOCTO_DIR)/$(YOCTO_ENV) && \
+		bitbake -c cleanall $(RECIPE)
+else ifeq ($(strip $(MACHINE)),imx6ul-var-dart)
 	@cd $(YOCTO_DIR) && \
 		MACHINE=$(MACHINE) DISTRO=$(YOCTO_DISTRO) EULA=$(EULA) . setup-environment $(YOCTO_ENV) && \
 		cd $(YOCTO_DIR)/$(YOCTO_ENV) && \

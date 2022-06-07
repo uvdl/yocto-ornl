@@ -121,6 +121,8 @@ function run_build()
     ts7180)
         sync_technologic
         ;;
+    imx6ul-var-dart)
+        ;&
     pix-c3)
         sync_variscite_platform
         ;;
@@ -597,6 +599,8 @@ function make_build_dir()
     OLD_DIR=${PWD}
 
     case "$TARGET_MACHINE" in
+    imx6ul-var-dart)
+        ;&
     pix-c3)
         # From scope of script change into the directory.
         eval cd $YOCTO_DIR_LOCATION/
@@ -700,10 +704,13 @@ function copy_config_files()
     jetson-xavier-nx-devkit)
         MACHINE_FOLDER="jetson"
         ;;
+    imx6ul-var-dart)
+        MACHINE_FOLDER="imx6ul"
+        ;;
     pix-c3)
         MACHINE_FOLDER="pixc"
         ;;
-    var-som-6ul)
+    imx6ul-var-dart)
 	MACHINE_FOLDER="variscite"
 	;;
     raspberrypi4)

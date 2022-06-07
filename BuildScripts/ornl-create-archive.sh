@@ -37,7 +37,7 @@ help() {
 	echo " -e		override YOCTO_ENV (default ${YOCTO_ENV})"
 	echo " -ip		override HOST (auto to get from build, default ${HOST})"
 	echo " -m		define MACHINE (default ${MACHINE}); valid:"
-    echo "          pix-c3, var-som-mx6 - Variscite DART-MX6"
+    echo "          pix-c3, imx6ul-var-dart - Variscite DART-MX6"
     echo "          jetson-xavier-nx-devkit - Jetson Xavier NX on devkit"
     echo "          raspberrypi4-64 - RPi Compute Module 4"
 	echo " -nm		override NETMASK (auto to get from build, default ${NETMASK})"
@@ -62,7 +62,7 @@ while [ "$moreoptions" = 1 -a $# -gt 0 ]; do
 	    -h) help; exit 3 ;;
 	    -ip) shift ; HOST=${1} ;;
 	    -m) shift ; MACHINE=${1}
-            if [[ ($MACHINE == var-som-mx6 || $MACHINE == pix-c3) ]] ; then
+            if [[ ($MACHINE == var-som-mx6 || $MACHINE == pix-c3 || $MACHINE == imx6ul-var-dart) ]] ; then
                 #MACHINE_FOLDER=variscite
                 YOCTO_VERSION=dunfell
                 #YOCTO_DISTRO=fslc-framebuffer
@@ -99,7 +99,7 @@ KERNEL_SOURCE=${YOCTO_DIR}/${YOCTO_ENV}/tmp/work-shared/${MACHINE}/kernel-source
 
 mkdir -p $_OUT
 
-if [[ ($MACHINE == var-som-mx6 || $MACHINE == pix-c3) ]] ; then
+if [[ ($MACHINE == var-som-mx6 || $MACHINE == pix-c3 || $MACHINE == imx6ul-var-dart) ]] ; then
     # .dtb and make .dts files out of them
 	mkdir -p ${_OUT}/dts
 	for f in `find ${YOCTO_DIR}/${YOCTO_ENV}/${KERNEL_DTS} -name "*.dtb" -print` ; do

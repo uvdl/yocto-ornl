@@ -49,6 +49,8 @@ done
 
 # NB: *EVERY* call to bitbake must have its environment prepared by setup-environment
 case ${MACHINE} in
+imx6ul-var-dart)
+	;&
 pix-c3)
 	cd ${YOCTO_DIR}
 	MACHINE=${MACHINE} DISTRO=${YOCTO_DISTRO} EULA=${EULA} . setup-environment ${YOCTO_ENV}

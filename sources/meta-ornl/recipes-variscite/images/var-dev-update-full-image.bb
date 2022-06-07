@@ -28,4 +28,4 @@ IMAGE_INSTALL_append = " \
 	u-boot-variscite \
 "
 
-COMPATIBLE_MACHINE = "var-som-6ul"
+COMPATIBLE_MACHINE = "imx6ul-var-dart"

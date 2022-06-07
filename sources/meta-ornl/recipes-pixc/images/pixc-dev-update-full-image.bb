@@ -28,4 +28,4 @@ IMAGE_INSTALL_append = " \
 	u-boot-variscite \
 "
 
-COMPATIBLE_MACHINE = "(pix-c3|var-som-6ul)"
+COMPATIBLE_MACHINE = "pix-c3"

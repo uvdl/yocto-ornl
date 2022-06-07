@@ -11,6 +11,11 @@ PACKAGECONFIG_pix-c3 += " \
     voaacenc \
 "
 
+PACKAGECONFIG_imx6ul-var-dart += " \ 
+    rtmp \
+    voaacenc \
+"
+
 PACKAGECONFIG_raspberrypi4-64 += " \
     rtmp \
     voaacenc \
