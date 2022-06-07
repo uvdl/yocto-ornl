@@ -77,7 +77,7 @@ YOCTO_DISTRO=fslc-framebuffer
 YOCTO_IMG=pixc-$(YOCTO_PROD)-update-full-image
 YOCTO_DIR := $(EPHEMERAL)/$(PROJECT)-$(YOCTO_VERSION)
 ARCHIVE_DIR=$(ARCHIVE)/var-$(DATE)
-ifeq ($(strip $(MACHINE)),imx6ul-var-dart)
+else ifeq ($(strip $(MACHINE)),imx6ul-var-dart)
 MACHINE_FOLDER=imx6ul-var-dart
 YOCTO_VERSION=dunfell
 YOCTO_DISTRO=fslc-framebuffer
@@ -146,9 +146,7 @@ $(YOCTO_DIR)/setup-environment: $(REPO) $(YOCTO_DIR)
 		$(REPO) init -u https://github.com/varigit/variscite-bsp-platform.git -b $(YOCTO_VERSION) && \
 		$(REPO) sync -j$(CPUS)
 	@if [ ! -x $@ ] ; then false ; fi
-endif
-
-ifeq ($(strip $(MACHINE)),imx6ul-var-dart)
+else ifeq ($(strip $(MACHINE)),imx6ul-var-dart)
 $(YOCTO_DIR)/setup-environment: $(REPO) $(YOCTO_DIR)
 	cd $(YOCTO_DIR) && \
 		$(REPO) init -u https://github.com/varigit/variscite-bsp-platform.git -b $(YOCTO_VERSION) && \
@@ -215,8 +213,7 @@ dependencies:
 	$(SUDO) apt-get install -y $(PKGDEPS2)
 ifeq ($(strip $(MACHINE)),pix-c3)
 	@$(MAKE) --no-print-directory -B YOCTO_VERSION=$(YOCTO_VERSION) $(YOCTO_DIR)/setup-environment
-endif
-ifeq ($(strip $(MACHINE)),imx6ul-var-dart)
+else ifeq ($(strip $(MACHINE)),imx6ul-var-dart)
 	@$(MAKE) --no-print-directory -B YOCTO_VERSION=$(YOCTO_VERSION) $(YOCTO_DIR)/setup-environment
 endif
 
