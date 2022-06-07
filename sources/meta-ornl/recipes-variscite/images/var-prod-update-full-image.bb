@@ -10,8 +10,6 @@ require recipes-core/images/ornl-prod-image.bb
 IMAGE_INSTALL_append = " \
 	imx-test \
 	iperf3 \
-	kernel-devicetree \
-	kernel-image \
 	mfgtest \
 	packagegroup-core-full-cmdline \
 	packagegroup-fsl-gstreamer1.0 \
@@ -21,7 +19,6 @@ IMAGE_INSTALL_append = " \
 	packagegroup-imx-tools-audio \
 	swupdate \
 	swupdate-www \
-	u-boot-variscite \
 "
 
 COMPATIBLE_MACHINE = "imx6ul-var-dart"
