@@ -11,7 +11,6 @@ IMAGE_INSTALL_append = " \
 	imx-test \
 	kernel-devicetree \
 	kernel-image \
-	ksz-initscripts \
 	mfgtest \
 	packagegroup-core-full-cmdline \
 	packagegroup-fsl-gstreamer1.0 \
