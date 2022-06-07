@@ -12,7 +12,6 @@ IMAGE_INSTALL_append = " \
 	iperf3 \
 	kernel-devicetree \
 	kernel-image \
-	ksz-initscripts \
 	mfgtest \
 	packagegroup-core-full-cmdline \
 	packagegroup-fsl-gstreamer1.0 \
