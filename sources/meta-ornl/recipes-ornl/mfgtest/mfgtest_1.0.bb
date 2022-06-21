@@ -38,4 +38,4 @@ do_install() {
     fi
 }
 
-COMPATIBLE_MACHINE = "(pix-c3)"
+COMPATIBLE_MACHINE = "(pix-c3|imx6ul-var-dart)"
