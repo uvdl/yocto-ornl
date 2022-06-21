@@ -21,7 +21,7 @@ help() {
 	echo " -e		override YOCTO_ENV (default ${YOCTO_ENV})"
 	echo " -h		display this Help message"
 	echo " -m		define MACHINE (default ${MACHINE}); valid:"
-    echo "          pix-c3, var-som-mx6 - Variscite DART-MX6"
+    echo "          pix-c3, imx6ul-var-dart - Variscite DART-MX6"
     echo "          jetson-xavier-nx-devkit - Jetson Xavier NX on devkit"
     echo "          raspberrypi4-64 - RPi Compute Module 4"
 	echo " -tp		override TOASTER_PORT (default ${TOASTER_PORT})"
