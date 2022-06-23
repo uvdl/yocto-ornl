@@ -13,6 +13,7 @@ IMAGE_INSTALL_append = " \
 	kernel-image \
 	ksz-initscripts \
 	mfgtest \
+	mosquitto \
 	packagegroup-core-full-cmdline \
 	packagegroup-fsl-gstreamer1.0 \
 	packagegroup-fsl-gstreamer1.0-full \
