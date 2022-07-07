@@ -8,12 +8,12 @@ Use the var-create-yocto-sdcard.sh script that is supplied by Variscite under th
 When using the Variscite script use the -a **AND** -r options. The following command should be used : 
 
 <pre>
-sudo MACHINE=var-som-mx6-ornl $YOCTO_DIR/sources/meta-variscite-fslc/scripts/var_mk_yocto_sdcard/var-create-yocto-sdcard.sh -a -r $YOCTO_DIR/$YOCTO_ENV/tmp/deploy/images/$MACHINE/$YOCTO_IMG-$MACHINE /dev/xxx
+sudo MACHINE=pix-c3 $YOCTO_DIR/sources/meta-variscite-fslc/scripts/var_mk_yocto_sdcard/var-create-yocto-sdcard.sh -a -r $YOCTO_DIR/$YOCTO_ENV/tmp/deploy/images/$MACHINE/$YOCTO_IMG-$MACHINE /dev/xxx
 </pre>
 Where:
 - /dev/xxx: The device that is the entire micro SD card. Example /dev/sdb
 - $YOCTO_IMG: The name of the full image you used in the `bitbake` command.  I.e. `var-dev-update-full-image`
-- $MACHINE: This is always `var-som-mx6-ornl` *(until its not, but thats another story...)*
+- $MACHINE: This is always `pix-c3` *(until its not, but thats another story...)*
 - $YOCTO_DIR: This is the path to where the Yocto system was initialized
 - $YOCTO_ENV: This is the name of the build folder in the path where Yocto was initialized. *Typically `build_ornl` unless you took pains to change it...*
 
@@ -42,7 +42,7 @@ drwxr-xr-x  2 6ov users      4096 Jun 22 16:06 dts
 ~/yocto-ornl-2021-06-22_1603$ cat readme.txt 
 # To write image to MMC, do:
 DEV=/dev/sdx
-sudo MACHINE=var-som-mx6-ornl build_ornl/sources/meta-variscite-fslc/scripts/var-create-yocto-sdcard.sh -a -r build_ornl/tmp/deploy/images/var-som-mx6-ornl/var-dev-update-full-image-var-som-mx6-ornl ${DEV}
+sudo MACHINE=pix-c3 build_ornl/sources/meta-variscite-fslc/scripts/var-create-yocto-sdcard.sh -a -r build_ornl/tmp/deploy/images/pix-c3/var-dev-update-full-image-pix-c3 ${DEV}
 # load var-dev-image-10.223.0.1-16.swu to port :9080
 ```
 

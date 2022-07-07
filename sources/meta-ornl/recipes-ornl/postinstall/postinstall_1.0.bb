@@ -18,4 +18,4 @@ do_install() {
         install -m 0755 ${WORKDIR}/postinstall.sh ${D}${localstatedir}/local
 }
 
-COMPATIBLE_MACHINE = "(var-som-mx6|var-som-mx6-ornl)"
+COMPATIBLE_MACHINE = "(pix-c3)"

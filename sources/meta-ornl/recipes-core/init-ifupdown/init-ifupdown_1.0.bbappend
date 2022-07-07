@@ -1,5 +1,5 @@
-FILESEXTRAPATHS_prepend_var-som-mx6-ornl := "${THISDIR}/${PN}/${MACHINE}:"
+FILESEXTRAPATHS_prepend_pix-c3 := "${THISDIR}/${PN}/${MACHINE}:"
 
-SRC_URI_append_var-som-mx6-ornl = " \
+SRC_URI_append_pix-c3 = " \
 									file://interfaces \
                                 "

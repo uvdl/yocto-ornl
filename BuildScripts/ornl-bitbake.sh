@@ -7,7 +7,7 @@ TOASTER_PORT=8000
 
 # Known variations
 # FIXME: requires mod to BuildScripts/ornl-setup-yocto.sh
-MACHINE=var-som-mx6-ornl
+MACHINE=pix-c3
 YOCTO_CMD=
 YOCTO_DIR=/tmp
 YOCTO_ENV=build_ornl
@@ -21,12 +21,12 @@ help() {
 	echo " -e		override YOCTO_ENV (default ${YOCTO_ENV})"
 	echo " -h		display this Help message"
 	echo " -m		define MACHINE (default ${MACHINE}); valid:"
-    echo "          var-som-mx6-ornl, var-som-mx6 - Variscite DART-MX6"
+    echo "          pix-c3, imx6ul-var-dart - Variscite DART-MX6"
     echo "          jetson-xavier-nx-devkit - Jetson Xavier NX on devkit"
     echo "          raspberrypi4-64 - RPi Compute Module 4"
 	echo " -tp		override TOASTER_PORT (default ${TOASTER_PORT})"
 	echo
-	echo " Example: $bn ornl-bitbake.sh -m var-som-mx6-ornl -d /ephemeral/yoctl-ornl-dunfell -e dunfell var-dev-update-full-image"
+	echo " Example: $bn ornl-bitbake.sh -m pix-c3 -d /ephemeral/yoctl-ornl-dunfell -e dunfell var-dev-update-full-image"
 	echo
 	echo " options:"
 	echo
@@ -49,7 +49,9 @@ done
 
 # NB: *EVERY* call to bitbake must have its environment prepared by setup-environment
 case ${MACHINE} in
-var-som-mx6-ornl)
+imx6ul-var-dart)
+	;&
+pix-c3)
 	cd ${YOCTO_DIR}
 	MACHINE=${MACHINE} DISTRO=${YOCTO_DISTRO} EULA=${EULA} . setup-environment ${YOCTO_ENV}
 	;;

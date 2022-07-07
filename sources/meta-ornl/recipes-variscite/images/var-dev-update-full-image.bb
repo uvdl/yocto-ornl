@@ -9,9 +9,6 @@ require recipes-core/images/ornl-dev-image.bb
 # the kernel, dtb, uboot in a /boot/ folder on both rootfs
 IMAGE_INSTALL_append = " \
 	imx-test \
-	kernel-devicetree \
-	kernel-image \
-	ksz-initscripts \
 	mfgtest \
 	packagegroup-core-full-cmdline \
 	packagegroup-fsl-gstreamer1.0 \
@@ -23,10 +20,6 @@ IMAGE_INSTALL_append = " \
 	packagegroup-imx-tools-audio \
 	packagegroup-tools-bluetooth \
 	perf \
-	postinstall \
-	swupdate \
-	swupdate-www \
-	u-boot-variscite \
 "
 
-COMPATIBLE_MACHINE = "var-som-mx6-ornl"
+COMPATIBLE_MACHINE = "imx6ul-var-dart"

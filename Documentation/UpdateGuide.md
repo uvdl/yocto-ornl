@@ -21,7 +21,7 @@ That command will build the base image (ornl-dev-image) if not already built, th
 ### Update Artifacts
 SWUpdate is normally found in source under the meta-layer/recipes-support directory.  In the ornl-recipes/swupdate directory you will find a few new .bb files.
 
-swupdate_%d.bbappend - this file appends a new swupdate directory structure for bitbake to view **and** it installs new swupdate.cfg files for the particular device. Example is adding the var-som-mx6-ornl device.
+swupdate_%d.bbappend - this file appends a new swupdate directory structure for bitbake to view **and** it installs new swupdate.cfg files for the particular device. Example is adding the pix-c3 device.
 var-dev-image-swu.bb - this is the recipe for building an update artifact.
 var-tstar-image-swu.bb - same as the previous .bb file, it creates an update artifact for the tstar project.
 
@@ -32,7 +32,7 @@ An SWUpdate build artifact is what the SWUpdate daemon uses to update rootfs wit
 bitbake var-dev-image-swu
 </pre>
 
-When commpleted, in the $build_dir$/tmp/deploy/images/var-som-mx6-ornl/ directory there will now be an archive named var-dev-image-swu-var-som-mx6-ornl.swu.  That is what the SWUpdate daemon will use in order to update rootfs.
+When commpleted, in the $build_dir$/tmp/deploy/images/pix-c3/ directory there will now be an archive named var-dev-image-swu-pix-c3.swu.  That is what the SWUpdate daemon will use in order to update rootfs.
 
 ### Server
 SWUpdate is packaged with [Mongoose](https://github.com/cesanta/mongoose) which is an embedded web server.  This definitely does not have to be the final solution, this is just a quick and dirty way to get the artifact onto the board easily.

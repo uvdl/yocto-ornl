@@ -63,7 +63,7 @@ $YOCTO_DIR> cp -r yocto-ornl/sources/meta-ornl sources
 ### Set-up Yocto build environment
 
 <pre>
-$YOCTO_DIR> MACHINE=var-som-mx6-ornl DISTRO=fslc-framebuffer . setup-environment $YOCTO_ENV
+$YOCTO_DIR> MACHINE=pix-c3 DISTRO=fslc-framebuffer . setup-environment $YOCTO_ENV
 </pre>
 
 ### Build Yocto

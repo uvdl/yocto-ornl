@@ -9,8 +9,15 @@ require recipes-core/images/ornl-min-image.bb
 # the kernel, dtb, uboot in a /boot/ folder on both rootfs
 IMAGE_INSTALL_append = " \
 	imx-test \
+	kernel-devicetree \
+	kernel-image \
+	ksz-initscripts \
 	mfgtest \
 	packagegroup-core-full-cmdline \
+	postinstall \
+	swupdate \
+	swupdate-www \
+	u-boot-variscite \
 "
 
-COMPATIBLE_MACHINE = "imx6ul-var-dart"
+COMPATIBLE_MACHINE = "pix-c3"

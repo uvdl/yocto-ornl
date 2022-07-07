@@ -35,6 +35,10 @@ PREFERRED_PROVIDER_wpa-supplicant-cli = "wpa-supplicant"
 PREFERRED_PROVIDER_wpa-supplicant-passphrase = "wpa-supplicant"
 PREFERRED_PROVIDER_wpa-supplicant = "wpa-supplicant"
 
+PREFERRED_VERSION_dotnet-core ?= "6.0.200"
+PREFERRED_VERSION_vsdbg ?= "16.8.11005.1"
+PACKAGECONFIG_pn-curl = "vers krb5 ssl zlib ipv6"
+
 PREFERRED_VERSION_python3-pyserial = "3.5"
 
 PREFERRED_RPROVIDER_ptpd = "ptpd"

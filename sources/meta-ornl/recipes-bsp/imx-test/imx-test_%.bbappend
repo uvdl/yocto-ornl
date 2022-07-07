@@ -1,1 +1,1 @@
-COMPATIBLE_MACHINE = "var-som-mx6-ornl"
+COMPATIBLE_MACHINE = "pix-c3"

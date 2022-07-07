@@ -10,6 +10,9 @@ require recipes-core/images/ornl-prod-image.bb
 IMAGE_INSTALL_append = " \
 	imx-test \
 	iperf3 \
+	kernel-devicetree \
+	kernel-image \
+	ksz-initscripts \
 	mfgtest \
 	packagegroup-core-full-cmdline \
 	packagegroup-fsl-gstreamer1.0 \
@@ -17,6 +20,10 @@ IMAGE_INSTALL_append = " \
 	packagegroup-fsl-tools-gpu \
 	packagegroup-fsl-tools-gpu-external \
 	packagegroup-imx-tools-audio \
+	postinstall \
+	swupdate \
+	swupdate-www \
+	u-boot-variscite \
 "
 
-COMPATIBLE_MACHINE = "imx6ul-var-dart"
+COMPATIBLE_MACHINE = "pix-c3"

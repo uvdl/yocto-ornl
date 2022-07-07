@@ -23,9 +23,7 @@ export USER=<choice>
 export S3=<choice>
 </pre>
 
-If you do not wish to import there are variable examples in the Makefile that you can uncomment. **NOTE**: if you choose to use these default variables remember to do the same in the **submodules** (specifically *yocto-ornl*)
-
-Once these variables are set, you can build:
+If you do not wish to import there are variable examples in the Makefile that you can uncomment.  Once these variables are set, you can build:
 
 <pre>
 make environment
@@ -40,22 +38,16 @@ to create the recover SD card with.  The files will be in the folder:
 
 With the time based on when the `make archive` command is called. If an s3 bucket location is specified `make archive` will also upload to that bucket
 
-#### `linuxsystembuilder.ornl.gov`
+#### Builder Server / Shared Folders
 
-On the Cades VM, I typically do the following *(after make dependencies is done once)*:
-
-<pre>
-for k in clean toaster all ; do make $k ; done
-</pre>
-
-Also, if using CADES be sure and use the pre-build folders:
+If building on a remote server (or if you just want to save time/space) I typically do the following *(after make dependencies is done once)*:
 
 <pre>
 /data/share/${MACHINE}/downloads/
 /data/share/${MACHINE}/sstate/
 </pre>
 
-Go into the local.conf file in `yocto-ornl` and uncomment them. They are defaulted to use CADES folder organization.
+Go into the local.conf file in `yocto-ornl` and uncomment them. They are defaulted to use for this organization but can be modified to anything.
 
 ### `EPHEMERAL`
 
@@ -65,18 +57,15 @@ important folder because:
   a) it cannot be moved because all the yocto files reference it by full pathname
   b) it holds alot of cached files that if present will speed up future builds
   c) it is strictly tied to the yocto base system **(sumo, thud, dunfell, etc.)**
-  d) it rises to about 76GB after a build completes
+  d) it rises to about 76GB after a build completes (can be reduced if using the Shared Folders approach)
 
-So, where this goes on your system makes a big difference.  The Makefile uses `/tmp` as the
-default, but you may want this to exist on something else (such as `/dev/shm` if your system
-has alot of memory, or a mount point to a fast storage drive).  If you wish to be able to
-restart your system and keep the build state you have, then ensure EPHEMERAL points to a
-persistent storage volume.
+So, where this goes on your system makes a big difference.  The Makefile uses a folder located
+on the root directory as the default, but you may want this to exist on something else 
+(such as `/dev/shm` if your system has alot of memory, or a mount point to a fast storage drive).  
+If you wish to be able to restart your system and keep the build state you have, then ensure EPHEMERAL points to a
+persistent storage volume.  This is set as an exported bash environment variable OR adding it to the top of the Makefile
+itself.  There are examples that you can uncomment.
 
-## Manual Step-by-Step Method for the Variscite SoM
-
-The manual method is deprecated (because it was not kept up to date).  Use the automatic methods.
-The steps can be found at `Documentation/VarisciteManualBuild.md`
 
 ### Use the Makefile target
 
@@ -86,24 +75,21 @@ This will create the build environment and give you additional instructions that
 you will need to run to configure your shell:
 
 <pre>
-make YOCTO_DIR=[path_to_build_directory] environment
+make environment
 </pre>
 
-This will synchronize an *existing* environment with any changes in *this* repo that have
+This will also synchronize an *existing* environment with any changes in *this* repo that have
 been updated.  *(Since this configuration is itself a repository, the standard workflows
 apply - this helps updated a working, evolved build environment so as to take advantage
 of Yocto's dependency and partial compilation system to save time.)*
 
-<pre>
-make YOCTO_DIR=[path_to_build_directory] environment-update
-</pre>
 
 #### Using Toaster
 
 You may wish to use 'Toaster', a dashboard for Yocto builds.  To prepare for using it, do:
 
 <pre>
-make YOCTO_DIR=[path_to_build_directory] toaster
+make toaster
 </pre>
 
 Then after setting up your environment do this once before issuing `bitbake` commands:
@@ -114,19 +100,15 @@ $YOCTO_DIR/$YOCTO_ENV> source toaster stop ; source toaster start
 
 Then, open a browser to http://localhost:8000 to get the UI.
 
-#### `linuxsystembuilder.ornl.gov`
+#### Remote Servers and Toaster
 
-When using the Cades VM (or an AWS instance to build), you will need to create an SSH tunnel to forward TCP/IP port 8000 to your local machine:
+When using the AWS instance to build, you will need to create an SSH tunnel to forward TCP/IP port 8000 to your local machine:
 
 <pre>
-ssh -i cadescloudvm.pem -L 8000:localhost:8000 cades@linuxsystembuilder.ornl.gov
+ssh -i some-cert.pem -L 8000:localhost:8000 builder@some-builder-url.com
 </pre>
 
 The `.pem` file is the private key to enable login.  You will have your own if you made a VM or an AWS instance.  You can always start up another SSH if you forgot to do this when you initially logged in.  Then you can open your browser as described above.
-
-## Create an SDcard for the Variscite SoM
-
-Instructions for creating a microSD card is available for the Variscite IMX6 SOM.  See `Documentation/VarisciteSdCard.md` for details.
 
 ## Clean a specific recipe
 
