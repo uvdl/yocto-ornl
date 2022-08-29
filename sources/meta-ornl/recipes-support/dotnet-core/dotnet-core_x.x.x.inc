@@ -6,7 +6,7 @@ S = "${WORKDIR}/dotnet-${PV}/"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=9fc642ff452b28d62ab19b7eea50dfb9"
 
-DEPENDS = "zlib"
+DEPENDS = "zlib unzip"
 RDEPENDS_${PN} = "bash icu lttng-tools lttng-ust zlib libgssglue krb5 libgssapi-krb5"
 
 

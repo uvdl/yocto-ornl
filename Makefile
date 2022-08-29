@@ -105,6 +105,13 @@ YOCTO_DISTRO=ornl-ts
 YOCTO_IMG=ts-$(YOCTO_PROD)-full-image
 YOCTO_DIR := $(EPHEMERAL)/$(PROJECT)-$(YOCTO_VERSION)
 ARCHIVE_DIR=$(ARCHIVE)/ts-$(DATE)
+else ifeq ($(strip $(MACHINE)),ts7553v2)
+MACHINE_FOLDER=ts7552v2
+YOCTO_VERSION=dunfell
+YOCTO_DISTRO=ornl-ts
+YOCTO_IMG=ts-$(YOCTO_PROD)-full-image
+YOCTO_DIR := $(EPHEMERAL)/$(PROJECT)-$(YOCTO_VERSION)
+ARCHIVE_DIR=$(ARCHIVE)/ts-$(DATE)
 endif
 ETH0_NETWORK=$(YOCTO_DIR)/ornl-layers/meta-ornl/recipes-core/default-eth0/files/$(DEFAULT_NETWORK_FILE)
 YOCTO_CMD := $(YOCTO_IMG)

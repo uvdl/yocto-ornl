@@ -118,6 +118,8 @@ function run_build()
     
     # Need to prepare the machine platorm, default is Variscite
     case "$TARGET_MACHINE" in
+    ts7553v2)
+        ;&
     ts7180)
         sync_technologic
         ;;
@@ -658,6 +660,8 @@ function make_build_dir()
         eval cd ${OLD_DIR}
         copy_config_files
         ;;
+    ts7553v2)
+        ;&
     ts7180)
         eval cd $YOCTO_DIR_LOCATION/
         # Run standard OE setup script
@@ -715,6 +719,8 @@ function copy_config_files()
     raspberrypi4-64)
         MACHINE_FOLDER="raspberrypi"
         ;;
+    ts7553v2)
+        ;&
     ts7180)
         MACHINE_FOLDER="technologic"
     esac

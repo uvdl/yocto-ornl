@@ -72,6 +72,8 @@ raspberrypi4-64)
 	source ${YOCTO_DIR}/ornl-yocto-rpi/layers/poky/oe-init-build-env ${YOCTO_ENV}
 	;;
 ts7180)
+	;&
+ts7553v2)
 	cd ${YOCTO_DIR}
 	source ${YOCTO_DIR}/ornl-yocto-ts/layers/poky/oe-init-build-env ${YOCTO_ENV}
 	;;
