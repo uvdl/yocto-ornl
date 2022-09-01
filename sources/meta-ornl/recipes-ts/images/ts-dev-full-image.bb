@@ -9,6 +9,5 @@ require recipes-core/images/ornl-dev-image.bb
 IMAGE_INSTALL_append = " \
     iperf3 \
 	packagegroup-core-full-cmdline \
-	perf \
     u-boot-ts \
 "

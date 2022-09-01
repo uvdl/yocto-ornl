@@ -74,7 +74,7 @@ while [ "$moreoptions" = 1 -a $# -gt 0 ]; do
                 #MACHINE_FOLDER=jetson
                 YOCTO_VERSION=dunfell
                 #YOCTO_DISTRO=FIXME
-			elif [[ $MACHINE == ts7180 ]] ; then
+			elif [[ $MACHINE == ts* ]] ; then
                 #MACHINE_FOLDER=ts7180
                 YOCTO_VERSION=dunfell
                 #YOCTO_DISTRO=FIXME
@@ -167,8 +167,8 @@ elif [[ $MACHINE == *raspberrypi* ]] ; then
 	cp -f ${YOCTO_DIR}/${YOCTO_ENV}/tmp-glibc/deploy/images/${MACHINE}/raspberrypi-${YOCTO_PROD}-full-image-${MACHINE}.wic.bz2 ${_OUT}
 	( cd ${_OUT} && bzip2 -d raspberrypi-${YOCTO_PROD}-full-image-${MACHINE}.wic.bz2 )
 
-elif [[ $MACHINE == ts7180 ]] ; then
-	tar -cf ${_OUT}/ts7180-archive.tar.gz ${YOCTO_DIR}/${YOCTO_ENV}/tmp/deploy/images/${MACHINE}/
+elif [[ $MACHINE == ts* ]] ; then
+	tar -cf ${_OUT}/ts-archive.tar.gz ${YOCTO_DIR}/${YOCTO_ENV}/tmp/deploy/images/${MACHINE}/
 
 else
 	help
