@@ -18,13 +18,13 @@ IMAGE_INSTALL_append += " \
 "
 
 IMAGE_INSTALL_append_jetson-xavier-nx-devkit += " \
-    deepstream-5.1 \
+    deepstream-6.0 \
     libvisionworks \
     tensorrt-core \
 "
 
 IMAGE_INSTALL_append_jetson-xavier-nx-emmc-devkit += " \
-    deepstream-5.1 \
+    deepstream-6.0 \
     libvisionworks \
     tensorrt-core \
 "
