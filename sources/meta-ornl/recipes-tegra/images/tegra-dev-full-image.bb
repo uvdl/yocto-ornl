@@ -10,11 +10,12 @@ NETWORK_MANAGER ?= "networkmanager"
 inherit features_check
 
 IMAGE_INSTALL_append += " \
-    nvgstapps \
-    exiftool \
-    cudnn \
     cuda-samples \
+    cudnn \
+    exiftool \
     gstreamer1.0-plugins-tegra \
+    jpegoptim \
+    nvgstapps \
 "
 
 IMAGE_INSTALL_append_jetson-xavier-nx-devkit += " \
