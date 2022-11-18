@@ -308,6 +308,15 @@ function sync_tegra_platform()
                 echo "==============================================="
                 exit 1
         fi
+        git clone -b $YOCTO_VERSION https://github.com/DynamicDevices/meta-mono.git
+        if [ $? -ne 0 ]
+            then
+                echo
+                echo "==============================================="
+                echo "${BOLD}Failed to clone MONO${NORMAL}"
+                echo "==============================================="
+                exit 1
+        fi
     fi
     eval cd $OLD_LOCATION
 }
