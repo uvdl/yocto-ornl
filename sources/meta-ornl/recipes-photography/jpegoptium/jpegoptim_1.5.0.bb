@@ -8,5 +8,3 @@ PV = "v1.5.0"
 SRC_URI = "git://github.com/tjko/jpegoptim.git;protocol=https;tag=${PV} "
 
 inherit cmake
-
-do_configure[noexec] = "1"
